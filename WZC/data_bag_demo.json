@@ -1,0 +1,12 @@
+{
+    // sign | file | mail | list
+    "request_type":"file",
+    "client_ip":"0.0.0.0",
+
+    //user info (for sign, and server return)
+    "username":"demo",
+    "password":"psswd",
+    "phonenum":"12345",
+    "userid":"0000"
+
+}

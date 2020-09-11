@@ -36,6 +36,12 @@
         "fstream": "cpp",
         "numeric": "cpp",
         "sstream": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "bitset": "cpp",
+        "cstring": "cpp",
+        "ctime": "cpp",
+        "memory": "cpp",
+        "cinttypes": "cpp",
+        "regex": "cpp"
     }
 }
