@@ -7,11 +7,12 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <pthread.h>
+
 namespace Server_Core
 {
     namespace CONFIG
     {
-        const char *server_ip = "0.0.0.0";
+        const char server_ip[] = "0.0.0.0";
         const int server_port = 8888;
         const int buffer_size = 100;
         const int data_bag_size = 1024;
@@ -19,8 +20,8 @@ namespace Server_Core
         {
             sign,
             file,
-            mail_to_client,
             mail_to_DB,
+            mail_send_to_client,
             list
 
         };
@@ -38,7 +39,7 @@ namespace Server_Core
         int Request_Judge(char *buffer);
 
         //接收内容,返回值是字符串之类的？
-        int Get_Content();
+        // int Get_Content();
 
         //一堆DB操作
 

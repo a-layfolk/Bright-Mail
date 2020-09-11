@@ -9,36 +9,44 @@
 #include <pthread.h>
 #include "Server.hpp"
 
-Server_Core::User_Space::User_Space(int client_sock)
+using namespace Server_Core;
+
+User_Space::User_Space(int client_sock)
 {
     this->client_sock = client_sock;
 }
-
-int Server_Core::User_Space::Get_Content()
+User_Space::~User_Space()
 {
-    char buffer[Server_Core::CONFIG::buffer_size];
-    int data_len = 0;
+}
+
+int User_Space::Send_To_Client(char *data)
+{
+    return 0;
+}
+int User_Space::Request_Judge(char *buffer)
+{
+    return CONFIG::mail_to_DB;
 }
 
 //把这个当main写
-int Server_Core::User_Space::Exe()
+int User_Space::Exe()
 {
     int data_len = 0;
-    char buffer[Server_Core::CONFIG::buffer_size];
+    char buffer[CONFIG::buffer_size];
 
     //接收请求
-    data_len = read(this->client_sock, buffer, Server_Core::CONFIG::buffer_size);
+    data_len = read(this->client_sock, buffer, CONFIG::buffer_size);
     int judge = this->Request_Judge(buffer);
 
     switch (judge)
     {
-    case Server_Core::CONFIG::file:
+    case CONFIG::file:
         //文件处理
         break;
-    case Server_Core::CONFIG::mail_to_DB:
+    case CONFIG::mail_to_DB:
+        //客户端发来要传输到数据库的信件
 
-        //客户端发来的信件
-        while ((data_len = read(this->client_sock, buffer, Server_Core::CONFIG::buffer_size)) > 0)
+        while ((data_len = read(this->client_sock, buffer, CONFIG::buffer_size)) > 0)
         {
             //数据都存在buffer中
             std::cout << buffer << std::endl;
@@ -47,7 +55,7 @@ int Server_Core::User_Space::Exe()
 
             //返回数据
             char *datas;
-            this->Send_To_Client(datas);
+            // this->Send_To_Client(datas);
 
             memset(buffer, 0, sizeof(buffer));
         }

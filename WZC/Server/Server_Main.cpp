@@ -10,14 +10,13 @@
 #include "Server.hpp"
 
 using namespace Server_Core;
-
 //用户所在的线程的各种操作
 void *User_Thread(void *args)
 {
     //创建了用户操作
     User_Space Usr_operations(*(int *)args);
 
-    //一个大循环
+    //操作进入用户线程
     Usr_operations.Exe();
 }
 
@@ -29,8 +28,8 @@ int main(int argc, char const *argv[])
     struct sockaddr_in server_addr;
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
-    server_addr.sin_addr.s_addr = inet_addr(Server_Core::CONFIG::server_ip);
-    server_addr.sin_port = htons(Server_Core::CONFIG::server_port);
+    server_addr.sin_addr.s_addr = inet_addr(CONFIG::server_ip);
+    server_addr.sin_port = htons(CONFIG::server_port);
     bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr));
     listen(server_socket, 20);
 
