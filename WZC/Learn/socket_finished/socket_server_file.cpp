@@ -20,24 +20,27 @@ void *User_connect(void *args)
     int clnt_sock = *(int *)args;
     char buffer[BUFFER_SIZE];
     memset(buffer, 0, sizeof(buffer));
-    while (recv(clnt_sock, buffer, BUFFER_SIZE, 0) > 0)
+    int len = 0;
+    FILE *out_file = NULL;
+    out_file = fopen("./server_get", "wb+");
+    if (out_file == NULL)
     {
-        //退出程序
-        if (strcmp(buffer, "exit") == 0)
-        {
-            // STATUS.online_users_number--;
-            strcpy(buffer, "enf of connect");
-            // send(clnt_sock, buffer, strlen(buffer), 0);
-            pthread_exit(NULL);
-            break;
-        }
-
-        std::cout << buffer<<std::endl;
-
-
-        // send(clnt_sock, buffer, strlen(buffer), 0);
-        memset(buffer, 0, sizeof(buffer));
+        std::cout << "ERROR" << std::endl;
     }
+    else
+    {
+
+        while ((len = recv(clnt_sock, buffer, BUFFER_SIZE, 0)) > 0)
+        {
+            fwrite(buffer, sizeof(char), len, out_file);
+            // std::cout << buffer << std::endl;
+
+            // send(clnt_sock, buffer, strlen(buffer), 0);
+            memset(buffer, 0, sizeof(buffer));
+        }
+    }
+    close(clnt_sock);
+    fclose(out_file);
 }
 
 int main(int argc, char const *argv[])
