@@ -32,6 +32,8 @@ namespace CLIENT_TO_SOCKET
 
         //输入文件地址（文本文件），类读取文件中内容并发送给服务器
         int text_file_transfer(const char *file_path);
+
+        //输入文件地址（任意文件），类读取文件并在服务器的指定路径中生成一个同名文件
         int file_transfer(const char *file_path);
     };
 

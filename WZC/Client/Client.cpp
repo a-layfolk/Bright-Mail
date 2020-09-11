@@ -50,8 +50,28 @@ int CLIENT_TO_SOCKET::client_socket::text_file_transfer(const char *file_path)
         memset(buffer, 0, 100);
     }
     close(file);
+    return 0;
 }
 
+//file得单方面接收
 int CLIENT_TO_SOCKET::client_socket::file_transfer(const char *file_path)
 {
+    FILE *fp;
+    fp = fopen((char *)file_path, "rb");
+    if (fp == NULL)
+    {
+        std::cout << "ERROR" << std::endl;
+        return -1;
+    }
+    else
+    {
+        char buffer[CLIENT_TO_SOCKET::CONFIG::buffer_size];
+        int read_len;
+        while ((read_len = fread(buffer, sizeof(char), CLIENT_TO_SOCKET::CONFIG::buffer_size, fp)) != 0)
+        {
+            write(this->clnt_socket, buffer, read_len);
+        }
+        fclose(fp);
+        return 0;
+    }
 }

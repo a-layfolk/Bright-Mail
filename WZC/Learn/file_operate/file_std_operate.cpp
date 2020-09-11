@@ -21,14 +21,14 @@ int main(int argc, char const *argv[])
         std::cout << "ERROR" << std::endl;
     }
 
-    unsigned char buffer[BUFFERSIZE];
+    char buffer[BUFFERSIZE];
     int len;
 
     //这样写完后生成的文件没有执行权限
-    while ((len = fread(buffer, sizeof(unsigned char), BUFFERSIZE, fp)) != 0)
+    while ((len = fread(buffer, sizeof(char), BUFFERSIZE, fp)) != 0)
     {
         /* code */
-        fwrite(buffer, sizeof(unsigned char), len, out_file);
+        fwrite(buffer, sizeof(char), len, out_file);
     }
 
     fclose(fp);
