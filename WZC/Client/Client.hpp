@@ -8,18 +8,18 @@
 #include <stdio.h>
 #include <unistd.h> //read,write
 #include <signal.h>
-
 namespace CLIENT_TO_SOCKET
 {
-    struct CONFIG
+    //存放各种配置常量
+    namespace CONFIG
     {
-        const char *server_ip;
-        const static int server_port = 8888;
-        CONFIG()
-        {
-            this->server_ip = "127.0.0.1";
-        }
-    };
+        const char server_ip[] = "127.0.0.1";
+        const int server_port = 8888;
+        const int buffer_size = 100;
+
+    } // namespace CONFIG
+
+    // client的socket类
     class client_socket
     {
     private:
@@ -30,8 +30,9 @@ namespace CLIENT_TO_SOCKET
         client_socket();
         ~client_socket();
 
-        //输入文件地址
-        int transfer_content_file(const char *file_path);
+        //输入文件地址（文本文件），类读取文件中内容并发送给服务器
+        int text_file_transfer(const char *file_path);
+        int file_transfer(const char *file_path);
     };
 
 } // namespace CLIENT_TO_SOCKET
