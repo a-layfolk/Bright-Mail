@@ -1,5 +1,5 @@
 #include "SqlCon.h"
-#include "mysql.h"
+#include "mysql/mysql.h"
 #include<stdio.h>
 #pragma comment(lib,"libmysql.lib")
 MYSQL* con = mysql_init(NULL);
@@ -11,7 +11,7 @@ const char* mysql::get_user_id(const char* username, const char* phonenum)
 	MYSQL_RES* res = NULL;
 	MYSQL_ROW row = NULL;
 	unsigned int 	numFields = 0;
-	sprintf_s(query, sizeof(char) * 100, "select * from UserTable where userName='%s' and  telephone= '%s'", username, phonenum);
+	sprintf(query, "select * from UserTable where userName='%s' and  telephone= '%s'", username, phonenum);
 	if (!mysql_query(con, query)) {
 		res = mysql_store_result(con);
 		row = mysql_fetch_row(res);
@@ -25,7 +25,7 @@ const char* mysql::get_user_id(const char* username, const char* phonenum)
 		exit(1);
 	}
 	return "helo";
-	return nullptr;
+
 }
 
 void mysql::connect(const char* ip, const char* username, const char* password, const char* db, const int port)
@@ -52,7 +52,7 @@ bool mysql::sign_in(const char* username, const char* password)
 	MYSQL_RES* res = NULL;
 	MYSQL_ROW row = NULL;
 	
-	sprintf_s(query, sizeof(char) * 100, "select * from UserTable where userName='%s' and  password= '%s'", username, password);
+	sprintf(query, "select * from UserTable where userName='%s' and  password= '%s'", username, password);
 	mysql_query(con, query);
 	res = mysql_store_result( con);
 
@@ -71,7 +71,7 @@ bool mysql::sign_in(const char* username, const char* password)
 bool mysql::sign_up(const char* username, const char* password, const char* phoneum)
 {
 	char* query = new char[100];
-	sprintf_s(query, sizeof(char) * 100, "insert into UserTable(userName,password,telephone) values('%s','%s','%s');", username, password, phoneum);
+	sprintf(query, "insert into UserTable(userName,password,telephone) values('%s','%s','%s');", username, password, phoneum);
 	if (mysql_query(con, query)) {
 	
 		printf("sign-up error : %s\n", mysql_error(con));
@@ -92,7 +92,7 @@ bool mysql::sign_up(const char* username, const char* password, const char* phon
 MYSQL_RES*   mysql::get_email_info(const int userId, const char* emailType)
 {
 	char* query = new char[500];
-	sprintf_s(query, sizeof(char) * 500, "select emailId,emailTitle,emailState,emailTime from EmailTable where ownerId=%d and emailType='%s';",userId, emailType);
+	sprintf(query, "select emailId,emailTitle,emailState,emailTime from EmailTable where ownerId=%d and emailType='%s';",userId, emailType);
 	MYSQL_RES* res = NULL;
 	MYSQL_ROW row = NULL;
 	unsigned int 	numFields = 0;
@@ -123,7 +123,7 @@ void mysql::get_contact_info(const int userId)
 {
 	
 	char* query = new char[500];
-	sprintf_s(query, sizeof(char) * 500, "select contactId from ContactTable where userId=%d ;", userId);
+	sprintf(query,  "select contactId from ContactTable where userId=%d ;", userId);
 	MYSQL_RES* res = NULL;
 	MYSQL_ROW row = NULL;
 	unsigned int 	numFields = 0;
@@ -143,7 +143,7 @@ void mysql::get_contact_info(const int userId)
 				MYSQL_RES* res_1 = NULL;
 				MYSQL_ROW row_1 = NULL;
 				unsigned int 	numFields_1 = 0;
-				sprintf_s(query, sizeof(char) * 500, "select userId,UserName,telephone from UserTable where userId=%s ;", row[i]);
+				sprintf(query, "select userId,UserName,telephone from UserTable where userId=%s ;", row[i]);
 
 				if (mysql_query(con, query)) {
 					printf("select_contact_info error : %s\n", mysql_error(con));
@@ -178,7 +178,7 @@ void mysql::get_one_email(const int emailId,const int ownerId)
 	MYSQL_RES* res= NULL;
 	MYSQL_ROW row = NULL;
 	unsigned int 	numFields_1 = 0;
-	sprintf_s(query, sizeof(char) * 500, "select * from EmailTable where emailId=%d and ownerId=%d ;", emailId,ownerId);
+	sprintf(query, "select * from EmailTable where emailId=%d and ownerId=%d ;", emailId,ownerId);
 
 	if (mysql_query(con, query)) {
 		printf("select_contact_info error : %s\n", mysql_error(con));
@@ -202,7 +202,7 @@ void mysql::get_one_email(const int emailId,const int ownerId)
 void mysql::add_email_to_db(const int ownerId, const int targetId, const char* email_type,const char* email_title, const char* email_content)
 {
 	char* query = new char[2048];
-	sprintf_s(query, sizeof(char) * 2048, "insert into EmailTable(ownerId,TargetUserId,emailTitle,emailType,emailContent)values(%d,%d,'%s','%s','%s');", ownerId, targetId, email_title,email_type,email_content);
+	sprintf(query,  "insert into EmailTable(ownerId,TargetUserId,emailTitle,emailType,emailContent)values(%d,%d,'%s','%s','%s');", ownerId, targetId, email_title,email_type,email_content);
 	if (mysql_query(con, query)) {
 
 		printf("insert error : %s\n", mysql_error(con));

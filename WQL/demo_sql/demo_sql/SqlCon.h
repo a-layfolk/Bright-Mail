@@ -2,8 +2,7 @@
 #define SQLCON_H
 #include<string>
 #include<iostream>
-#include<winsock2.h>
-#include"mysql.h"
+#include"mysql/mysql.h"
 #pragma comment(lib,"libmysql.lib")
 using namespace std;
 
@@ -38,7 +37,7 @@ public:
 	void get_one_email(const int emailId,const int ownerId);
 	
 	//·¢ËÍÓÊ¼þ²Ù×÷
-	void add_email_to_db(const int ownerId, const int targetId, const char* email_title, const char* email_content);
+	void add_email_to_db(const int ownerId, const int targetId, const char* email_type,const char* email_title, const char* email_content);
 
 	
 	
