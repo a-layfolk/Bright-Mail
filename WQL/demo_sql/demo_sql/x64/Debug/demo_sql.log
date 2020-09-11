@@ -1,0 +1,8 @@
+﻿  SqlCon.cpp
+E:\Projects\Cpp_Project\demo_sql\demo_sql\SqlCon.cpp(19,21): warning C4018: “<”: 有符号/无符号不匹配
+E:\Projects\Cpp_Project\demo_sql\demo_sql\SqlCon.cpp(10,8): warning C4101: “user_id”: 未引用的局部变量
+E:\Projects\Cpp_Project\demo_sql\demo_sql\SqlCon.cpp(110,22): warning C4018: “<”: 有符号/无符号不匹配
+E:\Projects\Cpp_Project\demo_sql\demo_sql\SqlCon.cpp(142,22): warning C4018: “<”: 有符号/无符号不匹配
+E:\Projects\Cpp_Project\demo_sql\demo_sql\SqlCon.cpp(159,25): warning C4018: “<”: 有符号/无符号不匹配
+E:\Projects\Cpp_Project\demo_sql\demo_sql\SqlCon.cpp(193,22): warning C4018: “<”: 有符号/无符号不匹配
+  demo_sql.vcxproj -> E:\Projects\Cpp_Project\demo_sql\x64\Debug\demo_sql.exe

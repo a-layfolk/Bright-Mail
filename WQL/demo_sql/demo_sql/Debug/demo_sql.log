@@ -1,0 +1,5 @@
+﻿源.obj : error LNK2019: 无法解析的外部符号 _mysql_init@4，函数 _main 中引用了该符号
+源.obj : error LNK2019: 无法解析的外部符号 _mysql_real_connect@32，函数 _main 中引用了该符号
+源.obj : error LNK2019: 无法解析的外部符号 _mysql_close@4，函数 _main 中引用了该符号
+libmysql.lib : warning LNK4272: 库计算机类型“x64”与目标计算机类型“x86”冲突
+E:\Projects\Cpp_Project\demo_sql\Debug\demo_sql.exe : fatal error LNK1120: 3 个无法解析的外部命令

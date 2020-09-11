@@ -1,0 +1,4 @@
+﻿源.obj : error LNK2001: 无法解析的外部符号 _mysql_real_connect@32
+源.obj : error LNK2001: 无法解析的外部符号 _mysql_close@4
+源.obj : error LNK2001: 无法解析的外部符号 _mysql_init@4
+E:\Projects\Cpp_Project\demo_sql\Release\demo_sql.exe : fatal error LNK1120: 3 个无法解析的外部命令
