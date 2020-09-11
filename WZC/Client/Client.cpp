@@ -51,3 +51,7 @@ int CLIENT_TO_SOCKET::client_socket::text_file_transfer(const char *file_path)
     }
     close(file);
 }
+
+int CLIENT_TO_SOCKET::client_socket::file_transfer(const char *file_path)
+{
+}
