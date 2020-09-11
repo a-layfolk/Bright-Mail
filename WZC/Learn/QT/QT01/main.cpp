@@ -1,0 +1,15 @@
+#include "mywidget.h"
+#include <QApplication>
+#include<QPushButton>
+#include<QWidget>
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    MyWidget w;
+    w.show();//MyWidget inherited from QWidget
+    QPushButton QB(&w);
+    connect(&QB,&QPushButton::pressed,w,w.close());
+//    MyWidget w2;
+//    w2.show();
+    return a.exec();//let programe stay execluting,untill user operate it
+}

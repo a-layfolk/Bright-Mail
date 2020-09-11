@@ -1,0 +1,26 @@
+#include "widget.h"
+#include "ui_widget.h"
+#include<QPushButton>
+
+Widget::Widget(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::Widget)
+{
+//    QPushButton b;
+    b.setParent(this);
+    b.setText("关闭窗口");
+
+    //connect(信号发出者，处理的信号，信号接受者，执行的槽函数)
+    connect(&b,&QPushButton::pressed,this,&Widget::close);
+    ui->setupUi(this);
+    
+    //自定义槽：可以是任意的成员函数，普通全局函数，静态函数
+    //槽函数需要和信号一致（参数，返回值）
+    //由于信号没有返回值，所以槽函数
+    
+}
+
+Widget::~Widget()
+{
+    delete ui;
+}
