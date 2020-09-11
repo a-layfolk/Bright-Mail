@@ -2,46 +2,98 @@
 #define SQLCON_H
 #include<string>
 #include<iostream>
-#include<winsock2.h>
 #include"mysql.h"
 #pragma comment(lib,"libmysql.lib")
 using namespace std;
 
-typedef struct contact_info
+typedef struct EMAIL_INFO
 {
-	char* info[3];
-}CONTACT_INFO;
+	char* emailTitle;
+	char* targetUsername;
+	char* emailTime;
+	char* emailId;
+}EMAIL_INFO;
 
 class mysql
 {
 
 public:
-	int* debug();
-	//工具类
-	const char* get_user_id(const char* username, const char* phonenum);
+	/*
+	通过 用户名 及 电话 获取用户ID
+	返回 用户ID(char*)
+	*/
+	 char* get_user_id(const char* username, const char* phonenum);
+	 char* get_time();
+	 char* get_user_name(const char* userId);
 
-	//数据库连接
+	/*
+	数据库连接
+	参数：ip,username,psw,db,port
+	*/
 	void connect(const char* ip, const char* username, const char* password, const char* db, const int port);
 
-	//用户登录与注册
+
+	/*
+	用户登录
+	返回布尔值，成功为true,失败为false
+	*/
 	bool sign_in(const char* username, const char* password);
-	
-	
+
+	/*
+	用户注册
+	返回布尔值，成功为true，失败为false
+	*/
 	bool sign_up(const char* username, const char* password,const char *phoneum);
 	
-	//相关信息预览
-	
-	MYSQL_RES* get_email_info(const int userId,const char* emailType);
-
+	/*
+	相关邮件信息预加载
+	 返回  标题，发件人，时间
+	*/
+	EMAIL_INFO *get_email_info(const char* userId, const char* emailType);
+	/*
+	好友信息预加载
+	返回好友用户名，好友电话
+	*/
 	void get_contact_info(const int userId);
-	
+	/*
+	数据库内邮件具体信息获得
+	返回 所有信息
+	*/
 	void get_one_email(const int emailId,const int ownerId);
 	
-	//发送邮件操作
-	void add_email_to_db(const int ownerId, const int targetId, const char* email_title, const char* email_content);
+	/*
+	发送邮件操作
+	返回布尔值 成功返回ture,失败返回false
+	*/
+	void add_email_to_db(const int ownerId, const int targetId, const char* email_type, const char* email_title, const char* email_content);
 
 	
-	
+
+	/*
+	修改原有邮件
+	*/
+	bool change_email_content(const int emailId, const int ownerId, const int targetId, const char* emailType, const char* emailTitle, const char* emailContent, const char* attachedFilePath);
+
+	/*
+	改变邮件状态
+	返回布尔值 成功true 失败false
+	*/
+	bool change_email_state(const int emailId, const char* newState);
+
+
+	/*
+	增加好友
+	返回布尔值 成功返回true，失败返回false
+	*/
+	bool add_contact_info(const int userId, const char* contactname, const char* phonenum);
+
+	/*
+	删除好友
+	返回布尔值 成功返回true，失败返回false
+	*/
+	bool delete_contatc_info(const int userId, const char* contactname, const char* phonenum);
+
+
 	void close();
 
 

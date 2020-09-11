@@ -12,7 +12,7 @@ int main() {
 	//mysql.get_email_info(1, "receive_read");
 	//mysql.get_contact_info(1);
 	//mysql.get_one_email(1, 1);
-	mysql.add_email_to_db(1, 2, "third", "nothing special");
+	//mysql.add_email_to_db(1, 2, "third", "send","nothing special");
 	mysql.close();
 	
 	
