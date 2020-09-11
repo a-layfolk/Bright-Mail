@@ -29,6 +29,24 @@ CLIENT_TO_SOCKET::client_socket::client_socket()
         exit(-1);
     }
 }
+CLIENT_TO_SOCKET::client_socket::client_socket(const char *server_ip)
+{
+    clnt_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    struct sockaddr_in clnt_addr;
+    clnt_addr.sin_family = AF_INET;
+    clnt_addr.sin_addr.s_addr = inet_addr(server_ip);
+    clnt_addr.sin_port = htons(CLIENT_TO_SOCKET::CONFIG::server_port);
+    if (connect(clnt_socket, (sockaddr *)&clnt_addr, sizeof(clnt_addr)) == 0)
+    {
+        std::cout << "Connect success" << std::endl;
+    }
+    else
+    {
+        //是否需要放一个信号？
+        perror("connect");
+        exit(-1);
+    }
+}
 
 CLIENT_TO_SOCKET::client_socket::~client_socket()
 {

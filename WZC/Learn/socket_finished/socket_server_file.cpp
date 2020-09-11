@@ -20,6 +20,7 @@ void *User_connect(void *args)
     int clnt_sock = *(int *)args;
     char buffer[BUFFER_SIZE];
     memset(buffer, 0, sizeof(buffer));
+    
     int len = 0;
     FILE *out_file = NULL;
     out_file = fopen("./server_get", "wb+");

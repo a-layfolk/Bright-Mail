@@ -28,6 +28,8 @@ namespace CLIENT_TO_SOCKET
     public:
         //默认构造函数：直接使用CONFIG中的ip和端口
         client_socket();
+        //输入服务器地址
+        client_socket(const char*server_ip);
         ~client_socket();
 
         //输入文件地址（文本文件），类读取文件中内容并发送给服务器
