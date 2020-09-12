@@ -2,6 +2,7 @@
 #include "mysql.h"
 #include<stdio.h>
 #pragma comment(lib,"libmysql.lib")
+
 MYSQL* con = mysql_init(NULL);
 
  char* mysql::get_user_id(const char* username, const char* phonenum)
@@ -46,6 +47,27 @@ MYSQL* con = mysql_init(NULL);
 	 }
 	 return time;
 
+
+ }
+
+ char* mysql::get_user_name(const char* userId)
+ {
+	 char* query = new char[100];
+	 char* username;
+	 MYSQL_RES* res = NULL;
+	 MYSQL_ROW row = NULL;
+	 sprintf_s(query, sizeof(char) * 100, "select userName from UserTable where userId=%s;",userId);
+	 if (!mysql_query(con, query)) {
+		 res = mysql_store_result(con);
+		 row = mysql_fetch_row(res);
+		 username = row[1];
+
+	 }
+	 else {
+		 printf("MySQL query error : %s\n", mysql_error(con));
+		 username = NULL;
+	 }
+	 return username;
 
  }
 
@@ -121,7 +143,6 @@ EMAIL_INFO *  mysql::get_email_info(const char* userId, const char* emailType)
 	unsigned int 	numFields = 0;
 	if (mysql_query(con, query)) {
 		printf("get_email_info error : %s\n", mysql_error(con));
-		exit(1);
 	}
 	else {
 		res = mysql_store_result(con);
@@ -136,97 +157,87 @@ EMAIL_INFO *  mysql::get_email_info(const char* userId, const char* emailType)
 			
 		}
 	
-		return emailInfo;
+	
 
 	}
+	return emailInfo;
 	
 }
 
-void mysql::get_contact_info(const int userId)
+CONTACT_INFO* mysql::get_contact_info(const char* userId)
 {
+	CONTACT_INFO contactInfo[200];
 	
 	char* query = new char[500];
-	sprintf_s(query, sizeof(char) * 500, "select contactId from ContactTable where userId=%d ;", userId);
+	sprintf_s(query, sizeof(char) * 500, "select contactId from ContactTable where userId=%s ;", userId);
 	MYSQL_RES* res = NULL;
 	MYSQL_ROW row = NULL;
-	unsigned int 	numFields = 0;
-
 	if (mysql_query(con, query)) {
 		printf("select_contact_id error : %s\n", mysql_error(con));
-		exit(1);
 	}
 	else {
 		res = mysql_store_result(con);
 		//Debug打印数据集内容
-		numFields = mysql_num_fields(res);
 		while ((row = mysql_fetch_row(res)) != NULL) {
-			
-			
-			for (int i = 0; i < numFields; i++) {
+		
 				MYSQL_RES* res_1 = NULL;
 				MYSQL_ROW row_1 = NULL;
 				unsigned int 	numFields_1 = 0;
-				sprintf_s(query, sizeof(char) * 500, "select userId,UserName,telephone from UserTable where userId=%s ;", row[i]);
+				sprintf_s(query, sizeof(char) * 500, "select userId,UserName,telephone from UserTable where userId=%s ;", row[0]);
 
 				if (mysql_query(con, query)) {
 					printf("select_contact_info error : %s\n", mysql_error(con));
-					exit(1);
+					
 				}
 				else {
 					res_1 = mysql_store_result(con);
-					
-				
-					int j = 1;
+					int j = 0;
 					while ((row_1 = mysql_fetch_row(res_1)) != NULL) {
-						numFields_1 = mysql_num_fields(res_1);
-						for (int i = 0; i < numFields_1; i++) {
-							printf("%s  ", row_1[i]);
-						
-							//Debug打印数据集内容
-						}
-						printf("\n");
+						contactInfo[j].userId = row_1[0];
+						contactInfo[j].userName = row_1[2];
+						contactInfo[j].telephone = row_1[3];
 					}
 				}
-			}
+			
 			
 		}
 
 	}
+	return contactInfo;
 
 }
 
-void mysql::get_one_email(const int emailId,const int ownerId)
+EMAIL_CONTENT* mysql::get_one_email(const char* emailId,const char* ownerId)
 {
+	EMAIL_CONTENT* emailContent;
 	char* query = new char[500];
 	MYSQL_RES* res= NULL;
 	MYSQL_ROW row = NULL;
 	unsigned int 	numFields_1 = 0;
-	sprintf_s(query, sizeof(char) * 500, "select * from EmailTable where emailId=%d and ownerId=%d ;", emailId,ownerId);
+	sprintf_s(query, sizeof(char) * 500, "select  emailTitle, emailContent, emailType, targetUsername, emailTime, attachedFilePath  from EmailTable where emailId=%s and ownerId=%s ;", emailId,ownerId);
 
 	if (mysql_query(con, query)) {
 		printf("select_contact_info error : %s\n", mysql_error(con));
-		exit(1);
 	}
 	else {
 		res = mysql_store_result(con);
-
-		//Debug打印数据集内容
 		while ((row = mysql_fetch_row(res)) != NULL) {
-			numFields_1 = mysql_num_fields(res);
-			for (int i = 0; i < numFields_1; i++) {
-				printf("%s  ", row[i]);
-
-			}
-			printf("\n");
+			emailContent->emailTitle = row[0];
+			emailContent->emailContent = row[1];
+			emailContent->emailType = row[2];
+			emailContent->targetUsername = row[3];
+			emailContent->emailTime = row[4];
+			emailContent->attachedFilePath = row[5];
 		}
 	}
+	return emailContent;
 }
 
 
-void mysql::add_email_to_db(const int ownerId, const int targetId, const char* email_type,const char* email_title, const char* email_content)
+void mysql::add_email_to_db(const char* ownerId, const char* targetId, const char* email_type,const char* email_title, const char* email_content)
 {
 	char* query = new char[2048];
-	sprintf_s(query, sizeof(char) * 2048, "insert into EmailTable(ownerId,TargetUserId,emailTitle,emailType,emailContent)values(%d,%d,'%s','%s','%s');", ownerId, targetId, email_title,email_type,email_content);
+	sprintf_s(query, sizeof(char) * 2048, "insert into EmailTable(ownerId,TargetUserId,emailTitle,emailType,emailContent)values(%s,%s,'%s','%s','%s');", ownerId, targetId, email_title,email_type,email_content);
 	if (mysql_query(con, query)) {
 
 		printf("insert error : %s\n", mysql_error(con));
@@ -240,11 +251,11 @@ void mysql::add_email_to_db(const int ownerId, const int targetId, const char* e
 
 }
 
-bool mysql::change_email_content(const int emailId, const int ownerId, const int targetId, const char* emailType, const char* emailTitle, const char* emailContent,const char* attachedFilePath)
+bool mysql::change_email_content(const char* emailId, const char* ownerId, const char* targetId, const char* emailType, const char* emailTitle, const char* emailContent,const char* attachedFilePath)
 {
 	char* query = new char[200];
 	char* nowtime = get_time();
-	sprintf_s(query, sizeof(char) * 2048, "update EmailTable set emailTitle=%s,emailContent='%s',TargetUserId=%d,emailTime='%s' ,attachedFilePath=%s,where emailId=%d;", emailTitle,emailContent,targetId,nowtime,attachedFilePath,emailId);
+	sprintf_s(query, sizeof(char) * 2048, "update EmailTable set emailTitle=%s,emailContent='%s',TargetUserId=%s,emailTime='%s' ,attachedFilePath=%s,where emailId=%s;", emailTitle,emailContent,targetId,nowtime,attachedFilePath,emailId);
 	if (mysql_query(con, query)) {
 
 		printf("change email content error: %s\n", mysql_error(con));
@@ -255,12 +266,12 @@ bool mysql::change_email_content(const int emailId, const int ownerId, const int
 }
 
 
-bool mysql::change_email_state(const int emailId, const char* newType)
+bool mysql::change_email_state(const char* emailId, const char* newType)
 {
 
 	char* query = new char[200];
 	char* nowtime = get_time();
-	sprintf_s(query, sizeof(char) * 2048, "update EmailTable set emailType='%s',emailTime='%s' where emailId=%d;", newType,nowtime,emailId);
+	sprintf_s(query, sizeof(char) * 2048, "update EmailTable set emailType='%s',emailTime='%s' where emailId=%s;", newType,nowtime,emailId);
 	if (mysql_query(con, query)) {
 
 		printf("change email type : %s\n", mysql_error(con));
@@ -275,13 +286,13 @@ bool mysql::change_email_state(const int emailId, const char* newType)
 
 }
 
-bool mysql::add_contact_info(const int userId, const char*contactname, const char* phonenum)
+bool mysql::add_contact_info(const char* userId, const char*contactname, const char* phonenum)
 {
 	char* contactId = NULL;
 	contactId = get_user_id(contactname, phonenum);
 	if (contactId != "false") {
 		char* query = new char[100];
-		sprintf_s(query, sizeof(char) * 100, "insert into ContactTable(userId,contactId) values('%s','%s');", userId, contactId);
+		sprintf_s(query, sizeof(char) * 100, "insert into ContactTable(userId,contactId) values(%s,%s);", userId, contactId);
 
 		if (mysql_query(con, query)) {
 
@@ -300,7 +311,7 @@ bool mysql::add_contact_info(const int userId, const char*contactname, const cha
 	
 }
 
-bool mysql::delete_contatc_info(const int userId, const char* contactname, const char* phonenum)
+bool mysql::delete_contatc_info(const char* userId, const char* contactname, const char* phonenum)
 {
 	char* contactId = NULL;
 	contactId = get_user_id(contactname, phonenum);
