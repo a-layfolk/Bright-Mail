@@ -7,6 +7,11 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <pthread.h>
+#include "rapidjson/rapidjson.h"
+#include "rapidjson/document.h"
+#include "rapidjson/reader.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
 
 namespace Server_Core
 {
@@ -36,7 +41,7 @@ namespace Server_Core
         int client_sock;
 
         //判断请求类型
-        int Request_Judge(char *buffer);
+        int Request_Judge(char *data_bag);
 
         //接收内容,返回值是字符串之类的？
         // int Get_Content();

@@ -8,8 +8,14 @@
 #include <netinet/in.h>
 #include <pthread.h>
 #include "Server.hpp"
+#include "rapidjson/rapidjson.h"
+#include "rapidjson/document.h"
+#include "rapidjson/reader.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
 
 using namespace Server_Core;
+using namespace rapidjson;
 
 User_Space::User_Space(int client_sock)
 {
@@ -23,9 +29,15 @@ int User_Space::Send_To_Client(char *data)
 {
     return 0;
 }
-int User_Space::Request_Judge(char *buffer)
+
+int User_Space::Request_Judge(char *data_bag)
 {
-    return CONFIG::mail_to_DB;
+    Document d;
+    d.Parse(data_bag);
+    if (strcmp(d["request_type"].GetString(), "file"))
+    {
+        return CONFIG::file;
+    }
 }
 
 //把这个当main写
@@ -38,6 +50,7 @@ int User_Space::Exe()
     data_len = read(this->client_sock, buffer, CONFIG::buffer_size);
     int judge = this->Request_Judge(buffer);
 
+    
     switch (judge)
     {
     case CONFIG::file:
