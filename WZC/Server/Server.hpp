@@ -13,7 +13,7 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
-namespace Server_Core
+namespace SERVER_CORE
 {
     namespace CONFIG
     {

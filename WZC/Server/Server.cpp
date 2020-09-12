@@ -14,8 +14,14 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
-using namespace Server_Core;
+using namespace SERVER_CORE;
 using namespace rapidjson;
+
+/*服务器操作顺序：
+1、客户端发送请求头
+2、若成功解析请求头，服务器向客户端发送'success'
+3、客户端向服务器发送内容数据
+*/
 
 User_Space::User_Space(int client_sock)
 {
@@ -28,7 +34,7 @@ User_Space::~User_Space()
 
 int User_Space::Send_Success()
 {
-    
+
     write(this->client_sock, "success", CONFIG::buffer_size);
     return 0;
 }
@@ -71,19 +77,19 @@ int User_Space::Request_Judge(char *data_bag)
     Document d;
     d.Parse(data_bag);
 
-    this->Send_Success();
-
     if (strcmp(d["request_type"].GetString(), "file") == 0)
     {
         char file_path[30] = "./recived/";
         strcat(file_path, d["file_name"].GetString());
         this->Write_File(file_path);
+        this->Send_Success();
 
         return CONFIG::file;
     }
     else
     {
         std::cout << "Request Judge Failed" << std::endl;
+        this->Send_Success(); //send一个faile过去
         return -1;
     }
 }
@@ -106,21 +112,6 @@ int User_Space::Exe()
         std::cout << "file saved" << std::endl;
         break;
     case CONFIG::mail_to_DB:
-        //客户端发来要传输到数据库的信件
-
-        // while ((data_len = read(this->client_sock, buffer, CONFIG::buffer_size)) > 0)
-        // {
-        //     //数据都存在buffer中
-        //     std::cout << buffer << std::endl;
-
-        //     //DB操作
-
-        //     //返回数据
-        //     char *datas;
-        //     // this->Send_To_Client(datas);
-
-        //     memset(buffer, 0, sizeof(buffer));
-        // }
 
         break;
 

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <string.h>
 #include <arpa/inet.h>
 #include <sys/socket.h> //socket函数
@@ -10,8 +11,13 @@
 #include <signal.h>
 #include <stdlib.h>
 #include "Client.hpp"
+#include "rapidjson/rapidjson.h"
+#include "rapidjson/document.h"
+#include "rapidjson/reader.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
 
-using namespace CLIENT_TO_SOCKET;
+using namespace CLIENT_CORE;
 
 Client_socket::Client_socket()
 {
@@ -69,7 +75,7 @@ bool Client_socket::Server_success()
     }
 }
 
-int Client_socket::Text_file_transfer(const char *file_path)
+int Client_socket::Send_text_file(const char *file_path)
 {
     int file = open(file_path, O_RDWR);
     char buffer[CONFIG::buffer_size];
@@ -88,7 +94,7 @@ int Client_socket::Text_file_transfer(const char *file_path)
 }
 
 //file得单方面接收
-int Client_socket::File_transfer(const char *file_path)
+int Client_socket::Send_file(const char *file_path)
 {
     FILE *fp;
     fp = fopen((char *)file_path, "rb");
@@ -157,7 +163,7 @@ int Client_socket::Send_to_server(char *request_type, char *content)
         int i = len;
         while (1)
         {
-            if (content[i] == '/')
+            if (content[i] == '/' || i <= 0)
             {
                 file_name_rev[name_size] = 0;
                 break;
@@ -182,7 +188,7 @@ int Client_socket::Send_to_server(char *request_type, char *content)
         if (this->Server_success())
         {
             //给服务器发送内容包
-            this->File_transfer(content);
+            this->Send_file(content);
         }
         else
         {
@@ -216,4 +222,70 @@ int Client_socket::Send_to_server(char *request_type, char *content)
             std::cout << "Server didn't accept transfer request for content" << std::endl;
         }
     }
+}
+
+char *Client_socket::Recive_json()
+{
+    int read_len = 0;
+
+    char buffer[CONFIG::buffer_size];
+    std::string *str = new std::string;
+
+    while ((read_len = read(this->clnt_socket, buffer, CONFIG::buffer_size)) > 0)
+    {
+        *str += buffer;
+        memset(buffer, 0, CONFIG::buffer_size);
+    }
+    char *JSON = new char[(*str).size()];
+    str->copy(JSON, (*str).size(), 0);
+    delete str;
+    return JSON;
+}
+
+int Client_socket::Write_file(char *save_path)
+{
+    //debug path
+    std::cout << save_path << std::endl;
+
+    int read_len = 0;
+    FILE *out_file = NULL;
+    out_file = fopen(save_path, "wb+");
+    char buffer[CONFIG::buffer_size];
+    if (out_file == NULL)
+    {
+        std::cout << "File Save ERROR" << std::endl;
+        return -1;
+    }
+    else
+    {
+
+        while ((read_len = recv(this->clnt_socket, buffer, CONFIG::buffer_size, 0)) > 0)
+        {
+            fwrite(buffer, sizeof(char), read_len, out_file);
+            memset(buffer, 0, sizeof(buffer));
+        }
+    }
+    fclose(out_file);
+    return 0;
+}
+
+int Client_socket::Recive_file()
+{
+    char request_buffer[CONFIG::data_bag_size];
+    memset(request_buffer, 0, CONFIG::data_bag_size);
+    recv(this->clnt_socket, request_buffer, CONFIG::buffer_size, 0);
+    rapidjson::Document d;
+    d.Parse(request_buffer);
+
+    char file_path[30] = "./recived/";
+    strcat(file_path, d["file_name"].GetString());
+    return this->Write_file(file_path);
+}
+
+int Client_socket::Recive_file(char *save_path)
+{
+    char request_buffer[CONFIG::data_bag_size];
+    memset(request_buffer, 0, CONFIG::data_bag_size);
+    recv(this->clnt_socket, request_buffer, CONFIG::buffer_size, 0);
+    return this->Write_file(save_path);
 }
