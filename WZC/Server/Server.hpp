@@ -39,39 +39,46 @@ namespace SERVER_CORE
         };
     } // namespace CONFIG
 
-    //用户连接后其线程的各种操作
-    // void *User_Thread(void *args);
-
     class User_Space
     {
     private:
-        int client_sock;
+        int client_socket;
         mysql *SQL;
         //判断请求类型，处理对应数据包头后返回请求类型
         int Request_Judge(char *data_bag);
 
+        //模仿read，content输入需要读取的字符串，并将读取的内容转移至较小的buffer中，方便数据包的分批发送。函数返回读取的字节数。注意，content在传入函数后会发生改变
+        int ChRead(char *content, char *buffer, int buffer_size);
+
         //接收文件并存储到指定位置
         int Write_File(char *save_path);
-
-        //返回给服务器"success"的请求
-        int Send_Success();
-
-        //接收内容,返回值是字符串之类的？
-        // int Get_Content();
-
-        //一堆DB操作
-
-        //数据传输给客户端
-        int Send_To_Client(char *);
 
     public:
         User_Space(int client_sock);
         ~User_Space();
 
+        //登陆函数
+        bool Sign();
+
         //获取超长的内容数据包
         char *Get_Content();
 
-        //程序把执行权交给用户线程
+        //给客户端发送数据
+        int Send_Data(const char *data);
+
+        //取得客户端数据，数据格式为JSON的字符串
+        char *Recive_Data();
+
+        //给客户端发送文件
+        int Send_File(const char *file_path);
+
+        //接收客户端端发送的文件
+        int Recive_File();
+
+        //重载，save_path是文件保存的地址
+        int Recive_File(char *save_path);
+
+        //把用户线程交给此函数
         int Exe();
     };
 

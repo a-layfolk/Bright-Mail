@@ -24,21 +24,32 @@ using namespace rapidjson;
 3、客户端向服务器发送内容数据
 */
 
-User_Space::User_Space(int client_sock)
+User_Space::User_Space(int client_socket)
 {
-    this->client_sock = client_sock;
+    this->client_socket = client_socket;
     this->SQL = new mysql(CONFIG::sql_ip, CONFIG::sql_user, CONFIG::sql_password, CONFIG::sql_db, CONFIG::server_port);
 }
 User_Space::~User_Space()
 {
-    close(this->client_sock);
+    close(this->client_socket);
 }
 
-int User_Space::Send_Success()
+int User_Space::ChRead(char *file_path, char *buffer, int buffer_size)
 {
+    int Bytes = 0;
+    for (int i = 0; i < buffer_size; i++)
+    {
+        if (*file_path == 0)
+        {
+            buffer[i] = 0;
+            break;
+        }
 
-    write(this->client_sock, "success", CONFIG::buffer_size);
-    return 0;
+        buffer[i] = *file_path;
+        file_path++;
+        Bytes++;
+    }
+    return Bytes;
 }
 
 int User_Space::Write_File(char *save_path)
@@ -60,7 +71,7 @@ int User_Space::Write_File(char *save_path)
     else
     {
 
-        while ((read_len = recv(this->client_sock, buffer, CONFIG::buffer_size, 0)) > 0)
+        while ((read_len = recv(this->client_socket, buffer, CONFIG::buffer_size, 0)) > 0)
         {
             fwrite(buffer, sizeof(char), read_len, out_file);
             memset(buffer, 0, sizeof(buffer));
@@ -69,59 +80,8 @@ int User_Space::Write_File(char *save_path)
     fclose(out_file);
 }
 
-int User_Space::Send_To_Client(char *data)
-{
-    return 0;
-}
-
 int User_Space::Request_Judge(char *data_bag)
 {
-    Document d;
-    d.Parse(data_bag);
-    char *request_type = new char((const char)d["request_type"].GetString());
-    if (strcmp(request_type, "file") == 0)
-    {
-        char file_path[30] = "./recived/";
-        strcat(file_path, d["file_name"].GetString());
-        this->Write_File(file_path);
-        this->Send_Success();
-
-        return CONFIG::file;
-    }
-    else if (strcmp(request_type, "mail") == 0)
-    {
-
-        this->Send_Success();
-        char *content = this->Get_Content();
-        Document *JSON = new Document();
-        JSON->Parse(content);
-        //数据库操作，存入邮件,ID居然是整形？
-        this->SQL->add_email_to_db((*JSON)["ownerId"].GetInt(), (*JSON)["targetId"].GetInt(), (*JSON)["email_type"].GetString(), (*JSON)["email_title"].GetString(), (*JSON)["email_content"].GetString());
-        delete JSON;
-        return CONFIG::mail_to_DB;
-    }
-    else if (strcmp(request_type, "sign") == 0)
-    {
-        this->Send_Success();
-        char *content = this->Get_Content();
-        Document *JSON = new Document();
-        JSON->Parse(content);
-        //数据库操作，用户登陆//这里还需要返回客户端信息
-
-        //还需要再解析一下包,判断是登陆还是注册
-        this->SQL->sign_in((*JSON)["username"].GetString(), (*JSON)["password"].GetString());
-
-
-        this->SQL->sign_up((*JSON)["username"].GetString(), (*JSON)["password"].GetString(), (*JSON)["phoneum"].GetString());
-
-        delete JSON;
-    }
-    else
-    {
-        std::cout << "Request Judge Failed" << std::endl;
-        this->Send_Success(); //send一个faild没完成
-        return -1;
-    }
 }
 
 //把这个当main写
@@ -131,7 +91,7 @@ int User_Space::Exe()
     char buffer[CONFIG::data_bag_size];
 
     //接收请求
-    data_len = read(this->client_sock, buffer, CONFIG::data_bag_size);
+    data_len = read(this->client_socket, buffer, CONFIG::data_bag_size);
 
     int judge = this->Request_Judge(buffer);
 
@@ -152,14 +112,14 @@ int User_Space::Exe()
     //接收内容
 }
 
-char *User_Space::Get_Content()
+char *User_Space::Recive_Data()
 {
     int read_len = 0;
 
     char buffer[CONFIG::buffer_size];
     std::string *str = new std::string;
 
-    while ((read_len = read(this->client_sock, buffer, CONFIG::buffer_size)) > 0)
+    while ((read_len = read(this->client_socket, buffer, CONFIG::buffer_size)) > 0)
     {
         *str += buffer;
         memset(buffer, 0, CONFIG::buffer_size);
