@@ -42,6 +42,7 @@
         "ctime": "cpp",
         "memory": "cpp",
         "cinttypes": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "string": "cpp"
     }
 }

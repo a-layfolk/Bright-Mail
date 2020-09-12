@@ -40,8 +40,15 @@ namespace Server_Core
     private:
         int client_sock;
 
-        //判断请求类型
+        //判断请求类型，处理对应数据包头后返回请求类型
         int Request_Judge(char *data_bag);
+
+        //接收文件并存储到指定位置
+        int Write_File(char *save_path);
+
+        //返回给服务器"success"的请求
+        int Send_Success();
+
 
         //接收内容,返回值是字符串之类的？
         // int Get_Content();

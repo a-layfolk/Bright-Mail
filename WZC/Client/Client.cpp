@@ -59,7 +59,7 @@ bool Client_socket::Server_success()
 {
     char buffer[CONFIG::buffer_size];
     recv(this->clnt_socket, buffer, CONFIG::buffer_size, 0);
-    if (strcmp(buffer, "success"))
+    if (strcmp(buffer, "success")==0)
     {
         return true;
     }
@@ -134,7 +134,7 @@ int Client_socket::Send_data_bag(char *data_bag)
     {
         char data_bag_expand[CONFIG::data_bag_size];
         memset(data_bag_expand, 0, CONFIG::data_bag_size);
-        strcpy(data_bag_expand, data_bag_expand);
+        strcpy(data_bag_expand, data_bag);
         write(this->clnt_socket, data_bag_expand, CONFIG::data_bag_size);
     }
     else
@@ -166,18 +166,19 @@ int Client_socket::Send_to_server(char *request_type, char *content)
             name_size++;
             i--;
         }
-        for (int i = 0; i <= name_size; i++)
+        for (int i = 0; i < name_size; i++)
         {
-            file_name[0] = file_name_rev[name_size - i];
+            file_name[i] = file_name_rev[name_size - 1 - i];
         }
 
         char data_bag[CONFIG::data_bag_size];
         memset(data_bag, 0, CONFIG::data_bag_size);
-        snprintf(data_bag, CONFIG::data_bag_size, "\"request_type\": \"file\",\"file_name\":\"%s\"", file_name);
+        snprintf(data_bag, CONFIG::data_bag_size, "{\"request_type\": \"file\",\"file_name\":\"%s\"}", file_name);
         this->Send_data_bag(data_bag);
 
         //收到服务器返回的确认信息
 
+        // if (true)
         if (this->Server_success())
         {
             //给服务器发送内容包
@@ -196,15 +197,12 @@ int Client_socket::Send_to_server(char *request_type, char *content)
 
         //发送第一个数据包
         this->Send_data_bag(request_type);
-        // while ((read_len = this->ChRead(t, buffer, CONFIG::buffer_size)))
-        // {
-        //     write(this->clnt_socket, buffer, read_len);
-        // }
 
         //收到服务器返回的确认信息
-        recv(this->clnt_socket, buffer, CONFIG::buffer_size, 0);
+        // recv(this->clnt_socket, buffer, CONFIG::buffer_size, 0);
 
-        if (this->Server_success())
+        // if (this->Server_success())
+        if (true)
         {
             //给服务器发送内容包
             char *t = content;
