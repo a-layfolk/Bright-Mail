@@ -59,7 +59,7 @@ bool Client_socket::Server_success()
 {
     char buffer[CONFIG::buffer_size];
     recv(this->clnt_socket, buffer, CONFIG::buffer_size, 0);
-    if (strcmp(buffer, "success")==0)
+    if (strcmp(buffer, "success") == 0)
     {
         return true;
     }
@@ -170,7 +170,7 @@ int Client_socket::Send_to_server(char *request_type, char *content)
         {
             file_name[i] = file_name_rev[name_size - 1 - i];
         }
-
+        file_name[name_size] = 0;
         char data_bag[CONFIG::data_bag_size];
         memset(data_bag, 0, CONFIG::data_bag_size);
         snprintf(data_bag, CONFIG::data_bag_size, "{\"request_type\": \"file\",\"file_name\":\"%s\"}", file_name);
