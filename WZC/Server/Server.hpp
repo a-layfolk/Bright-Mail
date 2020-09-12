@@ -12,6 +12,7 @@
 #include "rapidjson/reader.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "SQL/SqlCon.h"
 
 namespace SERVER_CORE
 {
@@ -21,6 +22,12 @@ namespace SERVER_CORE
         const int server_port = 8888;
         const int buffer_size = 100;
         const int data_bag_size = 1024;
+        const char sql_ip[] = "123.57.176.139";
+        const char sql_user[] = "root";
+        const char sql_password[] = "1233";
+        const char sql_db[] = "Email_schema";
+        const int sql_port = 3306;
+
         enum request_type
         {
             sign,
@@ -39,7 +46,7 @@ namespace SERVER_CORE
     {
     private:
         int client_sock;
-
+        mysql *SQL;
         //判断请求类型，处理对应数据包头后返回请求类型
         int Request_Judge(char *data_bag);
 
@@ -48,7 +55,6 @@ namespace SERVER_CORE
 
         //返回给服务器"success"的请求
         int Send_Success();
-
 
         //接收内容,返回值是字符串之类的？
         // int Get_Content();
@@ -62,8 +68,11 @@ namespace SERVER_CORE
         User_Space(int client_sock);
         ~User_Space();
 
+        //获取超长的内容数据包
+        char *Get_Content();
+
         //程序把执行权交给用户线程
         int Exe();
     };
 
-} // namespace Server_Core
+} // namespace SERVER_CORE

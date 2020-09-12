@@ -13,6 +13,7 @@
 #include "rapidjson/reader.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "SQL/SqlCon.h"
 
 using namespace SERVER_CORE;
 using namespace rapidjson;
@@ -26,6 +27,7 @@ using namespace rapidjson;
 User_Space::User_Space(int client_sock)
 {
     this->client_sock = client_sock;
+    this->SQL = new mysql(CONFIG::sql_ip, CONFIG::sql_user, CONFIG::sql_password, CONFIG::sql_db, CONFIG::server_port);
 }
 User_Space::~User_Space()
 {
@@ -76,8 +78,8 @@ int User_Space::Request_Judge(char *data_bag)
 {
     Document d;
     d.Parse(data_bag);
-
-    if (strcmp(d["request_type"].GetString(), "file") == 0)
+    char *request_type = new char((const char)d["request_type"].GetString());
+    if (strcmp(request_type, "file") == 0)
     {
         char file_path[30] = "./recived/";
         strcat(file_path, d["file_name"].GetString());
@@ -86,10 +88,38 @@ int User_Space::Request_Judge(char *data_bag)
 
         return CONFIG::file;
     }
+    else if (strcmp(request_type, "mail") == 0)
+    {
+
+        this->Send_Success();
+        char *content = this->Get_Content();
+        Document *JSON = new Document();
+        JSON->Parse(content);
+        //数据库操作，存入邮件,ID居然是整形？
+        this->SQL->add_email_to_db((*JSON)["ownerId"].GetInt(), (*JSON)["targetId"].GetInt(), (*JSON)["email_type"].GetString(), (*JSON)["email_title"].GetString(), (*JSON)["email_content"].GetString());
+        delete JSON;
+        return CONFIG::mail_to_DB;
+    }
+    else if (strcmp(request_type, "sign") == 0)
+    {
+        this->Send_Success();
+        char *content = this->Get_Content();
+        Document *JSON = new Document();
+        JSON->Parse(content);
+        //数据库操作，用户登陆//这里还需要返回客户端信息
+
+        //还需要再解析一下包,判断是登陆还是注册
+        this->SQL->sign_in((*JSON)["username"].GetString(), (*JSON)["password"].GetString());
+
+
+        this->SQL->sign_up((*JSON)["username"].GetString(), (*JSON)["password"].GetString(), (*JSON)["phoneum"].GetString());
+
+        delete JSON;
+    }
     else
     {
         std::cout << "Request Judge Failed" << std::endl;
-        this->Send_Success(); //send一个faile过去
+        this->Send_Success(); //send一个faild没完成
         return -1;
     }
 }
@@ -120,4 +150,22 @@ int User_Space::Exe()
     }
 
     //接收内容
+}
+
+char *User_Space::Get_Content()
+{
+    int read_len = 0;
+
+    char buffer[CONFIG::buffer_size];
+    std::string *str = new std::string;
+
+    while ((read_len = read(this->client_sock, buffer, CONFIG::buffer_size)) > 0)
+    {
+        *str += buffer;
+        memset(buffer, 0, CONFIG::buffer_size);
+    }
+    char *JSON = new char[(*str).size()];
+    str->copy(JSON, (*str).size(), 0);
+    delete str;
+    return JSON;
 }

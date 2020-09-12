@@ -7,9 +7,10 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <pthread.h>
+#include "SQL/SqlCon.h"
 #include "Server.hpp"
 
-using namespace Server_Core;
+using namespace SERVER_CORE;
 //用户所在的线程的各种操作
 void *User_Thread(void *args)
 {
@@ -18,7 +19,6 @@ void *User_Thread(void *args)
 
     //操作进入用户线程
     Usr_operations.Exe();
-    
 }
 
 int main(int argc, char const *argv[])

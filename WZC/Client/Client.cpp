@@ -258,7 +258,6 @@ int Client_socket::Write_file(char *save_path)
     }
     else
     {
-
         while ((read_len = recv(this->clnt_socket, buffer, CONFIG::buffer_size, 0)) > 0)
         {
             fwrite(buffer, sizeof(char), read_len, out_file);
