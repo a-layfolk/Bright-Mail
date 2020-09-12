@@ -15,10 +15,17 @@ using namespace SERVER_CORE;
 void *User_Thread(void *args)
 {
     //创建了用户操作
-    User_Space Usr_operations(*(int *)args);
+    User_Space Usr(*(int *)args);
 
-    //操作进入用户线程
-    Usr_operations.Exe();
+    if (Usr.Sign())
+    {
+        //操作进入用户线程
+        Usr.Exe();
+    }
+    else
+    {
+        pthread_exit(0);
+    }
 }
 
 int main(int argc, char const *argv[])

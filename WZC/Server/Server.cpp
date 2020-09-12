@@ -129,3 +129,8 @@ char *User_Space::Recive_Data()
     delete str;
     return JSON;
 }
+
+bool User_Space::Sign()
+{
+    
+}
