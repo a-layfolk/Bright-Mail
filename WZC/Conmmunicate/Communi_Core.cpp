@@ -45,8 +45,8 @@ namespace COMMUNI
             exit(-1);
         }
     }
-    Communi_Core::Communi_Core(int client_socket_number)
 
+    Communi_Core::Communi_Core(int client_socket_number)
     {
         this->clnt_socket = client_socket_number;
     }
@@ -56,22 +56,24 @@ namespace COMMUNI
         close(this->clnt_socket);
     }
 
-    int Communi_Core::ChRead(const char *data, char *buffer, int buffer_size)
+    //为了保证字符串一直向后读取，传入的data指针会移动
+    int Communi_Core::ChRead(char *&cursor, char *buffer, int buffer_size)
     {
         int Bytes = 0;
-        const char *content = data;
         for (int i = 0; i < buffer_size; i++)
         {
-            if (*content == 0)
+            if (*cursor == 0)
             {
                 buffer[i] = 0;
                 break;
             }
+            //debug
 
-            buffer[i] = *content;
-            content++;
+            buffer[i] = *cursor;
+            cursor++;
             Bytes++;
         }
+        // std::cout << "Bytes:" << Bytes << (int)*data << endl;
         return Bytes;
     }
     char *Communi_Core::Get_File_Name(const char *file_path)
@@ -119,6 +121,10 @@ namespace COMMUNI
             while ((read_len = fread(buffer, sizeof(char), CONFIG::buffer_size, fp)) != 0)
             {
                 write(this->clnt_socket, buffer, read_len);
+                if (read_len < CONFIG::buffer_size)
+                {
+                    break;
+                }
             }
             fclose(fp);
             return 0;
@@ -127,29 +133,39 @@ namespace COMMUNI
 
     char *Communi_Core::Recive_Data()
     {
-        int read_len = 0;
-
+        int read_len;
         char buffer[CONFIG::buffer_size];
-        std::string *str = new std::string;
-
+        char *s = new char[10000]; //动态内存分配的算法可以秀一下
+        char *cursor = s;
         while ((read_len = read(this->clnt_socket, buffer, CONFIG::buffer_size)) > 0)
         {
-            *str += buffer;
+            strcpy(cursor, buffer);
+            cursor += CONFIG::buffer_size;
             memset(buffer, 0, CONFIG::buffer_size);
+            if (read_len < CONFIG::buffer_size)
+            {
+                break;
+            }
         }
-        char *JSON = new char[(*str).size()];
-        str->copy(JSON, (*str).size(), 0);
-        delete str;
-        return JSON;
+        cout << s << endl; //debug
+        return s;
     }
 
     int Communi_Core::Send_Data(const char *data)
     {
         int read_len = 0;
         char buffer[CONFIG::buffer_size];
-        while ((read_len = this->ChRead(data, buffer, CONFIG::buffer_size)))
+        char *t_d = (char *)data;
+        while ((read_len = this->ChRead(t_d, buffer, CONFIG::buffer_size)) > 0)
         {
             write(this->clnt_socket, buffer, read_len);
+            cout << "send buffer" << buffer << endl;
+            // write(this->clnt_socket, buffer, read_len);
+            memset(buffer, 0, CONFIG::buffer_size);
+            if (read_len < CONFIG::buffer_size)
+            {
+                break;
+            }
         }
         return 0;
     }
@@ -182,8 +198,8 @@ namespace COMMUNI
 
     int Communi_Core::Recive_File()
     {
-        char request_buffer[CONFIG::data_bag_size];
-        memset(request_buffer, 0, CONFIG::data_bag_size);
+        char request_buffer[CONFIG::buffer_size];
+        memset(request_buffer, 0, CONFIG::buffer_size);
         recv(this->clnt_socket, request_buffer, CONFIG::buffer_size, 0);
         rapidjson::Document d;
         d.Parse(request_buffer);
@@ -195,8 +211,8 @@ namespace COMMUNI
 
     int Communi_Core::Recive_File(char *save_path)
     {
-        char request_buffer[CONFIG::data_bag_size];
-        memset(request_buffer, 0, CONFIG::data_bag_size);
+        char request_buffer[CONFIG::buffer_size];
+        memset(request_buffer, 0, CONFIG::buffer_size);
         recv(this->clnt_socket, request_buffer, CONFIG::buffer_size, 0);
         return this->Write_File(save_path);
     }
@@ -216,10 +232,13 @@ namespace SERVER
     }
     bool Server_Core::Sign()
     {
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 3; i++)
         {
+
             //接收请求包
+            cout << "start" << endl;
             char *sign = this->Recive_Data();
+            std::cout << "sign end recived Data" << sign << std::endl; //debug
             bool is_passed = false;
             //解析请求包
             rapidjson::Document d;
@@ -236,7 +255,6 @@ namespace SERVER
             {
                 std::cout << "User Sign Canceled" << std::endl;
                 //用户取消操作退出线程
-                break;
             }
             //释放请求包的内存
             delete sign;
@@ -248,13 +266,9 @@ namespace SERVER
             }
             else
             {
-                this->Send_Data("failed");
-                char info[3];
-                sprintf(info, "%d", i);
-                this->Send_Data(info);
             }
+            //给服务器发未成功信息
         }
-        //给服务器发未成功信息
 
         return false;
     }
@@ -286,7 +300,7 @@ namespace SERVER
 
 namespace CLIENT
 {
-    Client_Core::Client_Core() : COMMUNI::Communi_Core(SERVER::CONFIG::server_ip)
+    Client_Core::Client_Core() : COMMUNI::Communi_Core(CLIENT::CONFIG::server_ip)
     {
     }
     Client_Core::Client_Core(const char *target_ip) : COMMUNI::Communi_Core(target_ip)
@@ -299,31 +313,36 @@ namespace CLIENT
 
     bool Client_Core::Server_Success()
     {
-        return true;
+        char *data = this->Recive_Data();
+        std::cout << "success" << std::endl; //debug
+        if (strcmp(data, "success") == 0)
+        {
+            return true;
+        }
+        return false;
     }
 
     int Client_Core::Sign_in(char *username, char *password)
     {
         //发送请求包
-        // char *JSON = Creat_DataBag_Sign_in(username, password);
-        char *JSON = NULL;
+        char *JSON = DataBag_Sign_in(username, password);
 
         this->Send_Data(JSON);
         delete JSON;
 
         //接受消息
-        if (this->Server_Success())
-        {
-            return -1;
-        }
-        else
-        {
-            //再接收一次消息
-            char *str = this->Recive_Data();
-            int remain = str[0] - '0';
-            delete str;
-            return remain;
-        }
+        // if (this->Server_Success())
+        // {
+        //     return -1;
+        // }
+        // else
+        // {
+        //     //再接收一次消息
+        //     char *str = this->Recive_Data();
+        //     int remain = str[0] - '0';
+        //     delete str;
+        //     return remain;
+        // }
     }
 
     //返回还剩几次登陆机会

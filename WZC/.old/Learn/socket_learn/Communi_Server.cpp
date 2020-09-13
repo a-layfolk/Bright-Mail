@@ -20,19 +20,14 @@
 using namespace SERVER;
 void *User_Thread(void *args)
 {
+    cout << "creat Thread" << endl;
+    COMMUNI::Communi_Core CC(*(int *)args);
     //创建了用户操作
-    Server_Core Usr(*(int *)args);
-
-    if (Usr.Sign())
+    while (1)
     {
-        std::cout << "loged in" << std::endl;//debug
-        //操作进入用户线程
-        Usr.Exe();
-    }
-    else
-    {
-        std::cout << "failed" << std::endl;//debug
-        pthread_exit(0);
+        char *JSON = CC.Recive_Data();
+        cout << JSON << endl;
+        delete JSON;
     }
 }
 

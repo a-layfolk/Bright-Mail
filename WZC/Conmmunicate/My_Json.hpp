@@ -58,7 +58,7 @@ namespace My_Json
         }
         return str;
     }
-} // namespace JSON
+} // namespace My_Json
 namespace Data_Bag
 {
     using namespace My_Json;
@@ -75,7 +75,8 @@ namespace Data_Bag
         str->push_back('}');
 
         char *JSON = new char[(*str).size()];
-        str->copy(JSON, (*str).size(), 0);
+        memset(JSON, 0, (*str).size());
+        strcpy(JSON, (*str).c_str());
         delete str;
         return JSON;
     }

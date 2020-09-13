@@ -22,8 +22,7 @@ namespace COMMUNI
     namespace CONFIG
     {
         const int server_port = 8888;
-        const int buffer_size = 100;
-        const int data_bag_size = 1024;
+        const int buffer_size = 4000;
 
     } // namespace CONFIG
 
@@ -31,9 +30,8 @@ namespace COMMUNI
     {
     private:
         int clnt_socket;
-
-        //模仿read，content输入需要读取的字符串，并将读取的内容转移至较小的buffer中，方便数据包的分批发送。函数返回读取的字节数。注意，content在传入函数后会发生改变
-        int ChRead(const char *data, char *buffer, int buffer_size);
+        //模仿read，content输入需要读取的字符串，并将读取的内容转移至较小的buffer中，方便数据包的分批发送。函数返回读取的字节数。注意，cursor在传入函数后会发生改变
+        int ChRead(char *&cursor, char *buffer, int buffer_size);
 
         int Write_File(char *save_path);
 
@@ -72,9 +70,8 @@ namespace SERVER
     {
         const char server_ip[] = "0.0.0.0";
         const int server_port = 8888;
-        const int buffer_size = 100;
+        const int buffer_size = 4000;
 
-        const int data_bag_size = 1024;
         const char sql_ip[] = "123.57.176.139";
         const char sql_user[] = "root";
         const char sql_password[] = "1233";
@@ -112,18 +109,13 @@ namespace SERVER
 
 } // namespace SERVER
 
-
-
-
-
-
 namespace CLIENT
 {
     namespace CONFIG
     {
         const char server_ip[] = "123.57.176.139";
         const int server_port = COMMUNI::CONFIG::server_port;
-        const int buffer_size = 100;
+        const int buffer_size = 4000;
         const int data_bag_size = 1024;
 
     } // namespace CONFIG
@@ -151,4 +143,4 @@ namespace CLIENT
         int Sign_up(char *username, char *password, char *phoneum);
 
     }; // namespace CLIENT
-}
+} // namespace CLIENT
