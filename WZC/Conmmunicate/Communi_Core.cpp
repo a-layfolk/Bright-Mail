@@ -17,6 +17,7 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include "Communi_Core.hpp"
+
 using namespace rapidjson;
 // using namespace COMMUNI;
 
@@ -197,6 +198,9 @@ namespace SERVER
     {
         this->SQL.close();
     }
+
+    // Server_Core::Request_Analysis()
+    
 
 }; // namespace SERVER
 

@@ -9,12 +9,11 @@
 #include <unistd.h> //read,write
 #include <signal.h>
 #include "rapidjson/rapidjson.h"
-#include "rapidjson/document.h"
 #include "rapidjson/reader.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include "SQL/SqlCon.h"
-using namespace rapidjson;
+#include "JSON_Maker.hpp"
 
 namespace COMMUNI
 {
@@ -66,118 +65,6 @@ namespace COMMUNI
     };
 } // namespace COMMUNI
 
-#include <string>
-using namespace std;
-namespace JSON_Maker
-{
-    namespace Key_Type
-    {
-        const char request_type[] = "request_type";
-
-        const char command_type[] = "command_type";
-
-        const char sql_username[] = "username";
-        const char sql_password[] = "password";
-        const char sql_phoneum[] = "phoneum";
-        const char sql_emailType[] = "emailType";
-        const char sql_userId[] = "userId";
-        const char sql_emailType[] = "emailType";
-        const char sql_emailTitle[] = "emailTitle";
-        const char sql_emailContent[] = "emailContent";
-        const char sql_emailTime[] = "emailTime";
-        const char sql_attachedFilePath[] = "attachedFilePath";
-        const char sql_userId[] = "userId";
-        const char sql_targetUsername[] = "targetUsername";
-        const char sql_targetId[] = "targetId";
-        const char sql_ownerId[] = "ownerId";
-        const char sql_contactname[] = "contactname";
-        const char sql_newState[] = "newState";
-    } // namespace Key_Type
-
-    string Creat_Key(const char *key_name, const char *value, bool with_comma)
-    {
-        string str;
-        str.push_back('\"');
-        str += key_name;
-        str += "\':\"";
-        str += value;
-        if (with_comma)
-        {
-            str += "\",";
-        }
-        else
-        {
-            str.push_back('\"');
-        }
-        return str;
-    }
-    string Creat_Key(const char *key_name, int value, bool with_comma)
-    {
-        string str;
-        str.push_back('\"');
-        str += key_name;
-        str += "\':";
-        str += std::to_string(value);
-        if (with_comma)
-        {
-            str.push_back(',');
-        }
-        return str;
-    }
-
-    char *Creat_DataBag_Sign_in(char *username, char *password)
-    {
-        string *str = new string;
-        str->push_back('{');
-
-        *str += Creat_Key(Key_Type::request_type, "sign_in", true);
-
-        *str += Creat_Key(Key_Type::sql_username, username, true);
-        *str += Creat_Key(Key_Type::sql_password, password, false);
-
-        str->push_back('}');
-
-        char *JSON = new char[(*str).size()];
-        str->copy(JSON, (*str).size(), 0);
-        delete str;
-        return JSON;
-    }
-    char *Creat_DataBag_Sign_up(char *username, char *password, char *phoneum)
-    {
-        string *str = new string;
-        str->push_back('{');
-
-        *str += Creat_Key(Key_Type::request_type, "sign_in", true);
-
-        *str += Creat_Key(Key_Type::sql_username, username, true);
-        *str += Creat_Key(Key_Type::sql_password, password, true);
-        *str += Creat_Key(Key_Type::sql_phoneum, phoneum, false);
-
-        str->push_back('}');
-
-        char *JSON = new char[(*str).size()];
-        str->copy(JSON, (*str).size(), 0);
-        delete str;
-        return JSON;
-    }
-
-    char *Creat_DataBag_End_Connect()
-    {
-        string *str = new string;
-        str->push_back('{');
-
-        *str += Creat_Key(Key_Type::request_type, "operate", true);
-        *str += Creat_Key(Key_Type::command_type, "end_connect", true);
-
-        str->push_back('}');
-
-        char *JSON = new char[(*str).size()];
-        str->copy(JSON, (*str).size(), 0);
-        delete str;
-        return JSON;
-    }
-} // namespace JSON_Maker
-
 namespace SERVER
 {
     namespace CONFIG
@@ -207,22 +94,22 @@ namespace SERVER
     class Server_Core : private COMMUNI::Communi_Core
     {
     private:
-        /* data */
-        int Insert_Email(Document &d);
+        int Insert_Email(rapidjson::Document &d);
 
-        int Send_Email(Document &d);
+        int Send_Email(rapidjson::Document &d);
 
         int Request_Analysis()
         {
             //接收请求包
             char *data_bag = this->Recive_Data();
-            Document d;
+            rapidjson::Document d;
             d.Parse(data_bag);
             const char *rq_type = d[JSON_Maker::Key_Type::request_type].GetString();
             if (strcmp(rq_type, "insert_email") == 0)
             {
                 Insert_Email(d);
             }
+        /* data */
 
             //拆包
             //判断request_type
@@ -246,7 +133,8 @@ namespace SERVER
                 char *sign = this->Recive_Data();
                 bool is_passed = false;
                 //解析请求包
-                Document d;
+                /*
+                rapidjson::Document d;
                 d.Parse(sign);
                 if (strcmp(d[JSON_Maker::Key_Type::request_type].GetString(), "sign_up") == 0)
                 {
@@ -262,7 +150,7 @@ namespace SERVER
                     //用户取消操作退出线程
                     break;
                 }
-
+                */
                 //释放请求包的内存
                 delete sign;
                 if (is_passed)
