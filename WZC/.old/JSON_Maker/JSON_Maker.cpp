@@ -9,7 +9,6 @@ namespace JSON_Maker
     namespace Key_Type
     {
         const char request_type[] = "request_type";
-
         const char sql_username[] = "username";
         const char sql_password[] = "password";
         const char sql_phoneum[] = "phoneum";
@@ -82,7 +81,7 @@ namespace JSON_Maker
         string *str = new string;
         str->push_back('{');
 
-        *str += Creat_Key(Key_Type::request_type, "sign_in", true);
+        *str += Creat_Key(Key_Type::request_type, "sign_up", true);
 
         *str += Creat_Key(Key_Type::sql_username, username, true);
         *str += Creat_Key(Key_Type::sql_password, password, true);

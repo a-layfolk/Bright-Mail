@@ -8,6 +8,13 @@
 #include <stdio.h>
 #include <unistd.h> //read,write
 #include <signal.h>
+#include "rapidjson/rapidjson.h"
+#include "rapidjson/document.h"
+#include "rapidjson/reader.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+#include "SQL/SqlCon.h"
+using namespace rapidjson;
 
 namespace COMMUNI
 {
@@ -56,6 +63,100 @@ namespace COMMUNI
     };
 } // namespace COMMUNI
 
+#include <string>
+using namespace std;
+namespace JSON_Maker
+{
+    namespace Key_Type
+    {
+        const char request_type[] = "request_type";
+
+        const char sql_username[] = "username";
+        const char sql_password[] = "password";
+        const char sql_phoneum[] = "phoneum";
+        const char sql_emailType[] = "emailType";
+        const char sql_userId[] = "userId";
+        const char sql_emailType[] = "emailType";
+        const char sql_emailTitle[] = "emailTitle";
+        const char sql_emailContent[] = "emailContent";
+        const char sql_emailTime[] = "emailTime";
+        const char sql_attachedFilePath[] = "attachedFilePath";
+        const char sql_userId[] = "userId";
+        const char sql_targetUsername[] = "targetUsername";
+        const char sql_targetId[] = "targetId";
+        const char sql_ownerId[] = "ownerId";
+        const char sql_contactname[] = "contactname";
+        const char sql_newState[] = "newState";
+    } // namespace Key_Type
+
+    string Creat_Key(const char *key_name, const char *value, bool with_comma)
+    {
+        string str;
+        str.push_back('\"');
+        str += key_name;
+        str += "\':\"";
+        str += value;
+        if (with_comma)
+        {
+            str += "\",";
+        }
+        else
+        {
+            str.push_back('\"');
+        }
+        return str;
+    }
+    string Creat_Key(const char *key_name, int value, bool with_comma)
+    {
+        string str;
+        str.push_back('\"');
+        str += key_name;
+        str += "\':";
+        str += std::to_string(value);
+        if (with_comma)
+        {
+            str.push_back(',');
+        }
+        return str;
+    }
+
+    char *Creat_DataBag_Sign_in(char *username, char *password)
+    {
+        string *str = new string;
+        str->push_back('{');
+
+        *str += Creat_Key(Key_Type::request_type, "sign_in", true);
+
+        *str += Creat_Key(Key_Type::sql_username, username, true);
+        *str += Creat_Key(Key_Type::sql_password, password, false);
+
+        str->push_back('}');
+
+        char *JSON = new char[(*str).size()];
+        str->copy(JSON, (*str).size(), 0);
+        delete str;
+        return JSON;
+    }
+    char *Creat_DataBag_Sign_up(char *username, char *password, char *phoneum)
+    {
+        string *str = new string;
+        str->push_back('{');
+
+        *str += Creat_Key(Key_Type::request_type, "sign_in", true);
+
+        *str += Creat_Key(Key_Type::sql_username, username, true);
+        *str += Creat_Key(Key_Type::sql_password, password, true);
+        *str += Creat_Key(Key_Type::sql_phoneum, phoneum, false);
+
+        str->push_back('}');
+
+        char *JSON = new char[(*str).size()];
+        str->copy(JSON, (*str).size(), 0);
+        delete str;
+        return JSON;
+    }
+} // namespace JSON_Maker
+
 namespace SERVER
 {
     namespace CONFIG
@@ -73,30 +174,79 @@ namespace SERVER
 
         enum request_type
         {
-            sign,
+            sign_in,
+            sign_up,
             file,
-            mail_to_DB,
-            mail_send_to_client,
+            mail,
             list
 
         };
     } // namespace CONFIG
-    class Server_Core : private Communi_Core
+    class Server_Core : private COMMUNI::Communi_Core
     {
     private:
         /* data */
+        int Request_Analysis()
+        {
+            //接收请求包
+            //拆包
+            //判断request_type
+        }
+
+        int Insert_Email(Document &d);
+
+        int Send_Email(Document &d);
+
+        mysql SQL;
+
     public:
-        Server_Core(/* args */);
+        Server_Core();
         ~Server_Core();
+
+        bool Sign()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                //接收请求包
+                char *sign = this->Recive_Data();
+                bool is_passed = false;
+                //解析请求包
+                Document d;
+                d.Parse(sign);
+                if (strcmp(d[JSON_Maker::Key_Type::request_type].GetString(), "sign_up") == 0)
+                {
+                    is_passed = SQL.sign_up(d[JSON_Maker::Key_Type::sql_username].GetString(), d[JSON_Maker::Key_Type::sql_password].GetString(), d[JSON_Maker::Key_Type::sql_phoneum].GetString());
+                }
+                else if (strcmp(d[JSON_Maker::Key_Type::request_type].GetString(), "sign_in") == 0)
+                {
+                    is_passed = SQL.sign_in(d[JSON_Maker::Key_Type::sql_username].GetString(), d[JSON_Maker::Key_Type::sql_password].GetString());
+                }
+
+                //释放请求包的内存
+                delete sign;
+                if (is_passed)
+                {
+                    this->Send_Data("success");
+                    //给服务器发信息
+                    return true;
+                }
+                else
+                {
+                    this->Send_Data("failed");
+                    char info[3];
+                    sprintf(info, "%d", i);
+                    this->Send_Data(info);
+                }
+            }
+            //给服务器发未成功信息
+            return false;
+        }
+
+        //用户通信进程
+        int Exe()
+        {
+        }
     };
-
-    Server_Core::Server_Core() : Communi_Core(SERVER::CONFIG::server_ip)
-    {
-    }
-
-    Server_Core::~Server_Core()
-    {
-    }
 
 } // namespace SERVER
 
@@ -110,21 +260,72 @@ namespace CLIENT
         const int data_bag_size = 1024;
 
     } // namespace CONFIG
-    class Client_Core : private Communi_Core
+    class Client_Core : private COMMUNI::Communi_Core
     {
     private:
         /* data */
+        //服务器是否回传成功的消息
+        bool Server_Success()
+        {
+            char *str = this->Recive_Data();
+            if (strcmp(str, "success") == 0)
+            {
+                delete str;
+                return true;
+            }
+            delete str;
+            return false;
+        }
+
     public:
-        Client_Core(/* args */);
+        Client_Core();
+        Client_Core(const char *target_ip);
+
         ~Client_Core();
+
+        //返回还剩几次登陆机会,返回-1则是登陆成功
+        int Sign_in(char *username, char *password)
+        {
+            //发送请求包
+            char *JSON = JSON_Maker::Creat_DataBag_Sign_in(username, password);
+            this->Send_Data(JSON);
+            delete JSON;
+
+            //接受消息
+            if (this->Server_Success())
+            {
+                return -1;
+            }
+            else
+            {
+                //再接收一次消息
+                char *str = this->Recive_Data();
+                int remain = str[0] - '0';
+                delete str;
+                return remain;
+            }
+        }
+        //返回还剩几次登陆机会
+        int Sign_up(char *username, char *password, char *phoneum)
+        {
+            //发送请求包
+            char *JSON = JSON_Maker::Creat_DataBag_Sign_up(username, password,phoneum);
+            this->Send_Data(JSON);
+            delete JSON;
+
+            if (this->Server_Success())
+            {
+                return -1;
+            }
+            else
+            {
+                //再接收一次消息
+                char *str = this->Recive_Data();
+                int remain = str[0] - '0';
+                delete str;
+                return remain;
+            }
+        }
     };
-
-    Client_Core::Client_Core(/* args */)
-    {
-    }
-
-    Client_Core::~Client_Core()
-    {
-    }
 
 } // namespace CLIENT
