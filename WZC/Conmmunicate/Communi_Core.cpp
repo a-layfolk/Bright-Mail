@@ -10,16 +10,20 @@
 #include <unistd.h> //read,write
 #include <signal.h>
 #include <stdlib.h>
-#include "SQL/SqlCon.h"
+
 #include "rapidjson/rapidjson.h"
 #include "rapidjson/document.h"
 #include "rapidjson/reader.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+
+#include "SQL/SqlCon.h"
 #include "Communi_Core.hpp"
 
+#include "My_Json.hpp"
+using namespace Data_Bag;
+using namespace My_Json;
 using namespace rapidjson;
-// using namespace COMMUNI;
 
 namespace COMMUNI
 {
@@ -42,7 +46,7 @@ namespace COMMUNI
         }
     }
     Communi_Core::Communi_Core(int client_socket_number)
-    
+
     {
         this->clnt_socket = client_socket_number;
     }
@@ -52,6 +56,24 @@ namespace COMMUNI
         close(this->clnt_socket);
     }
 
+    int Communi_Core::ChRead(const char *data, char *buffer, int buffer_size)
+    {
+        int Bytes = 0;
+        const char *content = data;
+        for (int i = 0; i < buffer_size; i++)
+        {
+            if (*content == 0)
+            {
+                buffer[i] = 0;
+                break;
+            }
+
+            buffer[i] = *content;
+            content++;
+            Bytes++;
+        }
+        return Bytes;
+    }
     char *Communi_Core::Get_File_Name(const char *file_path)
     {
         int len = strlen(file_path);
@@ -103,24 +125,6 @@ namespace COMMUNI
         }
     }
 
-    int Communi_Core::ChRead(char *file_path, char *buffer, int buffer_size)
-    {
-        int Bytes = 0;
-        for (int i = 0; i < buffer_size; i++)
-        {
-            if (*file_path == 0)
-            {
-                buffer[i] = 0;
-                break;
-            }
-
-            buffer[i] = *file_path;
-            file_path++;
-            Bytes++;
-        }
-        return Bytes;
-    }
-
     char *Communi_Core::Recive_Data()
     {
         int read_len = 0;
@@ -137,6 +141,17 @@ namespace COMMUNI
         str->copy(JSON, (*str).size(), 0);
         delete str;
         return JSON;
+    }
+
+    int Communi_Core::Send_Data(const char *data)
+    {
+        int read_len = 0;
+        char buffer[CONFIG::buffer_size];
+        while ((read_len = this->ChRead(data, buffer, CONFIG::buffer_size)))
+        {
+            write(this->clnt_socket, buffer, read_len);
+        }
+        return 0;
     }
 
     int Communi_Core::Write_File(char *save_path)
@@ -185,6 +200,7 @@ namespace COMMUNI
         recv(this->clnt_socket, request_buffer, CONFIG::buffer_size, 0);
         return this->Write_File(save_path);
     }
+
 }; // namespace COMMUNI
 
 namespace SERVER
@@ -198,9 +214,73 @@ namespace SERVER
     {
         this->SQL.close();
     }
+    bool Server_Core::Sign()
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            //接收请求包
+            char *sign = this->Recive_Data();
+            bool is_passed = false;
+            //解析请求包
+            rapidjson::Document d;
+            d.Parse(sign);
+            if (strcmp(d[Key_Type::request_type].GetString(), "sign_up") == 0)
+            {
+                is_passed = SQL.sign_up(d[Key_Type::sql_username].GetString(), d[Key_Type::sql_password].GetString(), d[Key_Type::sql_phoneum].GetString());
+            }
+            else if (strcmp(d[Key_Type::request_type].GetString(), "sign_in") == 0)
+            {
+                is_passed = SQL.sign_in(d[Key_Type::sql_username].GetString(), d[Key_Type::sql_password].GetString());
+            }
+            else if (strcmp(d[Key_Type::request_type].GetString(), "operate") == 0)
+            {
+                std::cout << "User Sign Canceled" << std::endl;
+                //用户取消操作退出线程
+                break;
+            }
+            //释放请求包的内存
+            delete sign;
+            if (is_passed)
+            {
+                this->Send_Data("success");
+                //给服务器发信息
+                return true;
+            }
+            else
+            {
+                this->Send_Data("failed");
+                char info[3];
+                sprintf(info, "%d", i);
+                this->Send_Data(info);
+            }
+        }
+        //给服务器发未成功信息
 
-    // Server_Core::Request_Analysis()
-    
+        return false;
+    }
+
+    int Server_Core::Exe()
+    {
+    }
+    int Server_Core::Request_Analysis()
+    {
+        //接收请求包
+        char *data_bag = this->Recive_Data();
+        rapidjson::Document d;
+        d.Parse(data_bag);
+        const char *rq_type = d[Key_Type::request_type].GetString();
+        if (strcmp(rq_type, "insert_email") == 0)
+        {
+            // Insert_Email(d);
+        }
+        /* data */
+
+        //拆包
+        //判断request_type
+
+        delete data_bag;
+        return 0;
+    }
 
 }; // namespace SERVER
 
@@ -217,10 +297,17 @@ namespace CLIENT
     {
     }
 
+    bool Client_Core::Server_Success()
+    {
+        return true;
+    }
+
     int Client_Core::Sign_in(char *username, char *password)
     {
         //发送请求包
-        char *JSON = JSON_Maker::Creat_DataBag_Sign_in(username, password);
+        // char *JSON = Creat_DataBag_Sign_in(username, password);
+        char *JSON = NULL;
+
         this->Send_Data(JSON);
         delete JSON;
 
@@ -243,7 +330,8 @@ namespace CLIENT
     int Client_Core::Sign_up(char *username, char *password, char *phoneum)
     {
         //发送请求包
-        char *JSON = JSON_Maker::Creat_DataBag_Sign_up(username, password, phoneum);
+        char *JSON = DataBag_Sign_up(username, password, phoneum);
+        // char *JSON = NULL;
         this->Send_Data(JSON);
         delete JSON;
 
