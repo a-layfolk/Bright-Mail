@@ -12,7 +12,7 @@ char *mysql::get_user_id(const char *username, const char *phonenum)
 	MYSQL_RES *res = NULL;
 	MYSQL_ROW row = NULL;
 	unsigned int numFields = 0;
-	sprintf_s(query, sizeof(char) * 100, "select * from UserTable where userName='%s' and  telephone= '%s'", username, phonenum);
+	sprintf(query, "select * from UserTable where userName='%s' and  telephone= '%s'", username, phonenum);
 	if (!mysql_query(con, query))
 	{
 		res = mysql_store_result(con);
@@ -33,7 +33,7 @@ char *mysql::get_time()
 	char *time;
 	MYSQL_RES *res = NULL;
 	MYSQL_ROW row = NULL;
-	sprintf_s(query, sizeof(char) * 100, "select now();");
+	sprintf(query, "select now();");
 	if (!mysql_query(con, query))
 	{
 		res = mysql_store_result(con);
@@ -54,7 +54,7 @@ char *mysql::get_user_name(const char *userId)
 	char *username;
 	MYSQL_RES *res = NULL;
 	MYSQL_ROW row = NULL;
-	sprintf_s(query, sizeof(char) * 100, "select userName from UserTable where userId=%s;", userId);
+	sprintf(query, "select userName from UserTable where userId=%s;", userId);
 	if (!mysql_query(con, query))
 	{
 		res = mysql_store_result(con);
@@ -90,7 +90,7 @@ bool mysql::sign_in(const char *username, const char *password)
 	MYSQL_RES *res = NULL;
 	MYSQL_ROW row = NULL;
 
-	sprintf_s(query, sizeof(char) * 100, "select * from UserTable where userName='%s' and  password= '%s'", username, password);
+	sprintf(query,"select * from UserTable where userName='%s' and  password= '%s'", username, password);
 	mysql_query(con, query);
 	res = mysql_store_result(con);
 
@@ -110,7 +110,7 @@ bool mysql::sign_in(const char *username, const char *password)
 bool mysql::sign_up(const char *username, const char *password, const char *phoneum)
 {
 	char *query = new char[100];
-	sprintf_s(query, sizeof(char) * 100, "insert into UserTable(userName,password,telephone) values('%s','%s','%s');", username, password, phoneum);
+	sprintf(query, "insert into UserTable(userName,password,telephone) values('%s','%s','%s');", username, password, phoneum);
 	if (mysql_query(con, query))
 	{
 
@@ -132,7 +132,7 @@ EMAIL_INFO *mysql::get_email_info(const char *userId, const char *emailType)
 	EMAIL_INFO emailInfo[200];
 	char *query = new char[500];
 	char *targetUserName = NULL;
-	sprintf_s(query, sizeof(char) * 500, "select emailTitle,targetUserId,emailTime,emailId from EmailTable where ownerId=%d and emailType='%s';", userId, emailType);
+	sprintf(query,  "select emailTitle,targetUserId,emailTime,emailId from EmailTable where ownerId=%s and emailType='%s';", userId, emailType);
 	MYSQL_RES *res = NULL;
 	MYSQL_ROW row = NULL;
 	unsigned int numFields = 0;
@@ -162,7 +162,7 @@ CONTACT_INFO *mysql::get_contact_info(const char *userId)
 	CONTACT_INFO contactInfo[200];
 
 	char *query = new char[500];
-	sprintf_s(query, sizeof(char) * 500, "select contactId from ContactTable where userId=%s ;", userId);
+	sprintf(query,"select contactId from ContactTable where userId=%s ;", userId);
 	MYSQL_RES *res = NULL;
 	MYSQL_ROW row = NULL;
 	if (mysql_query(con, query))
@@ -179,7 +179,7 @@ CONTACT_INFO *mysql::get_contact_info(const char *userId)
 			MYSQL_RES *res_1 = NULL;
 			MYSQL_ROW row_1 = NULL;
 			unsigned int numFields_1 = 0;
-			sprintf_s(query, sizeof(char) * 500, "select userId,UserName,telephone from UserTable where userId=%s ;", row[0]);
+			sprintf(query,  "select userId,UserName,telephone from UserTable where userId=%s ;", row[0]);
 
 			if (mysql_query(con, query))
 			{
@@ -208,7 +208,7 @@ EMAIL_CONTENT *mysql::get_one_email(const char *emailId, const char *ownerId)
 	MYSQL_RES *res = NULL;
 	MYSQL_ROW row = NULL;
 	unsigned int numFields_1 = 0;
-	sprintf_s(query, sizeof(char) * 500, "select  emailTitle, emailContent, emailType, targetUsername, emailTime, attachedFilePath  from EmailTable where emailId=%s and ownerId=%s ;", emailId, ownerId);
+	sprintf(query,  "select  emailTitle, emailContent, emailType, targetUsername, emailTime, attachedFilePath  from EmailTable where emailId=%s and ownerId=%s ;", emailId, ownerId);
 
 	if (mysql_query(con, query))
 	{
@@ -233,7 +233,7 @@ EMAIL_CONTENT *mysql::get_one_email(const char *emailId, const char *ownerId)
 void mysql::add_email_to_db(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content)
 {
 	char *query = new char[2048];
-	sprintf_s(query, sizeof(char) * 2048, "insert into EmailTable(ownerId,TargetUserId,emailTitle,emailType,emailContent)values(%s,%s,'%s','%s','%s');", ownerId, targetId, email_title, email_type, email_content);
+	sprintf(query,  "insert into EmailTable(ownerId,TargetUserId,emailTitle,emailType,emailContent)values(%s,%s,'%s','%s','%s');", ownerId, targetId, email_title, email_type, email_content);
 	if (mysql_query(con, query))
 	{
 
@@ -250,7 +250,7 @@ bool mysql::change_email_content(const char *emailId, const char *ownerId, const
 {
 	char *query = new char[200];
 	char *nowtime = get_time();
-	sprintf_s(query, sizeof(char) * 2048, "update EmailTable set emailTitle=%s,emailContent='%s',TargetUserId=%s,emailTime='%s' ,attachedFilePath=%s,where emailId=%s;", emailTitle, emailContent, targetId, nowtime, attachedFilePath, emailId);
+	sprintf(query,  "update EmailTable set emailTitle=%s,emailContent='%s',TargetUserId=%s,emailTime='%s' ,attachedFilePath=%s,where emailId=%s;", emailTitle, emailContent, targetId, nowtime, attachedFilePath, emailId);
 	if (mysql_query(con, query))
 	{
 
@@ -265,7 +265,7 @@ bool mysql::change_email_state(const char *emailId, const char *newType)
 
 	char *query = new char[200];
 	char *nowtime = get_time();
-	sprintf_s(query, sizeof(char) * 2048, "update EmailTable set emailType='%s',emailTime='%s' where emailId=%s;", newType, nowtime, emailId);
+	sprintf(query, "update EmailTable set emailType='%s',emailTime='%s' where emailId=%s;", newType, nowtime, emailId);
 	if (mysql_query(con, query))
 	{
 
@@ -286,7 +286,7 @@ bool mysql::add_contact_info(const char *userId, const char *contactname, const 
 	if (contactId != "false")
 	{
 		char *query = new char[100];
-		sprintf_s(query, sizeof(char) * 100, "insert into ContactTable(userId,contactId) values(%s,%s);", userId, contactId);
+		sprintf(query,  "insert into ContactTable(userId,contactId) values(%s,%s);", userId, contactId);
 
 		if (mysql_query(con, query))
 		{
@@ -313,7 +313,7 @@ bool mysql::delete_contatc_info(const char *userId, const char *contactname, con
 	if (contactId != "false")
 	{
 		char *query = new char[100];
-		sprintf_s(query, sizeof(char) * 100, "delete from ContactTable where userId=%s and contactId=%s;", userId, contactId);
+		sprintf(query, "delete from ContactTable where userId=%s and contactId=%s;", userId, contactId);
 
 		if (mysql_query(con, query))
 		{

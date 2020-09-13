@@ -40,6 +40,11 @@ namespace COMMUNI
             exit(-1);
         }
     }
+    Communi_Core::Communi_Core(int client_socket_number)
+    
+    {
+        this->clnt_socket = client_socket_number;
+    }
 
     Communi_Core::~Communi_Core()
     {
@@ -180,9 +185,10 @@ namespace COMMUNI
         return this->Write_File(save_path);
     }
 }; // namespace COMMUNI
+
 namespace SERVER
 {
-    Server_Core::Server_Core() : COMMUNI::Communi_Core(SERVER::CONFIG::server_ip)
+    Server_Core::Server_Core(int client_socket) : COMMUNI::Communi_Core(client_socket)
     {
         this->SQL.connect(CONFIG::sql_ip, CONFIG::sql_user, CONFIG::sql_password, CONFIG::sql_db, CONFIG::sql_port);
     }
@@ -205,5 +211,49 @@ namespace CLIENT
 
     Client_Core::~Client_Core()
     {
+    }
+
+    int Client_Core::Sign_in(char *username, char *password)
+    {
+        //发送请求包
+        char *JSON = JSON_Maker::Creat_DataBag_Sign_in(username, password);
+        this->Send_Data(JSON);
+        delete JSON;
+
+        //接受消息
+        if (this->Server_Success())
+        {
+            return -1;
+        }
+        else
+        {
+            //再接收一次消息
+            char *str = this->Recive_Data();
+            int remain = str[0] - '0';
+            delete str;
+            return remain;
+        }
+    }
+
+    //返回还剩几次登陆机会
+    int Client_Core::Sign_up(char *username, char *password, char *phoneum)
+    {
+        //发送请求包
+        char *JSON = JSON_Maker::Creat_DataBag_Sign_up(username, password, phoneum);
+        this->Send_Data(JSON);
+        delete JSON;
+
+        if (this->Server_Success())
+        {
+            return -1;
+        }
+        else
+        {
+            //再接收一次消息
+            char *str = this->Recive_Data();
+            int remain = str[0] - '0';
+            delete str;
+            return remain;
+        }
     }
 } // namespace CLIENT

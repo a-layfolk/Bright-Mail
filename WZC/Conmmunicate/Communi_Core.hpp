@@ -20,7 +20,7 @@ namespace COMMUNI
 {
     namespace CONFIG
     {
-        // const char server_ip[] = "127.0.0.1";
+        const char server_ip[] = "127.0.0.1";
         const int server_port = 8888;
         const int buffer_size = 100;
         const int data_bag_size = 1024;
@@ -43,6 +43,9 @@ namespace COMMUNI
     public:
         //输入服务器地址,连接服务器
         Communi_Core(const char *server_ip);
+
+        //直接输入socket的代号
+        Communi_Core(int client_socket_number);
 
         ~Communi_Core();
 
@@ -70,6 +73,8 @@ namespace JSON_Maker
     namespace Key_Type
     {
         const char request_type[] = "request_type";
+
+        const char command_type[] = "command_type";
 
         const char sql_username[] = "username";
         const char sql_password[] = "password";
@@ -155,6 +160,22 @@ namespace JSON_Maker
         delete str;
         return JSON;
     }
+
+    char *Creat_DataBag_End_Connect()
+    {
+        string *str = new string;
+        str->push_back('{');
+
+        *str += Creat_Key(Key_Type::request_type, "operate", true);
+        *str += Creat_Key(Key_Type::command_type, "end_connect", true);
+
+        str->push_back('}');
+
+        char *JSON = new char[(*str).size()];
+        str->copy(JSON, (*str).size(), 0);
+        delete str;
+        return JSON;
+    }
 } // namespace JSON_Maker
 
 namespace SERVER
@@ -178,7 +199,8 @@ namespace SERVER
             sign_up,
             file,
             mail,
-            list
+            list,
+            operate
 
         };
     } // namespace CONFIG
@@ -186,21 +208,34 @@ namespace SERVER
     {
     private:
         /* data */
-        int Request_Analysis()
-        {
-            //接收请求包
-            //拆包
-            //判断request_type
-        }
-
         int Insert_Email(Document &d);
 
         int Send_Email(Document &d);
 
+        int Request_Analysis()
+        {
+            //接收请求包
+            char *data_bag = this->Recive_Data();
+            Document d;
+            d.Parse(data_bag);
+            const char *rq_type = d[JSON_Maker::Key_Type::request_type].GetString();
+            if (strcmp(rq_type, "insert_email") == 0)
+            {
+                Insert_Email(d);
+            }
+
+            //拆包
+            //判断request_type
+
+            delete data_bag;
+            return 0;
+        }
+
+        char *user_ip;
         mysql SQL;
 
     public:
-        Server_Core();
+        Server_Core(int client_socket);
         ~Server_Core();
 
         bool Sign()
@@ -220,6 +255,12 @@ namespace SERVER
                 else if (strcmp(d[JSON_Maker::Key_Type::request_type].GetString(), "sign_in") == 0)
                 {
                     is_passed = SQL.sign_in(d[JSON_Maker::Key_Type::sql_username].GetString(), d[JSON_Maker::Key_Type::sql_password].GetString());
+                }
+                else if (strcmp(d[JSON_Maker::Key_Type::request_type].GetString(), "operate") == 0)
+                {
+                    std::cout << "User Sign Canceled" << std::endl;
+                    //用户取消操作退出线程
+                    break;
                 }
 
                 //释放请求包的内存
@@ -254,8 +295,8 @@ namespace CLIENT
 {
     namespace CONFIG
     {
-        const char server_ip[] = "127.0.0.1";
-        const int server_port = 8888;
+        const char *server_ip = COMMUNI::CONFIG::server_ip;
+        const int server_port = COMMUNI::CONFIG::server_port;
         const int buffer_size = 100;
         const int data_bag_size = 1024;
 
@@ -281,51 +322,19 @@ namespace CLIENT
         Client_Core();
         Client_Core(const char *target_ip);
 
+        //向服务器发送结束操作的信息
+        void End_Connect()
+        {
+            char *JSON = JSON_Maker::Creat_DataBag_End_Connect();
+            this->Send_Data(JSON);
+            delete JSON;
+        }
         ~Client_Core();
 
         //返回还剩几次登陆机会,返回-1则是登陆成功
-        int Sign_in(char *username, char *password)
-        {
-            //发送请求包
-            char *JSON = JSON_Maker::Creat_DataBag_Sign_in(username, password);
-            this->Send_Data(JSON);
-            delete JSON;
-
-            //接受消息
-            if (this->Server_Success())
-            {
-                return -1;
-            }
-            else
-            {
-                //再接收一次消息
-                char *str = this->Recive_Data();
-                int remain = str[0] - '0';
-                delete str;
-                return remain;
-            }
-        }
+        int Sign_in(char *username, char *password);
         //返回还剩几次登陆机会
-        int Sign_up(char *username, char *password, char *phoneum)
-        {
-            //发送请求包
-            char *JSON = JSON_Maker::Creat_DataBag_Sign_up(username, password,phoneum);
-            this->Send_Data(JSON);
-            delete JSON;
-
-            if (this->Server_Success())
-            {
-                return -1;
-            }
-            else
-            {
-                //再接收一次消息
-                char *str = this->Recive_Data();
-                int remain = str[0] - '0';
-                delete str;
-                return remain;
-            }
-        }
+        int Sign_up(char *username, char *password, char *phoneum);
     };
 
 } // namespace CLIENT
