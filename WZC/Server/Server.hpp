@@ -59,10 +59,7 @@ namespace SERVER_CORE
 
         //登陆函数
         bool Sign();
-
-        //获取超长的内容数据包
-        char *Get_Content();
-
+        
         //给客户端发送数据
         int Send_Data(const char *data);
 
