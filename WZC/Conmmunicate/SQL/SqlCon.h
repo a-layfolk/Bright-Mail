@@ -22,6 +22,13 @@ typedef struct CONTATCT_INFO
 
 } CONTACT_INFO;
 
+typedef struct EMAIL_FILE_PATH
+{
+
+	char *filePath;
+
+} EMAIL_FILE_PATH;
+
 typedef struct EMAIL_CONTENT
 {
 	char *emailTitle;
@@ -29,7 +36,7 @@ typedef struct EMAIL_CONTENT
 	char *emailType;
 	char *targetUsername;
 	char *emailTime;
-	char *attachedFilePath;
+
 } EMAIL_CONTENT;
 
 class mysql
@@ -106,6 +113,14 @@ public:
 	返回布尔值 成功返回true，失败返回false
 	*/
 	bool delete_contatc_info(const char *userId, const char *contactname, const char *phonenum);
+	/*
+	获得邮件附件路径
+	*/
+	EMAIL_FILE_PATH * get_email_filepath(const char*emailId,int * num);
+	/*
+	删除邮件路径,先查找以前的，若存在则删除，再直接添加
+	*/
+	bool alter_email_filepath(const char*emailId,EMAIL_FILE_PATH *filePath,int * num);
 
 	void close();
 };

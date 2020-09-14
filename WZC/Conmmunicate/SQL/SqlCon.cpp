@@ -208,7 +208,7 @@ EMAIL_CONTENT *mysql::get_one_email(const char *emailId, const char *ownerId)
 	MYSQL_RES *res = NULL;
 	MYSQL_ROW row = NULL;
 	unsigned int numFields_1 = 0;
-	sprintf(query, "select  emailTitle, emailContent, emailType, targetUsername, emailTime, attachedFilePath  from EmailTable where emailId=%s and ownerId=%s ;", emailId, ownerId);
+	sprintf(query, "select  emailTitle, emailContent, emailType, targetUsername, emailTime, from EmailTable where emailId=%s and ownerId=%s ;", emailId, ownerId);
 
 	if (mysql_query(con, query))
 	{
@@ -224,7 +224,7 @@ EMAIL_CONTENT *mysql::get_one_email(const char *emailId, const char *ownerId)
 			emailContent->emailType = row[2];
 			emailContent->targetUsername = row[3];
 			emailContent->emailTime = row[4];
-			emailContent->attachedFilePath = row[5];
+		
 		}
 	}
 	return emailContent;
@@ -246,11 +246,11 @@ void mysql::add_email_to_db(const char *ownerId, const char *targetId, const cha
 	}
 }
 
-bool mysql::change_email_content(const char *emailId, const char *ownerId, const char *targetId, const char *emailType, const char *emailTitle, const char *emailContent, const char *attachedFilePath)
+bool mysql::change_email_content(const char *emailId, const char *ownerId, const char *targetId, const char *emailType, const char *emailTitle, const char *emailContent)
 {
 	char *query = new char[200];
 	char *nowtime = get_time();
-	sprintf(query, "update EmailTable set emailTitle=%s,emailContent='%s',TargetUserId=%s,emailTime='%s' ,attachedFilePath=%s,where emailId=%s;", emailTitle, emailContent, targetId, nowtime, attachedFilePath, emailId);
+	sprintf(query, "update EmailTable set emailTitle=%s,emailContent='%s',TargetUserId=%s,emailTime='%s' ,where emailId=%s;", emailTitle, emailContent, targetId, nowtime, emailId);
 	if (mysql_query(con, query))
 	{
 
@@ -331,6 +331,60 @@ bool mysql::delete_contatc_info(const char *userId, const char *contactname, con
 		printf("不存在该用户\n");
 		return false;
 	}
+}
+EMAIL_FILE_PATH * mysql::get_email_filepath(const char*emailId,int * num)
+{
+    EMAIL_FILE_PATH *filePath=new EMAIL_FILE_PATH[200];
+	char *query = new char[500];
+	MYSQL_RES *res = NULL;
+	MYSQL_ROW row = NULL;
+	*num=0;
+	sprintf(query, "select filePath  from EmailFilePath where emailId=%s;",emailId);
+	
+	if (mysql_query(con, query))
+	{
+		printf("get email file path error : %s\n", mysql_error(con));
+	}
+	else
+	{
+		res = mysql_store_result(con);
+		while ((row = mysql_fetch_row(res)) != NULL)
+		{
+			filePath[*num].filePath=row[0];
+			*num++;
+		}
+	}
+	return filePath;
+}
+bool mysql::alter_email_filepath(const char*emailId,EMAIL_FILE_PATH *filePath,int * num)
+{
+	char *query = new char[500];
+	MYSQL_RES *res = NULL;
+	MYSQL_ROW row = NULL;
+	sprintf(query, "delete  from EmailFilePath where emailId=%s;",emailId);
+	
+	if (mysql_query(con, query))
+	{
+		printf("delete email path error : %s\n", mysql_error(con));
+		return false;
+	}
+	else
+	{
+		
+		while (*num)
+		{
+			sprintf(query, "insert into EmailFilePath (emailId,filePath) values(%s,'%s');",emailId,filePath[*num].filePath);
+			if (mysql_query(con, query))
+			{
+	         	printf("insert email path error : %s\n", mysql_error(con));
+				 return false;
+				}else{
+					*num--;
+				}
+			
+		}
+	}
+	return true;
 }
 
 void mysql::close()
