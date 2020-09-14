@@ -97,7 +97,7 @@ bool mysql::sign_in(const char *username, const char *password)
 	if (!(row = mysql_fetch_row(res)))
 	{
 		printf("login error : %s\n", mysql_error(con)); //需要加上这个，因为这个是操作失败时返回显示
-		getchar();
+		// getchar();
 		return false;
 	}
 	else

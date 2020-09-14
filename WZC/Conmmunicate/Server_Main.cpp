@@ -23,17 +23,9 @@ void *User_Thread(void *args)
     //创建了用户操作
     Server_Core Usr(*(int *)args);
 
-    if (Usr.Sign())
-    {
-        std::cout << "loged in" << std::endl;//debug
-        //操作进入用户线程
-        Usr.Exe();
-    }
-    else
-    {
-        std::cout << "failed" << std::endl;//debug
-        pthread_exit(0);
-    }
+    Usr.Exe();
+
+    pthread_exit(0);
 }
 
 int main(int argc, char const *argv[])
@@ -65,6 +57,14 @@ int main(int argc, char const *argv[])
         {
             std::cout << "successful" << std::endl;
         }
+
+        // struct sockaddr_in sa;
+        // int len = sizeof(sa);
+        // if (!getpeername(sockfd, (struct sockaddr *)&sa, &len))
+        // {
+        //     printf("对方IP：%s ", inet_ntoa(sa.sin_addr));
+        //     printf("对方PORT：%d ", ntohs(sa.sin_port));可以写进Server_Core内
+        // }
 
         //创建多线程
         pthread_t tid;
