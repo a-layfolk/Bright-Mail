@@ -204,6 +204,7 @@ namespace Data_Bag
         char *JSON = new char[(*str).size()];
         strcpy(JSON, (*str).c_str());
         delete str;
+        cout << JSON << endl;
         return JSON;
     }
 
