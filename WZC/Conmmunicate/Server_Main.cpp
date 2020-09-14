@@ -25,6 +25,7 @@ void *User_Thread(void *args)
     Server_Core *Usr = new Server_Core(*(int *)args);
     Usr->Exe();
     delete Usr;
+    cout << "Thread close" << endl;
     pthread_exit(0);
 }
 
