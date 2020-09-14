@@ -2,7 +2,8 @@
 #include <iostream>
 int main(int argc, char const *argv[])
 {
-    CLIENT::Client_Core CC("0.0.0.0");
+    // CLIENT::Client_Core CC("123.57.176.139");
+    CLIENT::Client_Core CC;
     char user_name[20];
     char password[20];
 

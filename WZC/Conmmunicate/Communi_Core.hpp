@@ -16,7 +16,7 @@
 #include "rapidjson/stringbuffer.h"
 
 #include "SQL/SqlCon.h"
-#define APP_PORT 8889
+#define APP_PORT 8888
 #define BUFFER_SIZE 4000
 //客户端配置
 namespace CLIENT
@@ -40,7 +40,8 @@ namespace SERVER
         const int server_port = APP_PORT;
         const int buffer_size = BUFFER_SIZE;
 
-        const char sql_ip[] = "123.57.176.139";
+        // const char sql_ip[] = "123.57.176.139";
+        const char sql_ip[] = "0.0.0.0";
         const char sql_user[] = "root";
         const char sql_password[] = "1233";
         const char sql_db[] = "Email_schema";
