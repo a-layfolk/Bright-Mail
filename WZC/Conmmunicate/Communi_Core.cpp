@@ -133,10 +133,13 @@ namespace COMMUNI
         int read_len;
         char buffer[CONFIG::buffer_size];
         char *s = new char[2 * CONFIG::buffer_size]; //动态内存分配的算法可以秀一下
+        memset(s, 0, 2 * CONFIG::buffer_size);
         char *cursor = s;
+        memset(buffer, 0, CONFIG::buffer_size);
         while ((read_len = read(this->clnt_socket, buffer, CONFIG::buffer_size)) > 0)
         {
             strcpy(cursor, buffer);
+            // sprintf(s, "%s", cursor);
             cursor += read_len; //这样写是对的吗
             memset(buffer, 0, CONFIG::buffer_size);
             if (read_len < CONFIG::buffer_size)
