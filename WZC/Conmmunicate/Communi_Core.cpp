@@ -283,6 +283,7 @@ namespace SERVER
         while (1)
         {
             //接收请求包
+            cout << "into request" << endl;
             char *data_bag = this->Recive_Data();
             rapidjson::Document d;
             ParseResult ok = d.Parse(data_bag); //解析的错误处理
@@ -294,6 +295,7 @@ namespace SERVER
                 if (wrong_num > 3)
                 {
                     // close(this->clnt_socket);
+                    delete data_bag;
                     break;
                 }
                 cout << "This is not a Json-data bag!" << endl;
@@ -308,6 +310,12 @@ namespace SERVER
                     if (strcmp(d[Key_Type::command_type].GetString(), "exit") == 0)
                     {
                         // close(this->clnt_socket);
+                        delete data_bag;
+                        break;
+                    }
+                    else
+                    {
+                        delete data_bag;
                         break;
                     }
                 }

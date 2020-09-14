@@ -15,7 +15,7 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
-#define APP_PORT 8889
+#define APP_PORT 8888
 #define BUFFER_SIZE 1000
 
 //通信核心

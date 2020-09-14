@@ -20,6 +20,7 @@
 using namespace SERVER;
 void *User_Thread(void *args)
 {
+    cout << "Thread create" << endl;
     //创建了用户操作
     // Server_Core Usr(*(int *)args);
     int socket = *(int *)args;
