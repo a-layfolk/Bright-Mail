@@ -16,13 +16,47 @@
 #include "rapidjson/stringbuffer.h"
 
 #include "SQL/SqlCon.h"
-
-namespace COMMUNI
+#define APP_PORT 8889
+#define BUFFER_SIZE 4000
+//客户端配置
+namespace CLIENT
 {
     namespace CONFIG
     {
-        const int server_port = 8888;
-        const int buffer_size = 4000;
+        const char server_ip[] = "123.57.176.139";
+        const int server_port = APP_PORT;
+        const int buffer_size = BUFFER_SIZE;
+
+    } // namespace CONFIG
+
+} // namespace CLIENT
+
+//服务器配置
+namespace SERVER
+{
+    namespace CONFIG
+    {
+        const char server_ip[] = "0.0.0.0";
+        const int server_port = APP_PORT;
+        const int buffer_size = BUFFER_SIZE;
+
+        const char sql_ip[] = "123.57.176.139";
+        const char sql_user[] = "root";
+        const char sql_password[] = "1233";
+        const char sql_db[] = "Email_schema";
+        const int sql_port = 3306;
+    } // namespace CONFIG
+
+} // namespace SERVER
+
+//通信核心
+namespace COMMUNI
+{
+    //通信核心配置
+    namespace CONFIG
+    {
+        const int server_port = APP_PORT;
+        const int buffer_size = BUFFER_SIZE;
 
     } // namespace CONFIG
 
@@ -47,7 +81,7 @@ namespace COMMUNI
 
         ~Communi_Core();
 
-        //给服务器发送数据
+        //给服务器发送数据，send后记得将原字符串删除！
         int Send_Data(const char *data);
 
         //取得服务器数据，数据格式为JSON的字符串
@@ -64,38 +98,22 @@ namespace COMMUNI
     };
 } // namespace COMMUNI
 
+//服务器端代码
 namespace SERVER
 {
-    namespace CONFIG
-    {
-        const char server_ip[] = "0.0.0.0";
-        const int server_port = 8888;
-        const int buffer_size = 4000;
-
-        const char sql_ip[] = "123.57.176.139";
-        const char sql_user[] = "root";
-        const char sql_password[] = "1233";
-        const char sql_db[] = "Email_schema";
-        const int sql_port = 3306;
-
-        enum request_type
-        {
-            sign_in,
-            sign_up,
-            file,
-            mail,
-            list,
-            operate
-
-        };
-    } // namespace CONFIG
 
     class Server_Core : protected COMMUNI::Communi_Core
     {
     private:
-        int Insert_Email(rapidjson::Document &d);
-        int Send_Email(rapidjson::Document &d);
+        int Add_Email(rapidjson::Document &d);
+        int Return_Email(rapidjson::Document &d);
+        int Return_List(rapidjson::Document &d);
+
         int Request_Analysis();
+        void Send_Error(const char *error_info);
+        void Send_Success();
+        bool Sign(rapidjson::Document &d, bool is_sign_in);
+
         char *user_ip;
         mysql SQL;
 
@@ -103,40 +121,29 @@ namespace SERVER
         Server_Core(int client_socket);
         ~Server_Core();
 
-        bool Sign();
         int Exe();
     };
 
 } // namespace SERVER
 
+//客户端代码
 namespace CLIENT
 {
-    namespace CONFIG
-    {
-        const char server_ip[] = "123.57.176.139";
-        const int server_port = COMMUNI::CONFIG::server_port;
-        const int buffer_size = 4000;
-        const int data_bag_size = 1024;
-
-    } // namespace CONFIG
     class Client_Core : protected COMMUNI::Communi_Core
     {
     private:
-        /* data */
-        //服务器是否回传成功的消息
-        bool Server_Success();
+        //服务器是否回传成功的消息.如果传回的是失败，则在error_info中填入失败信息
+        bool Recive_Success(char *error_info);
+        //解析返回的信息，记得delete包！
+        rapidjson::Document *Return_Analysis(char *data_bag);
 
     public:
         Client_Core();
         Client_Core(const char *target_ip);
 
-        //向服务器发送结束操作的信息
-        void End_Connect()
-        {
-            char *JSON = NULL; //JSON_M::Creat_DataBag_End_Connect();
-            this->Send_Data(JSON);
-            delete JSON;
-        }
+        //向服务器发送结束线程的信息
+        void Send_Exit();
+
         ~Client_Core();
 
         int Sign_in(char *username, char *password);

@@ -11,9 +11,17 @@ using namespace rapidjson;
 int main()
 {
     // 1. 把 JSON 解析至 DOM。
-    const char *json = "{\"project\":\"rapidjson\",\"stars\":10}";
+    const char *json = "{\"project\"sdfsfg:\"rapidjson\",\"stars\":10}";
     Document d;
-    d.Parse(json);
+    ParseResult ok = d.Parse(json); //错误处理
+    if (!ok)
+    {
+        printf("Error");
+    }
+    else
+    {
+        printf("%d\n", d["stars"].GetInt());
+    }
 
     // 2. 利用 DOM 作出修改。
     /*    Value& s = d["stars"];
@@ -26,6 +34,5 @@ int main()
  
     // Output {"project":"rapidjson","stars":11}
     std::cout << buffer.GetString() << std::endl;*/
-    printf("%d\n", d["stars"].GetInt());
     return 0;
 }

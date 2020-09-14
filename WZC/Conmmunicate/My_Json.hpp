@@ -26,6 +26,16 @@ namespace My_Json
         const char sql_contactname[] = "contactname";
         const char sql_newState[] = "newState";
     } // namespace Key_Type
+    namespace Rq_Type
+    {
+        const char command[] = "command";
+        const char sign_in[] = "sign_in";
+        const char sign_up[] = "sign_up";
+        // const char [] = "";
+        // const char [] = "";
+        // const char [] = "";
+
+    } // namespace Rq_Type
 
     string Creat_Key(const char *key_name, const char *value, bool with_comma)
     {
@@ -44,6 +54,8 @@ namespace My_Json
         }
         return str;
     }
+    //创建其余空键值的函数？
+
     string Creat_Key_int(const char *key_name, int value, bool with_comma)
     {
         string str;
@@ -67,7 +79,7 @@ namespace Data_Bag
         string *str = new string;
         str->push_back('{');
 
-        *str += Creat_Key(Key_Type::request_type, "sign_in", true);
+        *str += Creat_Key(Key_Type::request_type, Rq_Type::sign_in, true);
 
         *str += Creat_Key(Key_Type::sql_username, username, true);
         *str += Creat_Key(Key_Type::sql_password, password, false);
@@ -78,6 +90,7 @@ namespace Data_Bag
         memset(JSON, 0, (*str).size());
         strcpy(JSON, (*str).c_str());
         delete str;
+        cout << "data_bag:" << JSON << endl; //debug
         return JSON;
     }
 
@@ -86,7 +99,7 @@ namespace Data_Bag
         string *str = new string;
         str->push_back('{');
 
-        *str += Creat_Key(Key_Type::request_type, "sign_in", true);
+        *str += Creat_Key(Key_Type::request_type, Rq_Type::sign_up, true);
 
         *str += Creat_Key(Key_Type::sql_username, username, true);
         *str += Creat_Key(Key_Type::sql_password, password, true);
@@ -95,7 +108,7 @@ namespace Data_Bag
         str->push_back('}');
 
         char *JSON = new char[(*str).size()];
-        str->copy(JSON, (*str).size(), 0);
+        strcpy(JSON, (*str).c_str());
         delete str;
         return JSON;
     }
@@ -105,14 +118,48 @@ namespace Data_Bag
         string *str = new string;
         str->push_back('{');
 
-        *str += Creat_Key(Key_Type::request_type, "operate", true);
-        *str += Creat_Key(Key_Type::command_type, "end_connect", true);
+        *str += Creat_Key(Key_Type::request_type, Rq_Type::command, true);
+        *str += Creat_Key(Key_Type::command_type, "end_connect", false);
 
         str->push_back('}');
 
         char *JSON = new char[(*str).size()];
-        str->copy(JSON, (*str).size(), 0);
+        strcpy(JSON, (*str).c_str());
         delete str;
+        return JSON;
+    }
+
+    char *Data_Bag_Success()
+    {
+        string *str = new string;
+        str->push_back('{');
+
+        *str += Creat_Key(Key_Type::request_type, Rq_Type::command, true);
+        *str += Creat_Key(Key_Type::command_type, "success", false);
+
+        str->push_back('}');
+
+        char *JSON = new char[(*str).size()];
+        strcpy(JSON, (*str).c_str());
+        delete str;
+        return JSON;
+    }
+
+    char *Data_Bag_Error(const char *error_info)
+    {
+        string *str = new string;
+        str->push_back('{');
+
+        *str += Creat_Key(Key_Type::request_type, Rq_Type::command, true);
+        *str += Creat_Key(Key_Type::command_type, "error", true);
+        *str += Creat_Key("error_info", error_info, false);
+
+        str->push_back('}');
+
+        char *JSON = new char[(*str).size()];
+        strcpy(JSON, (*str).c_str());
+        delete str;
+        cout << JSON << endl; //debug
         return JSON;
     }
 } // namespace Data_Bag

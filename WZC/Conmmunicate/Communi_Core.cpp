@@ -67,13 +67,10 @@ namespace COMMUNI
                 buffer[i] = 0;
                 break;
             }
-            //debug
-
             buffer[i] = *cursor;
             cursor++;
             Bytes++;
         }
-        // std::cout << "Bytes:" << Bytes << (int)*data << endl;
         return Bytes;
     }
     char *Communi_Core::Get_File_Name(const char *file_path)
@@ -135,19 +132,20 @@ namespace COMMUNI
     {
         int read_len;
         char buffer[CONFIG::buffer_size];
-        char *s = new char[10000]; //动态内存分配的算法可以秀一下
+        char *s = new char[3 * CONFIG::buffer_size]; //动态内存分配的算法可以秀一下
         char *cursor = s;
         while ((read_len = read(this->clnt_socket, buffer, CONFIG::buffer_size)) > 0)
         {
             strcpy(cursor, buffer);
-            cursor += CONFIG::buffer_size;
+            cursor += read_len; //这样写是对的吗
+            cout << "read len:" << read_len << endl;
             memset(buffer, 0, CONFIG::buffer_size);
             if (read_len < CONFIG::buffer_size)
             {
+                cout << "reciving content:" << s << endl;
                 break;
             }
         }
-        cout << s << endl; //debug
         return s;
     }
 
@@ -159,11 +157,10 @@ namespace COMMUNI
         while ((read_len = this->ChRead(t_d, buffer, CONFIG::buffer_size)) > 0)
         {
             write(this->clnt_socket, buffer, read_len);
-            cout << "send buffer" << buffer << endl;
-            // write(this->clnt_socket, buffer, read_len);
             memset(buffer, 0, CONFIG::buffer_size);
             if (read_len < CONFIG::buffer_size)
             {
+                cout << "send break" << endl;
                 break;
             }
         }
@@ -230,70 +227,106 @@ namespace SERVER
     {
         this->SQL.close();
     }
-    bool Server_Core::Sign()
-    {
-        for (int i = 0; i < 3; i++)
-        {
 
-            //接收请求包
-            cout << "start" << endl;
-            char *sign = this->Recive_Data();
-            std::cout << "sign end recived Data" << sign << std::endl; //debug
-            bool is_passed = false;
-            //解析请求包
-            rapidjson::Document d;
-            d.Parse(sign);
-            if (strcmp(d[Key_Type::request_type].GetString(), "sign_up") == 0)
-            {
-                is_passed = SQL.sign_up(d[Key_Type::sql_username].GetString(), d[Key_Type::sql_password].GetString(), d[Key_Type::sql_phoneum].GetString());
-            }
-            else if (strcmp(d[Key_Type::request_type].GetString(), "sign_in") == 0)
-            {
-                is_passed = SQL.sign_in(d[Key_Type::sql_username].GetString(), d[Key_Type::sql_password].GetString());
-            }
-            else if (strcmp(d[Key_Type::request_type].GetString(), "operate") == 0)
-            {
-                std::cout << "User Sign Canceled" << std::endl;
-                //用户取消操作退出线程
-            }
-            //释放请求包的内存
-            delete sign;
-            if (is_passed)
-            {
-                this->Send_Data("success");
-                //给服务器发信息
-                return true;
-            }
-            else
-            {
-            }
-            //给服务器发未成功信息
+    void Server_Core::Send_Success()
+    {
+        char *DB = Data_Bag::Data_Bag_Success();
+        this->Send_Data(DB);
+        delete DB;
+    }
+    void Server_Core::Send_Error(const char *error_info)
+    {
+        char *DB = Data_Bag::Data_Bag_Error(error_info);
+        this->Send_Data(DB);
+        delete DB;
+    }
+
+    bool Server_Core::Sign(Document &d, bool is_sign_in)
+    {
+
+        bool is_passed = false;
+        if (is_sign_in)
+        {
+            is_passed = SQL.sign_in(d[Key_Type::sql_username].GetString(), d[Key_Type::sql_password].GetString());
+            cout << d[Key_Type::sql_username].GetString() << d[Key_Type::sql_password].GetString() << endl; //debug
+        }
+        else
+        {
+            is_passed = SQL.sign_up(d[Key_Type::sql_username].GetString(), d[Key_Type::sql_password].GetString(), d[Key_Type::sql_phoneum].GetString());
         }
 
+        if (is_passed)
+        {
+            cout << "pass!" << endl; //debug
+            this->Send_Success();
+            return true;
+        }
+        else
+        {
+            this->Send_Error("FUCK!");
+            // cout << "no pass!" << endl; //debug
+            // if (is_sign_in)
+            // {
+            //     this->Send_Error("User not exsist!");
+            // }
+            // else
+            // {
+            //     this->Send_Error("Sign up failed!");
+            // }
+        }
         return false;
     }
 
-    int Server_Core::Exe()
-    {
-    }
     int Server_Core::Request_Analysis()
     {
-        //接收请求包
-        char *data_bag = this->Recive_Data();
-        rapidjson::Document d;
-        d.Parse(data_bag);
-        const char *rq_type = d[Key_Type::request_type].GetString();
-        if (strcmp(rq_type, "insert_email") == 0)
+        int wrong_num = 0;
+        while (1)
         {
-            // Insert_Email(d);
+            //接收请求包
+            char *data_bag = this->Recive_Data();
+            rapidjson::Document d;
+            ParseResult ok = d.Parse(data_bag); //解析的错误处理
+            if (!ok)
+            {
+                //解析失败，这玩意不是JSON
+                wrong_num++;
+                sleep(1);
+                if (wrong_num > 3)
+                {
+                    break;
+                }
+                cout << "This is not a Json-data bag!" << endl;
+            }
+            else
+            {
+                //其余的返回信息都在对应功能函数内写
+                //哈夫曼树1、请求列表 2、请求内容 3、请求信件 4、通讯录操作 5、发送信件 6、登陆操作
+                const char *rq_type = d[Key_Type::request_type].GetString();
+                if (strcmp(rq_type, "insert_email") == 0)
+                {
+                    // Insert_Email(d);
+                }
+                else if (strcmp(rq_type, Rq_Type::sign_in) == 0)
+                {
+                    Sign(d, true);
+                }
+                else if (strcmp(rq_type, Rq_Type::sign_up) == 0)
+                {
+                    Sign(d, false);
+                }
+                /* data */
+
+                //拆包
+                //判断request_type
+            }
+            delete data_bag;
         }
-        /* data */
-
-        //拆包
-        //判断request_type
-
-        delete data_bag;
         return 0;
+    }
+    int Server_Core::Exe()
+    {
+
+        this->Request_Analysis();
     }
 
 }; // namespace SERVER
@@ -311,14 +344,52 @@ namespace CLIENT
     {
     }
 
-    bool Client_Core::Server_Success()
+    //这个只相当于中间件
+    rapidjson::Document *Client_Core::Return_Analysis(char *data_bag)
     {
-        char *data = this->Recive_Data();
-        std::cout << "success" << std::endl; //debug
-        if (strcmp(data, "success") == 0)
+        Document *d = new Document;
+        ParseResult ok = d->Parse(data_bag);
+        if (!ok)
         {
-            return true;
+            return NULL;
         }
+        else
+        {
+            return d;
+        }
+    }
+
+    //接收成功消息
+    bool Client_Core::Recive_Success(char *error_info)
+    {
+        char *data_bag = this->Recive_Data();
+        Document *d = this->Return_Analysis(data_bag);
+        if (d != NULL)
+        {
+            if (strcmp((*d)[Key_Type::request_type].GetString(), Rq_Type::command) == 0)
+            {
+                if (strcmp((*d)[Key_Type::command_type].GetString(), "error") == 0)
+                {
+                    const char *ei = (*d)["error_info"].GetString();
+                    error_info = new char[strlen(ei) + 1];
+                    strcpy(error_info, ei);
+                }
+                else
+                {
+                    error_info = NULL;
+                    delete data_bag;
+                    delete d;
+                    return true;
+                }
+            }
+            delete d;
+        }
+        else
+        {
+            error_info = new char[15];
+            strcpy(error_info, "No Data Bag!");
+        }
+        delete data_bag;
         return false;
     }
 
@@ -326,45 +397,41 @@ namespace CLIENT
     {
         //发送请求包
         char *JSON = DataBag_Sign_in(username, password);
-
         this->Send_Data(JSON);
         delete JSON;
-
-        //接受消息
-        // if (this->Server_Success())
-        // {
-        //     return -1;
-        // }
-        // else
-        // {
-        //     //再接收一次消息
-        //     char *str = this->Recive_Data();
-        //     int remain = str[0] - '0';
-        //     delete str;
-        //     return remain;
-        // }
+        char *error_info;
+        cout << "recving sucess" << endl; //debug
+        if (this->Recive_Success(error_info))
+        {
+            cout << "success log in" << endl; //debug
+            return 0;
+        }
+        else
+        {
+            cout << error_info << endl;
+            delete error_info;
+            return -1;
+        }
     }
 
-    //返回还剩几次登陆机会
     int Client_Core::Sign_up(char *username, char *password, char *phoneum)
     {
         //发送请求包
         char *JSON = DataBag_Sign_up(username, password, phoneum);
-        // char *JSON = NULL;
         this->Send_Data(JSON);
         delete JSON;
-
-        if (this->Server_Success())
+        char *error_info;
+        if (this->Recive_Success(error_info))
         {
-            return -1;
+            return 0;
         }
         else
         {
-            //再接收一次消息
-            char *str = this->Recive_Data();
-            int remain = str[0] - '0';
-            delete str;
-            return remain;
+            cout << "Error:";
+            cout << error_info << endl;
+            delete error_info;
+            return -1;
         }
     }
+
 } // namespace CLIENT
