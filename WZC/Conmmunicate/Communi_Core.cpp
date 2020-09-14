@@ -53,7 +53,7 @@ namespace COMMUNI
 
     Communi_Core::~Communi_Core()
     {
-        close(this->clnt_socket);
+        // close(this->clnt_socket);
     }
 
     //为了保证字符串一直向后读取，传入的data指针会移动
@@ -263,16 +263,15 @@ namespace SERVER
         }
         else
         {
-            this->Send_Error("FUCK!");
-            // cout << "no pass!" << endl; //debug
-            // if (is_sign_in)
-            // {
-            //     this->Send_Error("User not exsist!");
-            // }
-            // else
-            // {
-            //     this->Send_Error("Sign up failed!");
-            // }
+            cout << "no pass!" << endl; //debug
+            if (is_sign_in)
+            {
+                this->Send_Error("User not exsist!");
+            }
+            else
+            {
+                this->Send_Error("Sign up failed!");
+            }
         }
         return false;
     }
@@ -302,7 +301,15 @@ namespace SERVER
                 //其余的返回信息都在对应功能函数内写
                 //哈夫曼树1、请求列表 2、请求内容 3、请求信件 4、通讯录操作 5、发送信件 6、登陆操作
                 const char *rq_type = d[Key_Type::request_type].GetString();
-                if (strcmp(rq_type, "insert_email") == 0)
+                if (strcmp(rq_type, Rq_Type::command) == 0)
+                {
+                    if (strcmp(d[Key_Type::command_type].GetString(), "exit") == 0)
+                    {
+                        close(this->clnt_socket);
+                        break;
+                    }
+                }
+                else if (strcmp(rq_type, "insert_email") == 0)
                 {
                     // Insert_Email(d);
                 }
@@ -358,7 +365,13 @@ namespace CLIENT
             return d;
         }
     }
-
+    void Client_Core::Send_Exit()
+    {
+        char *data_bag = Data_Bag::DataBag_Exit();
+        this->Send_Data(data_bag);
+        delete data_bag;
+        close(this->clnt_socket);
+    }
     //接收成功消息
     bool Client_Core::Recive_Success(char *error_info)
     {
@@ -408,6 +421,7 @@ namespace CLIENT
         }
         else
         {
+            cout << "Error:";
             cout << error_info << endl;
             delete error_info;
             return -1;

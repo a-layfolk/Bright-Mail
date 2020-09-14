@@ -64,7 +64,6 @@ namespace COMMUNI
     class Communi_Core
     {
     private:
-        int clnt_socket;
         //模仿read，content输入需要读取的字符串，并将读取的内容转移至较小的buffer中，方便数据包的分批发送。函数返回读取的字节数。注意，cursor在传入函数后会发生改变
         int ChRead(char *&cursor, char *buffer, int buffer_size);
 
@@ -74,6 +73,7 @@ namespace COMMUNI
         char *Get_File_Name(const char *file_path);
 
     public:
+        int clnt_socket;
         //输入服务器地址,连接服务器
         Communi_Core(const char *server_ip);
 

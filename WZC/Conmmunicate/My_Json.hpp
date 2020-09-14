@@ -70,6 +70,68 @@ namespace My_Json
         }
         return str;
     }
+    class Json_Maker
+    {
+    private:
+    public:
+        Json_Maker();
+
+        const char *request_type = NULL;
+        const char *command_type = NULL;
+
+        const char *sql_username = NULL;
+        const char *sql_password = NULL;
+        const char *sql_phoneum = NULL;
+        const char *sql_emailType = NULL;
+        const char *sql_userId = NULL;
+        const char *sql_emailTitle = NULL;
+        const char *sql_emailContent = NULL;
+        const char *sql_emailTime = NULL;
+        const char *sql_attachedFilePath = NULL;
+        const char *sql_targetUsername = NULL;
+        const char *sql_targetId = NULL;
+        const char *sql_ownerId = NULL;
+        const char *sql_contactname = NULL;
+        const char *sql_newState = NULL;
+
+        char *Create_Json(string *str)
+        {
+            str->push_back('{');
+
+            *str += Creat_Key(Key_Type::request_type, this->request_type, true);
+
+            *str += Creat_Key(Key_Type::sql_username, this->sql_username, true);
+            *str += Creat_Key(Key_Type::sql_password, this->sql_password, true);
+
+            *str += Creat_Key(Key_Type::sql_password, this->sql_password, true);
+            *str += Creat_Key(Key_Type::sql_password, this->sql_password, true);
+            *str += Creat_Key(Key_Type::sql_password, this->sql_password, true);
+            *str += Creat_Key(Key_Type::sql_password, this->sql_password, true);
+            *str += Creat_Key(Key_Type::sql_password, this->sql_password, true);
+            *str += Creat_Key(Key_Type::sql_password, this->sql_password, true);
+            *str += Creat_Key(Key_Type::sql_password, this->sql_password, true);
+
+            *str += Creat_Key("tail", "yes", false);
+            str->push_back('}');
+
+            char *JSON = new char[(*str).size()];
+            memset(JSON, 0, (*str).size());
+            strcpy(JSON, (*str).c_str());
+            delete str;
+            cout << "data_bag:" << JSON << endl; //debug
+            return JSON;
+        }
+        ~Json_Maker();
+    };
+
+    Json_Maker::Json_Maker()
+    {
+    }
+
+    Json_Maker::~Json_Maker()
+    {
+    }
+
 } // namespace My_Json
 namespace Data_Bag
 {
@@ -113,13 +175,13 @@ namespace Data_Bag
         return JSON;
     }
 
-    char *DataBag_End_Connect()
+    char *DataBag_Exit()
     {
         string *str = new string;
         str->push_back('{');
 
         *str += Creat_Key(Key_Type::request_type, Rq_Type::command, true);
-        *str += Creat_Key(Key_Type::command_type, "end_connect", false);
+        *str += Creat_Key(Key_Type::command_type, "exit", false);
 
         str->push_back('}');
 
