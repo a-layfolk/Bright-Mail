@@ -18,39 +18,30 @@ int main(int argc, char const *argv[])
     int rt_val = -1;
     // CC.Send_Exit();
     // return 0;
-    int i = 0;
-    while (1)
-    {
-        i++;
-        if (i > 5)
-        {
-            break;
-        }
 
-        std::cout << "input username:" << std::endl;
-        std::cin >> user_name;
-        std::cout << "input password:" << std::endl;
-        std::cin >> password;
-        if (strcmp(request, "sign_in") == 0)
-        {
-            rt_val = CC.Sign_in(user_name, password);
-        }
-        else if (strcmp(request, "sign_up") == 0)
-        {
-            std::cout << "input telephone:" << std::endl;
-            std::cin >> telephone;
-            rt_val = CC.Sign_up(user_name, password, telephone);
-        }
-        if (rt_val < 0)
-        {
-            cout << "login fail" << endl;
-        }
-        else
-        {
-            cout << "login success" << endl;
-        }
+    std::cout << "input username:" << std::endl;
+    std::cin >> user_name;
+    std::cout << "input password:" << std::endl;
+    std::cin >> password;
+    if (strcmp(request, "sign_in") == 0)
+    {
+        rt_val = CC.Sign_in(user_name, password);
+    }
+    else if (strcmp(request, "sign_up") == 0)
+    {
+        std::cout << "input telephone:" << std::endl;
+        std::cin >> telephone;
+        rt_val = CC.Sign_up(user_name, password, telephone);
+    }
+    if (rt_val < 0)
+    {
+        cout << "login fail" << endl;
+    }
+    else
+    {
+        cout << "login success" << endl;
     }
     // signal(SIGINT, );
-    // CC.Send_Exit();
+    CC.Send_Exit();
     return 0;
 }

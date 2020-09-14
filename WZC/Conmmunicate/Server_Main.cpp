@@ -26,6 +26,7 @@ void *User_Thread(void *args)
     Server_Core *Usr = new Server_Core(socket);
     Usr->Exe();
     delete Usr;
+    close(*(int *)args);
     cout << "Thread close" << endl;
     pthread_exit(0);
 }
@@ -53,7 +54,7 @@ int main(int argc, char const *argv[])
 
         //accept接受服务器的套接字 多客户端需要多线程
         int clnt_sock = accept(server_socket, (struct sockaddr *)&clnt_addr, &clnt_addr_size);
-
+        cout << "acc" << endl;
         //连接成功提示
         if (clnt_sock >= 0)
         {
