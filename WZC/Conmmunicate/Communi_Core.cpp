@@ -132,7 +132,7 @@ namespace COMMUNI
     {
         int read_len;
         char buffer[CONFIG::buffer_size];
-        char *s = new char[4 * CONFIG::buffer_size]; //动态内存分配的算法可以秀一下
+        char *s = new char[2 * CONFIG::buffer_size]; //动态内存分配的算法可以秀一下
         char *cursor = s;
         while ((read_len = read(this->clnt_socket, buffer, CONFIG::buffer_size)) > 0)
         {
@@ -228,6 +228,7 @@ namespace SERVER
     void Server_Core::Send_Success()
     {
         char *DB = Data_Bag::Data_Bag_Success();
+        cout << "success data:" << DB << endl;
         this->Send_Data(DB);
         delete DB;
     }
@@ -440,7 +441,7 @@ namespace CLIENT
         char *JSON = DataBag_Sign_up(username, password, phoneum);
         this->Send_Data(JSON);
         delete JSON;
-        char *error_info;
+        char *error_info = new char[100];
         if (this->Recive_Success(error_info))
         {
             return 0;
@@ -448,8 +449,11 @@ namespace CLIENT
         else
         {
             cout << "Error:";
-            cout << error_info << endl;
-            free(error_info);
+            if (error_info != NULL)
+            {
+                cout << error_info << endl;
+                delete error_info;
+            }
             // delete error_info;
             return -1;
         }

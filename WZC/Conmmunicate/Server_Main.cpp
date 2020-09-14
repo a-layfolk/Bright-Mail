@@ -21,10 +21,10 @@ using namespace SERVER;
 void *User_Thread(void *args)
 {
     //创建了用户操作
-    Server_Core Usr(*(int *)args);
-
-    Usr.Exe();
-
+    // Server_Core Usr(*(int *)args);
+    Server_Core *Usr = new Server_Core(*(int *)args);
+    Usr->Exe();
+    delete Usr;
     pthread_exit(0);
 }
 
