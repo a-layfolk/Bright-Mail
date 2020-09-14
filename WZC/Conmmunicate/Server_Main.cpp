@@ -22,7 +22,8 @@ void *User_Thread(void *args)
 {
     //创建了用户操作
     // Server_Core Usr(*(int *)args);
-    Server_Core *Usr = new Server_Core(*(int *)args);
+    int socket = *(int *)args;
+    Server_Core *Usr = new Server_Core(socket);
     Usr->Exe();
     delete Usr;
     cout << "Thread close" << endl;
