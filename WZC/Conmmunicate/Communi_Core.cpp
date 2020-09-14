@@ -248,7 +248,9 @@ namespace SERVER
         bool is_passed = false;
         if (is_sign_in)
         {
-            is_passed = SQL.sign_in(d[Key_Type::sql_username].GetString(), d[Key_Type::sql_password].GetString());
+            cout << d[Key_Type::sql_username].GetString() << '\n'
+                 << d[Key_Type::sql_password].GetString() << endl;
+            is_passed = true;                                                                               //SQL.sign_in(d[Key_Type::sql_username].GetString(), d[Key_Type::sql_password].GetString());
             cout << d[Key_Type::sql_username].GetString() << d[Key_Type::sql_password].GetString() << endl; //debug
         }
         else
@@ -290,15 +292,14 @@ namespace SERVER
             if (!ok)
             {
                 //解析失败，这玩意不是JSON
-                wrong_num++;
-                sleep(1);
-                if (wrong_num > 3)
+                // close(this->clnt_socket);
+                if (data_bag != NULL)
                 {
-                    // close(this->clnt_socket);
                     delete data_bag;
-                    break;
                 }
+
                 cout << "This is not a Json-data bag!" << endl;
+                break;
             }
             else
             {
