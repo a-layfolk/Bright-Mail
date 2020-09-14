@@ -293,7 +293,7 @@ namespace SERVER
                 sleep(1);
                 if (wrong_num > 3)
                 {
-                    close(this->clnt_socket);
+                    // close(this->clnt_socket);
                     break;
                 }
                 cout << "This is not a Json-data bag!" << endl;
@@ -307,7 +307,7 @@ namespace SERVER
                 {
                     if (strcmp(d[Key_Type::command_type].GetString(), "exit") == 0)
                     {
-                        close(this->clnt_socket);
+                        // close(this->clnt_socket);
                         break;
                     }
                 }
@@ -379,7 +379,7 @@ namespace CLIENT
     bool Client_Core::Recive_Success(char *error_info)
     {
         char *data_bag = this->Recive_Data();
-        cout << "recived bag:" << data_bag << endl;
+        // cout << "recived bag:" << data_bag << endl;
         Document *d = this->Return_Analysis(data_bag);
         bool rt_val = false;
         if (d != NULL)
