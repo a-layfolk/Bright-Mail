@@ -11,6 +11,22 @@
         },
         {
             "type": "shell",
+            "label": "client_debug",
+            "command": "make",
+            "args": [
+                "client_debug"
+            ]
+        },
+        {
+            "type": "shell",
+            "label": "server_debug",
+            "command": "make",
+            "args": [
+                "server_debug"
+            ]
+        },
+        {
+            "type": "shell",
             "label": "C/C++: g++ build active file",
             "command": "g++",
             "args": [

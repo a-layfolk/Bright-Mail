@@ -15,20 +15,11 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
-#define APP_PORT 8888
-#define BUFFER_SIZE 1000
+#include "Communi_Core.h"
 
 //通信核心
 namespace COMMUNI
 {
-    //通信核心配置
-    namespace CONFIG
-    {
-        const int server_port = APP_PORT;
-        const int buffer_size = BUFFER_SIZE;
-
-    } // namespace CONFIG
-
     class Communi_Core
     {
     private:
@@ -178,6 +169,9 @@ namespace COMMUNI
         {
 
             //写一个发送文件名的？
+            char *file_name = this->Get_File_Name(file_path);
+            write(this->clnt_socket, file_name, CONFIG::buffer_size);
+            delete[] file_name;
             FILE *fp;
             fp = fopen((char *)file_path, "rb");
             if (fp == NULL)
@@ -205,23 +199,22 @@ namespace COMMUNI
         //接收服务器端发送的文件
         int Recive_File()
         {
-            char request_buffer[CONFIG::buffer_size];
-            memset(request_buffer, 0, CONFIG::buffer_size);
-            recv(this->clnt_socket, request_buffer, CONFIG::buffer_size, 0);
-            rapidjson::Document d;
-            d.Parse(request_buffer);
+            char file_name[CONFIG::buffer_size];
+            memset(file_name, 0, CONFIG::buffer_size);
+            recv(this->clnt_socket, file_name, CONFIG::buffer_size, 0);
 
-            char file_path[30] = "./recived/";
-            strcat(file_path, d["file_name"].GetString());
+            char file_path[CONFIG::buffer_size * 2] = "./recived/";
+            strcat(file_path, file_name);
             return this->Write_File(file_path);
         }
 
         //重载，save_path是文件保存的地址
         int Recive_File(char *save_path)
         {
-            char request_buffer[CONFIG::buffer_size];
-            memset(request_buffer, 0, CONFIG::buffer_size);
-            recv(this->clnt_socket, request_buffer, CONFIG::buffer_size, 0);
+            char file_name[CONFIG::buffer_size];
+            memset(file_name, 0, CONFIG::buffer_size);
+            recv(this->clnt_socket, file_name, CONFIG::buffer_size, 0);
+            
             return this->Write_File(save_path);
         }
     };

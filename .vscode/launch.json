@@ -35,9 +35,10 @@
             "preLaunchTask": "C/C++: g++ build active file",
         },
         {
-            "program": "${fileDirname}/${fileBasenameNoExtension}.out",
+            // "program": "${fileDirname}/${fileBasenameNoExtension}.out",
+            "program": "Client_demo.out",
             "miDebuggerPath": "/usr/bin/gdb",
-            "name": "MakeFile Debug",
+            "name": "Client Debug",
             "type": "cppdbg",
             "request": "launch",
             "args": [],
@@ -53,7 +54,29 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "debug",
+            "preLaunchTask": "client_debug",
+        },
+        {
+            // "program": "${fileDirname}/${fileBasenameNoExtension}.out",
+            "program": "Server_Main.out",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "name": "Server Debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "internalConsoleOptions": "neverOpen",
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "server_debug",
         }
     ]
 }

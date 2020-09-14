@@ -1,6 +1,8 @@
-#include "Client_Core.hpp"
+#include "Client_Core.h"
 #include <iostream>
 #include <string.h>
+using namespace std;
+
 int main(int argc, char const *argv[])
 {
     CLIENT::Client_Core CC("123.57.176.139");
