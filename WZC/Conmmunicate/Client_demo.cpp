@@ -3,15 +3,21 @@
 #include <string.h>
 int main(int argc, char const *argv[])
 {
-    // CLIENT::Client_Core CC("123.57.176.139");
+    CLIENT::Client_Core CC("123.57.176.139");
     // CLIENT::Client_Core CC;
-    CLIENT::Client_Core CC("0.0.0.0");
+    // CLIENT::Client_Core CC("0.0.0.0");
     const char *request = argv[1];
+    if (argv[1] == NULL)
+    {
+        request = "sign_in";
+    }
+
     char user_name[20];
     char password[20];
     char telephone[20];
     int rt_val = -1;
-
+    // CC.Send_Exit();
+    // return 0;
     std::cout << "input username:" << std::endl;
     std::cin >> user_name;
     std::cout << "input password:" << std::endl;
@@ -26,7 +32,6 @@ int main(int argc, char const *argv[])
         std::cin >> telephone;
         rt_val = CC.Sign_up(user_name, password, telephone);
     }
-
     if (rt_val < 0)
     {
         cout << "login fail" << endl;

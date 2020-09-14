@@ -132,17 +132,15 @@ namespace COMMUNI
     {
         int read_len;
         char buffer[CONFIG::buffer_size];
-        char *s = new char[3 * CONFIG::buffer_size]; //动态内存分配的算法可以秀一下
+        char *s = new char[4 * CONFIG::buffer_size]; //动态内存分配的算法可以秀一下
         char *cursor = s;
         while ((read_len = read(this->clnt_socket, buffer, CONFIG::buffer_size)) > 0)
         {
             strcpy(cursor, buffer);
             cursor += read_len; //这样写是对的吗
-            cout << "read len:" << read_len << endl;
             memset(buffer, 0, CONFIG::buffer_size);
             if (read_len < CONFIG::buffer_size)
             {
-                cout << "reciving content:" << s << endl;
                 break;
             }
         }
@@ -160,7 +158,6 @@ namespace COMMUNI
             memset(buffer, 0, CONFIG::buffer_size);
             if (read_len < CONFIG::buffer_size)
             {
-                cout << "send break" << endl;
                 break;
             }
         }
@@ -292,6 +289,7 @@ namespace SERVER
                 sleep(1);
                 if (wrong_num > 3)
                 {
+                    close(this->clnt_socket);
                     break;
                 }
                 cout << "This is not a Json-data bag!" << endl;
@@ -377,33 +375,38 @@ namespace CLIENT
     {
         char *data_bag = this->Recive_Data();
         Document *d = this->Return_Analysis(data_bag);
+        bool rt_val = false;
         if (d != NULL)
         {
+            cout << (*d)[Key_Type::request_type].GetString() << endl;
             if (strcmp((*d)[Key_Type::request_type].GetString(), Rq_Type::command) == 0)
             {
                 if (strcmp((*d)[Key_Type::command_type].GetString(), "error") == 0)
                 {
                     const char *ei = (*d)["error_info"].GetString();
-                    error_info = new char[strlen(ei) + 1];
+                    cout << ei << endl;
                     strcpy(error_info, ei);
+                    cout << error_info << endl;
                 }
-                else
+                else if (strcmp((*d)[Key_Type::command_type].GetString(), "success") == 0)
                 {
-                    error_info = NULL;
-                    delete data_bag;
-                    delete d;
-                    return true;
+                    cout << "success" << endl;
+                    rt_val = true;
                 }
             }
             delete d;
         }
         else
         {
-            error_info = new char[15];
-            strcpy(error_info, "No Data Bag!");
+            cout << "No data bag!" << endl;
+            strcpy(error_info, "No data bag!");
         }
-        delete data_bag;
-        return false;
+        if (data_bag != NULL)
+        {
+            delete data_bag;
+        }
+
+        return rt_val;
     }
 
     int Client_Core::Sign_in(char *username, char *password)
@@ -412,8 +415,7 @@ namespace CLIENT
         char *JSON = DataBag_Sign_in(username, password);
         this->Send_Data(JSON);
         delete JSON;
-        char *error_info;
-        cout << "recving sucess" << endl; //debug
+        char *error_info = new char[100];
         if (this->Recive_Success(error_info))
         {
             cout << "success log in" << endl; //debug
@@ -422,8 +424,12 @@ namespace CLIENT
         else
         {
             cout << "Error:";
-            cout << error_info << endl;
-            delete error_info;
+            if (error_info != NULL)
+            {
+                cout << error_info << endl;
+                delete error_info;
+            }
+
             return -1;
         }
     }
@@ -443,7 +449,8 @@ namespace CLIENT
         {
             cout << "Error:";
             cout << error_info << endl;
-            delete error_info;
+            free(error_info);
+            // delete error_info;
             return -1;
         }
     }

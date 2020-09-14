@@ -152,7 +152,7 @@ namespace Data_Bag
         memset(JSON, 0, (*str).size());
         strcpy(JSON, (*str).c_str());
         delete str;
-        cout << "data_bag:" << JSON << endl; //debug
+        // cout << "data_bag:" << JSON << endl; //debug
         return JSON;
     }
 
