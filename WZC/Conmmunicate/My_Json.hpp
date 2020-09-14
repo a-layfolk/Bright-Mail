@@ -201,9 +201,10 @@ namespace Data_Bag
         *str += Creat_Key("error_info", "success", false);
 
         str->push_back('}');
-
-        char *JSON = new char[(*str).size()];
-        strcpy(JSON, (*str).c_str());
+        int l = str->length();
+        char *JSON = new char[l];
+        memset(JSON, 0, l);
+        strcpy(JSON, str->c_str());
         delete str;
         cout << JSON << endl;
         return JSON;
