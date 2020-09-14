@@ -103,9 +103,9 @@ namespace CLIENT
             close(this->clnt_socket);
         }
 
-        ~Client_Core(){}
+        ~Client_Core() {}
 
-        int Sign_in(char *username, char *password)
+        int Sign_in(const char *username, const char *password)
         {
             //发送请求包
             char *JSON = DataBag_Sign_in(username, password);
@@ -129,7 +129,7 @@ namespace CLIENT
                 return -1;
             }
         }
-        int Sign_up(char *username, char *password, char *phoneum)
+        int Sign_up(const char *username, const char *password, const char *phoneum)
         {
             //发送请求包
             char *JSON = DataBag_Sign_up(username, password, phoneum);

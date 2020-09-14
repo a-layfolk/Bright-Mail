@@ -58,6 +58,8 @@ int main(int argc, char const *argv[])
         if (clnt_sock >= 0)
         {
             std::cout << "successful" << std::endl;
+            pthread_t tid;
+            pthread_create(&tid, NULL, User_Thread, (void *)&(clnt_sock));
         }
 
         // struct sockaddr_in sa;
@@ -69,8 +71,6 @@ int main(int argc, char const *argv[])
         // }
 
         //创建多线程
-        pthread_t tid;
-        pthread_create(&tid, NULL, User_Thread, (void *)&(clnt_sock));
     }
 
     return 0;
