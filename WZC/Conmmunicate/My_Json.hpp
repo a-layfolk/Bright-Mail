@@ -197,7 +197,8 @@ namespace Data_Bag
         str->push_back('{');
 
         *str += Creat_Key(Key_Type::request_type, Rq_Type::command, true);
-        *str += Creat_Key(Key_Type::command_type, "success", false);
+        *str += Creat_Key(Key_Type::command_type, "success", true);
+        *str += Creat_Key("error_info", "success", false);
 
         str->push_back('}');
 

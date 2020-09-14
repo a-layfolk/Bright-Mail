@@ -357,6 +357,7 @@ namespace CLIENT
         ParseResult ok = d->Parse(data_bag);
         if (!ok)
         {
+            cout << "解析：" << data_bag << endl;
             return NULL;
         }
         else
@@ -375,6 +376,7 @@ namespace CLIENT
     bool Client_Core::Recive_Success(char *error_info)
     {
         char *data_bag = this->Recive_Data();
+        cout << "recived bag:" << data_bag << endl;
         Document *d = this->Return_Analysis(data_bag);
         bool rt_val = false;
         if (d != NULL)
