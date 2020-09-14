@@ -94,7 +94,7 @@ public:
 	/*
 	修改原有邮件
 	*/
-	bool change_email_content(const char *emailId, const char *ownerId, const char *targetId, const char *emailType, const char *emailTitle, const char *emailContent, const char *attachedFilePath);
+	bool change_email_content(const char *emailId, const char *ownerId, const char *targetId, const char *emailType, const char *emailTitle, const char *emailContent);
 
 	/*
 	改变邮件状态
