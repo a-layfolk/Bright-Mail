@@ -1,0 +1,99 @@
+
+/*按钮普通态*/
+QPushButton#loginBtn
+{
+    /*字体为微软雅黑*/
+
+    /*字体大小为20点*/
+    font-size:12pt;
+    /*字体颜色为白色*/
+    color:white;
+    /*背景颜色*/
+ border-image:url(:/sources/beautify/img/logindlg/6.png);
+    /*边框圆角半径为8像素*/
+    border-radius:8px;
+    border-style:outset;
+}
+QPushButton#exitBtn
+{
+    /*字体为微软雅黑*/
+
+    /*字体大小为20点*/
+    font-size:12pt;
+    /*字体颜色为白色*/
+    color:white;
+    /*背景颜色*/
+ border-image:url(:/sources/beautify/img/logindlg/6.png);
+    /*边框圆角半径为8像素*/
+    border-radius:8px;
+    border-style:outset;
+}
+QPushButton#signupBtn
+{
+    /*字体为微软雅黑*/
+
+    /*字体大小为20点*/
+    font-size:12pt;
+    /*字体颜色为白色*/
+    color:white;
+    /*背景颜色*/
+ border-image:url(:/sources/beautify/img/logindlg/6.png);
+    /*边框圆角半径为8像素*/
+    border-radius:8px;
+    border-style:outset;
+}
+/*按钮停留态*/
+QPushButton:hover
+{
+    /*背景颜色*/
+    background:grey;
+}
+
+/*按钮按下态*/
+QPushButton:pressed
+{
+    /*背景颜色*/
+    background-color:rgb(219,112,147);
+    /*左内边距为3像素，让按下时字向右移动3像素*/
+    padding-left:3px;
+    /*上内边距为3像素，让按下时字向下移动3像素*/
+    padding-top:3px;
+}
+LoginDlg{
+color:white;
+border-image:url(:/sources/beautify/img/logindlg/login.back.jpg);
+}
+
+QLineEdit {
+
+        /* 倒角 */
+        border-radius: 10px;
+
+        /*  內邊框:上下和左右的距離*/
+        padding: 10 8px;
+
+        /* 背景色 */
+  border-image:url(:/sources/beautify/img/logindlg/6.png);
+        /* 選中高亮背色 */
+        color:white;
+        selection-background-color:white;
+        min-width:200px;
+        min-height:20px;
+}
+
+QPushButton#sendBtn
+{
+    /*字体为微软雅黑*/
+   min- width:12px;	          //设置宽度 单位像素
+    min-height:40px
+    /*字体大小为20点*/
+    font-size:12pt;
+    /*字体颜色为白色*/
+    color:red;
+    /*背景颜色*/
+    border-image:url(:/sources/beautify/img/logindlg/6.png);
+    /*边框圆角半径为8像素*/
+    border-radius:0px;
+
+}
+
