@@ -7,7 +7,7 @@
 
 MYSQL *con = mysql_init(NULL);
 using namespace DataBag;
-char *mysql::get_user_id(const char *username, const char *phonenum)
+char *mysql::get_user_id(const char *phonenum)
 {
 	char *value = new char[200];
 	strcpy(value, "user_id");
@@ -56,8 +56,9 @@ bool mysql::sign_up(const char *username, const char *password, const char *phon
 */
 
 //email info size?
-EMAIL_INFO *mysql::get_email_info(const char *userId, const char *emailType)
+EMAIL_INFO *mysql::get_email_info(const char *userId, const char *emailType, int *num)
 {
+	*num = 2;
 	EMAIL_INFO *emailInfo = new EMAIL_INFO[2];
 	for (int i = 0; i < 2; i++)
 	{
@@ -70,8 +71,9 @@ EMAIL_INFO *mysql::get_email_info(const char *userId, const char *emailType)
 	return emailInfo;
 }
 
-DataBag::CONTATCT_INFO *mysql::get_contact_info(const char *userId)
+DataBag::CONTATCT_INFO *mysql::get_contact_info(const char *userId, int *num)
 {
+	*num = 2;
 	DataBag::CONTATCT_INFO *contactInfo = new DataBag::CONTATCT_INFO[2];
 	for (int i = 0; i < 2; i++)
 	{
@@ -95,8 +97,13 @@ EMAIL_CONTENT *mysql::get_one_email(const char *emailId, const char *ownerId)
 }
 
 //判断呢？
-void mysql::add_email_to_db(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content)
+
+//返回emailId
+char *mysql::add_email_to_db(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content)
 {
+	char *E_id = new char[10];
+	strcpy(E_id, "1111");
+	return E_id;
 }
 
 bool mysql::change_email_content(const char *emailId, const char *ownerId, const char *targetId, const char *emailType, const char *emailTitle, const char *emailContent)
@@ -119,7 +126,7 @@ bool mysql::add_contact_info(const char *userId, const char *contactname, const 
 	return true;
 }
 
-bool mysql::delete_contatc_info(const char *userId, const char *contactname, const char *phonenum)
+bool mysql::Delete_contatc_info(const char *userId, const char *contactname, const char *phonenum)
 {
 	return true;
 }

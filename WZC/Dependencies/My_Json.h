@@ -80,6 +80,7 @@ namespace DataBag
         char *emailType;
         char *targetUsername;
         char *emailTime;
+        char *fileName;
     };
     char *DataBag_Sign_in(const char *username, const char *password);
     char *DataBag_Sign_up(const char *username, const char *password, const char *phoneum);

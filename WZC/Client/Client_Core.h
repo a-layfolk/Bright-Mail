@@ -74,8 +74,13 @@ namespace CLIENT
         CONTATCT_INFO *Get_Contact(const char *userId, int *list_size);
 
         //接收文件如何处理待商榷，先做不带附件的吧
-        int Send_File();
-        char *Get_File_Info();
+
+
+        //输入相对地址或者绝对地址//email id我自己查，SQL add todb时会返回
+        int Send_File(const char *file_path);//我需要
+
+        //在执行文件当前目录放文件
+        int Get_File();
 
     }; // namespace CLIENT
 } // namespace CLIENT

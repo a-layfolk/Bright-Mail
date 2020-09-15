@@ -31,6 +31,7 @@ namespace SERVER
     Server_Core::Server_Core(int client_socket) : COMMUNI::Communi_Core(client_socket)
     {
         this->SQL.connect(CONFIG::sql_ip, CONFIG::sql_user, CONFIG::sql_password, CONFIG::sql_db, CONFIG::sql_port);
+        cout << "SQL end" << endl;
     }
 
     Server_Core::~Server_Core()
@@ -127,7 +128,8 @@ namespace SERVER
     {
         if (d.HasMember("emailId") && d.HasMember("ownerId"))
         {
-            DataBag::EMAIL_CONTENT *EC = SQL.get_one_email(d["emailId"].GetString(), d["ownerId"].GetString());
+            // DataBag::EMAIL_CONTENT *EC = SQL.get_one_email(d["emailId"].GetString(), d["ownerId"].GetString());
+            EC = SQL.get_one_email(d["emailId"].GetString(), d["ownerId"].GetString());
             char *JSON = DataBag_Sd_Mail_Server_Core(EC->emailTitle, EC->emailContent, EC->emailType, EC->targetUsername, EC->emailTime); //这个databag需要重新改一下 debug
             cout << "ED JSON:" << JSON << endl;
             this->Send_Data(JSON);
@@ -147,7 +149,7 @@ namespace SERVER
         int size = 0; //debug size需要可变
         if (d.HasMember("userId") && d.HasMember("emailType"))
         {
-            DataBag::EMAIL_INFO *EI = SQL.get_email_info(d["userId"].GetString(), d["emailType"].GetString(), &size);
+            EI = SQL.get_email_info(d["userId"].GetString(), d["emailType"].GetString(), &size);
             char *JSON = DataBag_Sd_Mail_List(size, EI);
             this->Send_Data(JSON);
             delete[] EI;
@@ -166,12 +168,13 @@ namespace SERVER
     {
         if (d.HasMember("userId"))
         {
+            // SQL.
             int size = 0; //debug size需要可变
-            DataBag::CONTATCT_INFO *EI = SQL.get_contact_info(d["userId"].GetString(), &size);
-            char *JSON = DataBag_Sd_Contact_List(size, EI);
+            CI = SQL.get_contact_info(d["userId"].GetString(), &size);
+            char *JSON = DataBag_Sd_Contact_List(size, CI);
             cout << "JSON:" << JSON << endl;
             this->Send_Data(JSON);
-            delete[] EI;
+            delete[] CI;
             delete[] JSON;
             return 0;
         }

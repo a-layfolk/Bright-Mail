@@ -6,9 +6,9 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
-    CLIENT::Client_Core CC("0.0.0.0");
+    // CLIENT::Client_Core CC("123.57.176.139");
     // CLIENT::Client_Core CC;
-    // CLIENT::Client_Core CC("0.0.0.0");
+    CLIENT::Client_Core CC("0.0.0.0");
     const char *request = argv[1];
     if (argv[1] == NULL)
     {
