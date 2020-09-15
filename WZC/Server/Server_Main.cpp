@@ -10,12 +10,12 @@
 #include <unistd.h> //read,write
 #include <signal.h>
 #include <stdlib.h>
-#include "rapidjson/rapidjson.h"
-#include "rapidjson/document.h"
-#include "rapidjson/reader.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-#include "Communi_Core.hpp"
+#include "Dependencies/rapidjson/rapidjson.h"
+#include "Dependencies/rapidjson/document.h"
+#include "Dependencies/rapidjson/reader.h"
+#include "Dependencies/rapidjson/writer.h"
+#include "Dependencies/rapidjson/stringbuffer.h"
+#include "Server_Core.h"
 
 using namespace SERVER;
 void *User_Thread(void *args)

@@ -14,41 +14,12 @@
 #include "rapidjson/reader.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
-
+#include "Dependencies/My_Json.h"
 #include "Dependencies/Communi_Core.h"
 
 namespace CLIENT
 {
-    struct EMAIL_INFO
-    {
-        char *emailTitle;
-        char *targetUsername;
-        char *emailTime;
-        char *emailId;
-    };
-
-    struct CONTATCT_INFO
-    {
-        char *userId;
-        char *userName;
-        char *telephone;
-    };
-
-    struct EMAIL_FILE_PATH
-    {
-
-        char *filePath;
-    };
-
-    struct EMAIL_CONTENT
-    {
-        char *emailTitle;
-        char *emailContent;
-        char *emailType;
-        char *targetUsername;
-        char *emailTime;
-    };
-
+    using namespace DataBag;
     namespace CONFIG
     {
         const char server_ip[] = "123.57.176.139";
@@ -84,7 +55,7 @@ namespace CLIENT
 
         //发送邮件，输入指定内容为服务器插入邮件，返回值为-1时表示注册不成功，返回0为成功
         int Send_Mail(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content);
-        
+
         //新建联系人，返回值为-1时表示注册不成功，返回0为成功
         int Send_Contact(const char *userId, const char *contactname, const char *phonenum);
 

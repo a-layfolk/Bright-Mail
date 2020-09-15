@@ -7,6 +7,7 @@
 using namespace std;
 namespace My_Json
 {
+
     namespace Key_Type
     {
         const char request_type[] = "request_type";
@@ -51,6 +52,35 @@ namespace My_Json
 } // namespace My_Json
 namespace DataBag
 {
+    struct EMAIL_INFO
+    {
+        char *emailTitle;
+        char *targetUsername;
+        char *emailTime;
+        char *emailId;
+    };
+
+    struct CONTATCT_INFO
+    {
+        char *userId;
+        char *userName;
+        char *telephone;
+    };
+
+    struct EMAIL_FILE_PATH
+    {
+
+        char *filePath;
+    };
+
+    struct EMAIL_CONTENT
+    {
+        char *emailTitle;
+        char *emailContent;
+        char *emailType;
+        char *targetUsername;
+        char *emailTime;
+    };
     char *DataBag_Sign_in(const char *username, const char *password);
     char *DataBag_Sign_up(const char *username, const char *password, const char *phoneum);
 
@@ -65,13 +95,13 @@ namespace DataBag
     char *DataBag_Sd_Contact(const char *userId, const char *contactname, const char *phonenum);
 
     //需要做一个可以制造JSON列表的函数
-    char *DataBag_Sd_List(const char *emailTitle, const char *targetUsername, const char *emailTime, const char *emailId);
+    char *Mail_List_Tag(const char *emailTitle, const char *targetUsername, const char *emailTime, const char *emailId);
+    char *DataBag_Sd_List(int size, DataBag::EMAIL_INFO *E_info);
 
     char *DataBag_Rq_Mail(const char *emailId, const char *ownerId);
 
     //先查mailId对应的文件数和文件名，再通过文件名来接收文件
     char *DataBag_Rq_File(const char *ownerId, const char *emailId, const char *fileName);
-
     char *DataBag_Rq_Contact(const char *userId);
     char *DataBag_Rq_List(const char *userId, const char *emailType);
 

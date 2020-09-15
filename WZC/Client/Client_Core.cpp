@@ -27,6 +27,7 @@ using namespace rapidjson;
 
 namespace CLIENT
 {
+    using namespace DataBag;
     class Client_Core : protected COMMUNI::Communi_Core
     {
     private:
@@ -149,13 +150,53 @@ namespace CLIENT
         //发送邮件，输入指定内容为服务器插入邮件，返回值为-1时表示注册不成功，返回0为成功
         int Send_Mail(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content)
         {
-            return 0;
+            char *JSON = DataBag_Sd_Mail(ownerId, targetId, email_type, email_title, email_content);
+            this->Send_Data(JSON);
+            delete[] JSON;
+
+            char *error_info = new char[100];
+            if (this->Recive_Success(error_info))
+            {
+                cout << "success log in" << endl; //debug
+                return 0;
+            }
+            else
+            {
+                cout << "Error:";
+                if (error_info != NULL)
+                {
+                    cout << error_info << endl;
+                    delete[] error_info;
+                }
+
+                return -1;
+            }
         }
 
         //新建联系人，返回值为-1时表示注册不成功，返回0为成功
         int Send_Contact(const char *userId, const char *contactname, const char *phonenum)
         {
-            return 0;
+            char *JSON = DataBag_Sd_Contact(userId, contactname, phonenum);
+            this->Send_Data(JSON);
+            delete[] JSON;
+
+            char *error_info = new char[100];
+            if (this->Recive_Success(error_info))
+            {
+                cout << "success log in" << endl; //debug
+                return 0;
+            }
+            else
+            {
+                cout << "Error:";
+                if (error_info != NULL)
+                {
+                    cout << error_info << endl;
+                    delete[] error_info;
+                }
+
+                return -1;
+            }
         }
 
         //返回万琦玲式结构数组，详情看定义，第三个参数list_size会返回列表大小

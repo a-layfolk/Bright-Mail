@@ -12,7 +12,15 @@ namespace My_Json
         str.push_back('\"');
         str += key_name;
         str += "\":\"";
-        str += value;
+        if (value != NULL)
+        {
+            str += value;
+        }
+        else
+        {
+            str += "null";
+        }
+
         if (with_comma)
         {
             str += "\",";
@@ -42,6 +50,35 @@ namespace My_Json
 } // namespace My_Json
 namespace DataBag
 {
+    // struct EMAIL_INFO
+    // {
+    //     char *emailTitle;
+    //     char *targetUsername;
+    //     char *emailTime;
+    //     char *emailId;
+    // };
+
+    // struct CONTATCT_INFO
+    // {
+    //     char *userId;
+    //     char *userName;
+    //     char *telephone;
+    // };
+
+    // struct EMAIL_FILE_PATH
+    // {
+
+    //     char *filePath;
+    // };
+
+    // struct EMAIL_CONTENT
+    // {
+    //     char *emailTitle;
+    //     char *emailContent;
+    //     char *emailType;
+    //     char *targetUsername;
+    //     char *emailTime;
+    // };
     using namespace My_Json;
     char *DataBag_Sign_in(const char *username, const char *password)
     {
@@ -170,7 +207,8 @@ namespace DataBag
         delete str;
         return JSON;
     }
-    char *DataBag_Sd_List(const char *emailTitle, const char *targetUsername, const char *emailTime, const char *emailId)
+
+    char *Mail_List_Tag(const char *emailTitle, const char *targetUsername, const char *emailTime, const char *emailId)
     {
         string *str = new string;
         str->push_back('{');
@@ -183,6 +221,60 @@ namespace DataBag
 
         str->push_back('}');
 
+        char *JSON = new char[(*str).size()];
+        strcpy(JSON, (*str).c_str());
+        delete str;
+        return JSON;
+    }
+    char *DataBag_Sd_Mail_List(int size, DataBag::EMAIL_INFO *E_info)
+    {
+        string *str = new string;
+        str->push_back('{');
+        *str += Creat_Key(Key_Type::request_type, Rq_Type::sd_list, true);
+        char *size_tag = new char[20];
+        sprintf(size_tag, "\"size\":%d,\"info\":[", size);
+        *str += size_tag;
+        delete size_tag;
+        for (int i = 0; i < size; i++)
+        {
+            cout << "fuck";
+            char *tag = Mail_List_Tag(((EMAIL_INFO *)E_info + i)->targetUsername, ((EMAIL_INFO *)E_info + i)->targetUsername, ((EMAIL_INFO *)E_info + i)->emailTime, ((EMAIL_INFO *)E_info + i)->emailId);
+            *str += tag;
+            delete[] tag;
+            if (i != size - 1)
+            {
+                str->push_back(',');
+            }
+        }
+        str->push_back(']');
+        str->push_back('}');
+        char *JSON = new char[(*str).size()];
+        strcpy(JSON, (*str).c_str());
+        delete str;
+        return JSON;
+    }
+    char *DataBag_Sd_Contact_List(int size, DataBag::CONTATCT_INFO *C_info)
+    {
+        string *str = new string;
+        str->push_back('{');
+        *str += Creat_Key(Key_Type::request_type, Rq_Type::rq_contact, true);
+        char *size_tag = new char[20];
+        sprintf(size_tag, "\"size\":%d,\"info\":[", size);
+        *str += size_tag;
+        delete size_tag;
+        for (int i = 0; i < size; i++)
+        {
+            cout << "fuck";
+            char *tag = DataBag_Sd_Contact(((CONTATCT_INFO *)C_info + i)->userId, ((CONTATCT_INFO *)C_info + i)->userName, ((CONTATCT_INFO *)C_info + i)->telephone);
+            *str += tag;
+            delete[] tag;
+            if (i != size - 1)
+            {
+                str->push_back(',');
+            }
+        }
+        str->push_back(']');
+        str->push_back('}');
         char *JSON = new char[(*str).size()];
         strcpy(JSON, (*str).c_str());
         delete str;
@@ -257,13 +349,13 @@ namespace DataBag
         delete str;
         return JSON;
     }
-    char *DataBag_Rq_List(const char *userId, const char *emailType)
+    char *DataBag_Rq(const char *userId, const char *emailType)
     {
 
         string *str = new string;
         str->push_back('{');
-
         *str += Creat_Key(Key_Type::request_type, Rq_Type::rq_list, true);
+
         *str += Creat_Key("userId", userId, true);
         *str += Creat_Key("emailType", emailType, false);
 

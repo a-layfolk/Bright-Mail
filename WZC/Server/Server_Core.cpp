@@ -58,10 +58,7 @@ namespace SERVER
         bool is_passed = false;
         if (is_sign_in)
         {
-            cout << d[Key_Type::sql_username].GetString() << '\n'
-                 << d[Key_Type::sql_password].GetString() << endl;
-            is_passed = true;                                                                               //SQL.sign_in(d[Key_Type::sql_username].GetString(), d[Key_Type::sql_password].GetString());
-            cout << d[Key_Type::sql_username].GetString() << d[Key_Type::sql_password].GetString() << endl; //debug
+            is_passed = SQL.sign_in(d[Key_Type::sql_username].GetString(), d[Key_Type::sql_password].GetString()); //错误处理？
         }
         else
         {
@@ -87,6 +84,30 @@ namespace SERVER
             }
         }
         return false;
+    }
+
+    int Server_Core::Add_Email(rapidjson::Document &d)
+    {
+        SQL.add_email_to_db(d["ownerId"].GetString(), d["targetId"].GetString(), d["email_type"].GetString(), d["email_title"].GetString(), d["email_content"].GetString()); //错误处理？
+        this->Send_Success();
+    }
+    int Server_Core::Add_Contact(rapidjson::Document &d)
+    {
+        SQL.add_contact_info(d["userId"].GetString(), d["contactname"].GetString(), d["phonenum"].GetString());
+        this->Send_Success();
+    }
+    int Server_Core::Add_File(rapidjson::Document &d)
+    {
+        return 0;
+    }
+    int Server_Core::Return_Email_Detail(rapidjson::Document &d)
+    {
+    }
+    int Server_Core::Return_Email_List(rapidjson::Document &d)
+    {
+    }
+    int Server_Core::Return_Contact_List(rapidjson::Document &d)
+    {
     }
 
     int Server_Core::Request_Analysis()
@@ -130,10 +151,15 @@ namespace SERVER
                         break;
                     }
                 }
-                else if (strcmp(rq_type, "insert_email") == 0)
+                else if (strcmp(rq_type, Rq_Type::sd_mail) == 0)
                 {
-                    // Insert_Email(d);
+                    this->Add_Email(d);
                 }
+                else if (strcmp(rq_type, Rq_Type::sd_contact) == 0)
+                {
+                    this->Add_Contact(d);
+                }
+
                 else if (strcmp(rq_type, Rq_Type::sign_in) == 0)
                 {
                     Sign(d, true);

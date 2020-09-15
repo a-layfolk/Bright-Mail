@@ -41,6 +41,11 @@ namespace SERVER
     class Server_Core : protected COMMUNI::Communi_Core
     {
     private:
+        void Send_Error(const char *error_info);
+        void Send_Success();
+
+        bool Sign(rapidjson::Document &d, bool is_sign_in);
+        
         int Add_Email(rapidjson::Document &d);
         int Add_Contact(rapidjson::Document &d);
         //?
@@ -53,12 +58,9 @@ namespace SERVER
         //?
         int Return_File(rapidjson::Document &d);
 
+
+
         int Request_Analysis();
-        void Send_Error(const char *error_info);
-        void Send_Success();
-
-        bool Sign(rapidjson::Document &d, bool is_sign_in);
-
         char *user_ip;
         mysql SQL;
 
