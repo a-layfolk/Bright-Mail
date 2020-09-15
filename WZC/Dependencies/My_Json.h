@@ -96,7 +96,8 @@ namespace DataBag
 
     //需要做一个可以制造JSON列表的函数
     char *Mail_List_Tag(const char *emailTitle, const char *targetUsername, const char *emailTime, const char *emailId);
-    char *DataBag_Sd_List(int size, DataBag::EMAIL_INFO *E_info);
+    char *DataBag_Sd_Mail_List(int size, DataBag::EMAIL_INFO *E_info);
+    char *DataBag_Sd_Contact_List(int size, DataBag::CONTATCT_INFO *C_info);
 
     char *DataBag_Rq_Mail(const char *emailId, const char *ownerId);
 

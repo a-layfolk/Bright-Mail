@@ -237,7 +237,6 @@ namespace DataBag
         delete size_tag;
         for (int i = 0; i < size; i++)
         {
-            cout << "fuck";
             char *tag = Mail_List_Tag(((EMAIL_INFO *)E_info + i)->targetUsername, ((EMAIL_INFO *)E_info + i)->targetUsername, ((EMAIL_INFO *)E_info + i)->emailTime, ((EMAIL_INFO *)E_info + i)->emailId);
             *str += tag;
             delete[] tag;
@@ -264,7 +263,6 @@ namespace DataBag
         delete size_tag;
         for (int i = 0; i < size; i++)
         {
-            cout << "fuck";
             char *tag = DataBag_Sd_Contact(((CONTATCT_INFO *)C_info + i)->userId, ((CONTATCT_INFO *)C_info + i)->userName, ((CONTATCT_INFO *)C_info + i)->telephone);
             *str += tag;
             delete[] tag;
