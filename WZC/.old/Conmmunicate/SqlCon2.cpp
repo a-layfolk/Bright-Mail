@@ -7,14 +7,14 @@
 
 MYSQL *con = mysql_init(NULL);
 
-char *mysql::get_user_id(const char *username, const char *phonenum)
+char *mysql::get_user_id( const char *phonenum)
 {
 	char *query = new char[100];
 	char *userId = new char[100];
 	MYSQL_RES *res;
 	MYSQL_ROW row;
 
-	sprintf(query, "select userId from UserTable where userName='%s' and  telephone= '%s'", username, phonenum);
+	sprintf(query, "select userId from UserTable where  telephone= '%s'", phonenum);
 	mysql_query(con, query);
 
 	res = mysql_store_result(con);
@@ -250,7 +250,7 @@ bool mysql::change_email_state(const char *emailId, const char *newType)
 bool mysql::add_contact_info(const char *userId, const char *contactname, const char *phonenum)
 {
 	char *contactId = NULL;
-	contactId = get_user_id(contactname, phonenum);
+	contactId = get_user_id(phonenum);
 
 	if (contactId != "false")
 	{
@@ -270,7 +270,7 @@ bool mysql::add_contact_info(const char *userId, const char *contactname, const 
 bool mysql::Delete_contatc_info(const char *userId, const char *contactname, const char *phonenum)
 {
 	char *contactId = NULL;
-	contactId = get_user_id(contactname, phonenum);
+	contactId = get_user_id( phonenum);
 	if (contactId != "false")
 	{
 		char *query = new char[100];

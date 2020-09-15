@@ -39,7 +39,7 @@ public:
 	通过 用户名 及 电话 获取用户ID
 	返回 用户ID(char*)
 	*/
-	char *get_user_id(const char *username, const char *phonenum);
+	char *get_user_id(const char *phonenum);
 	char *get_time();
 	char *get_user_name(const char *userId);
 
