@@ -34,6 +34,9 @@ namespace CLIENT
         //服务器是否回传成功的消息.如果传回的是失败，则在error_info中填入失败信息
         bool Recive_Success(char *error_info);
 
+        CONTATCT_INFO *Json_To_Contact_List(const char *JSON, int *list_size);
+        EMAIL_INFO *Json_To_Email_List(const char *JSON, int *list_size);
+
         //解析返回的信息，记得delete包！
         rapidjson::Document *Return_Analysis(char *data_bag);
 

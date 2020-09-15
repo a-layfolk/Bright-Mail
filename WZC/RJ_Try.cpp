@@ -152,6 +152,10 @@ int main(int argc, char const *argv[])
     }
     char *JSON = DataBag_Sd_Mail_List(size, EI);
     cout << JSON << endl;
+    
+    
+    
+    
     int newSize;
     EMAIL_INFO *newEI = Json_To_Email_List(JSON, &newSize);
 

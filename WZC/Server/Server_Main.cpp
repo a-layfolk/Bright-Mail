@@ -22,7 +22,7 @@ void *User_Thread(void *args)
 {
     cout << "Thread create" << endl;
     //创建了用户操作
-    // Server_Core Usr(*(int *)args);
+
     int socket = *(int *)args;
     Server_Core *Usr = new Server_Core(socket);
     Usr->Exe();
@@ -63,16 +63,6 @@ int main(int argc, char const *argv[])
             pthread_t tid;
             pthread_create(&tid, NULL, User_Thread, (void *)&(clnt_sock));
         }
-
-        // struct sockaddr_in sa;
-        // int len = sizeof(sa);
-        // if (!getpeername(sockfd, (struct sockaddr *)&sa, &len))
-        // {
-        //     printf("对方IP：%s ", inet_ntoa(sa.sin_addr));
-        //     printf("对方PORT：%d ", ntohs(sa.sin_port));可以写进Server_Core内
-        // }
-
-        //创建多线程
     }
 
     return 0;

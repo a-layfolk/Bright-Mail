@@ -28,202 +28,338 @@ using namespace rapidjson;
 namespace CLIENT
 {
     using namespace DataBag;
-    class Client_Core : protected COMMUNI::Communi_Core
+
+    EMAIL_INFO *Client_Core::Json_To_Email_List(const char *JSON, int *list_size)
     {
-    private:
-        //服务器是否回传成功的消息.如果传回的是失败，则在error_info中填入失败信息
-        bool Recive_Success(char *error_info)
+        Document d;
+        ParseResult ok = d.Parse(JSON);
+        EMAIL_INFO *CI = NULL;
+        bool is_ok = false;
+        if (!ok)
         {
-            char *data_bag = this->Recive_Data();
-            // cout << "recived bag:" << data_bag << endl;
-            Document *d = this->Return_Analysis(data_bag);
-            bool rt_val = false;
-            if (d != NULL)
+            is_ok = false;
+        }
+        else
+        {
+            if (d.HasMember("info") && d.HasMember("size"))
             {
-                cout << (*d)[Key_Type::request_type].GetString() << endl;
-                if (strcmp((*d)[Key_Type::request_type].GetString(), Rq_Type::command) == 0)
+                if (d["info"].IsArray())
                 {
-                    if (strcmp((*d)[Key_Type::command_type].GetString(), "error") == 0)
+                    if (d["info"].Size() > 0 && d["info"][0].HasMember("emailTitle") && d["info"][0].HasMember("targetUsername") && d["info"][0].HasMember("emailTime") && d["info"][0].HasMember("emailId"))
                     {
-                        const char *ei = (*d)["error_info"].GetString();
-                        cout << ei << endl;
-                        strcpy(error_info, ei);
-                        cout << error_info << endl;
+
+                        int size = d["size"].GetInt();
+                        *list_size = size;
+                        CI = new EMAIL_INFO[size];
+                        for (int i = 0; i < d["info"].Size(); i++)
+                        {
+                            CI[i].emailTitle = new char[d["info"][i]["emailTitle"].GetStringLength()];
+                            strcpy(CI[i].emailTitle, d["info"][i]["emailTitle"].GetString());
+
+                            CI[i].targetUsername = new char[d["info"][i]["targetUsername"].GetStringLength()];
+                            strcpy(CI[i].targetUsername, d["info"][i]["targetUsername"].GetString());
+
+                            CI[i].emailTime = new char[d["info"][i]["emailTime"].GetStringLength()];
+                            strcpy(CI[i].emailTime, d["info"][i]["emailTime"].GetString());
+
+                            CI[i].emailId = new char[d["info"][i]["emailId"].GetStringLength()];
+                            strcpy(CI[i].emailId, d["info"][i]["emailId"].GetString());
+                        }
+                        is_ok = true;
                     }
-                    else if (strcmp((*d)[Key_Type::command_type].GetString(), "success") == 0)
-                    {
-                        cout << "success" << endl;
-                        rt_val = true;
-                    }
                 }
-                delete d;
-            }
-            else
-            {
-                cout << "No data bag!" << endl;
-                strcpy(error_info, "No data bag!");
-            }
-            if (data_bag != NULL)
-            {
-                delete[] data_bag;
-            }
-
-            return rt_val;
-        }
-
-        //解析返回的信息，记得delete包！
-        rapidjson::Document *Return_Analysis(char *data_bag)
-        {
-            Document *d = new Document;
-            ParseResult ok = d->Parse(data_bag);
-            if (!ok)
-            {
-                return NULL;
-            }
-            else
-            {
-                return d;
             }
         }
-
-    public:
-        Client_Core() : COMMUNI::Communi_Core(CLIENT::CONFIG::server_ip) {}
-        Client_Core(const char *target_ip) : COMMUNI::Communi_Core(target_ip) {}
-        ~Client_Core() {}
-
-        //向服务器发送结束线程的信息
-        void Send_Exit()
+        if (is_ok)
         {
-            char *data_bag = DataBag::DataBag_Exit();
-            this->Send_Data(data_bag);
-            delete[] data_bag;
-            close(this->clnt_socket);
-        }
-        int Sign_in(const char *username, const char *password)
-        {
-            //发送请求包
-            char *JSON = DataBag_Sign_in(username, password);
-            this->Send_Data(JSON);
-            delete[] JSON;
-            char *error_info = new char[100];
-            if (this->Recive_Success(error_info))
-            {
-                cout << "success log in" << endl; //debug
-                return 0;
-            }
-            else
-            {
-                cout << "Error:";
-                if (error_info != NULL)
-                {
-                    cout << error_info << endl;
-                    delete[] error_info;
-                }
-
-                return -1;
-            }
-        }
-        int Sign_up(const char *username, const char *password, const char *phoneum)
-        {
-            //发送请求包
-            char *JSON = DataBag_Sign_up(username, password, phoneum);
-            this->Send_Data(JSON);
-            delete[] JSON;
-            char *error_info = new char[100];
-            if (this->Recive_Success(error_info))
-            {
-                return 0;
-            }
-            else
-            {
-                cout << "Error:";
-                if (error_info != NULL)
-                {
-                    cout << error_info << endl;
-                    delete[] error_info;
-                }
-                // delete error_info;
-                return -1;
-            }
-        }
-
-        //发送邮件，输入指定内容为服务器插入邮件，返回值为-1时表示注册不成功，返回0为成功
-        int Send_Mail(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content)
-        {
-            char *JSON = DataBag_Sd_Mail(ownerId, targetId, email_type, email_title, email_content);
-            this->Send_Data(JSON);
-            delete[] JSON;
-
-            char *error_info = new char[100];
-            if (this->Recive_Success(error_info))
-            {
-                cout << "success log in" << endl; //debug
-                return 0;
-            }
-            else
-            {
-                cout << "Error:";
-                if (error_info != NULL)
-                {
-                    cout << error_info << endl;
-                    delete[] error_info;
-                }
-
-                return -1;
-            }
-        }
-
-        //新建联系人，返回值为-1时表示注册不成功，返回0为成功
-        int Send_Contact(const char *userId, const char *contactname, const char *phonenum)
-        {
-            char *JSON = DataBag_Sd_Contact(userId, contactname, phonenum);
-            this->Send_Data(JSON);
-            delete[] JSON;
-
-            char *error_info = new char[100];
-            if (this->Recive_Success(error_info))
-            {
-                cout << "success log in" << endl; //debug
-                return 0;
-            }
-            else
-            {
-                cout << "Error:";
-                if (error_info != NULL)
-                {
-                    cout << error_info << endl;
-                    delete[] error_info;
-                }
-
-                return -1;
-            }
-        }
-
-        //返回万琦玲式结构数组，详情看定义，第三个参数list_size会返回列表大小
-        EMAIL_INFO *Get_Mail_List(const char *userId, const char *emailType, int *list_size)
-        {
-            EMAIL_INFO *EI = new EMAIL_INFO[200];
-            *list_size = 200;
-            return EI;
-        }
-
-        //返回万琦玲式结构体，详情看定义
-        EMAIL_CONTENT *Get_Mail_Detail(const char *emailId, const char *ownerId)
-        {
-            EMAIL_CONTENT *EC = new EMAIL_CONTENT;
-            return EC;
-        }
-
-        //返回万琦玲式结构数组，详情看定义，第三个参数list_size会返回列表大小
-        CONTATCT_INFO *Get_Contact(const char *userId, int *list_size)
-        {
-            CONTATCT_INFO *CI = new CONTATCT_INFO[200];
-            *list_size = 200;
             return CI;
         }
+        else
+        {
+            return NULL;
+        }
+    }
 
-        //接收文件如何处理待商榷，先做不带附件的吧
-        int Send_File() {}
-        char *Get_File_Info() {}
-    }; // namespace CLIENT
+    CONTATCT_INFO *Client_Core::Json_To_Contact_List(const char *JSON, int *list_size)
+    {
+        Document d;
+        ParseResult ok = d.Parse(JSON);
+        CONTATCT_INFO *CI = NULL;
+        bool is_ok = false;
+        if (!ok)
+        {
+            is_ok = false;
+        }
+        else
+        {
+            if (d.HasMember("info") && d.HasMember("size"))
+            {
+                if (d["info"].IsArray())
+                {
+                    if (d["info"].Size() > 0 && d["info"][0].HasMember("telephone") && d["info"][0].HasMember("userId") && d["info"][0].HasMember("userName"))
+                    {
+
+                        int size = d["size"].GetInt();
+                        *list_size = size;
+                        CI = new CONTATCT_INFO[size];
+                        for (int i = 0; i < d["info"].Size(); i++)
+                        {
+                            CI[i].telephone = new char[d["info"][i]["telephone"].GetStringLength()];
+                            strcpy(CI[i].telephone, d["info"][i]["telephone"].GetString());
+
+                            CI[i].userId = new char[d["info"][i]["userId"].GetStringLength()];
+                            strcpy(CI[i].userId, d["info"][i]["userId"].GetString());
+
+                            CI[i].userName = new char[d["info"][i]["userName"].GetStringLength()];
+                            strcpy(CI[i].userName, d["info"][i]["userName"].GetString());
+                        }
+                        is_ok = true;
+                    }
+                }
+            }
+        }
+        if (is_ok)
+        {
+            return CI;
+        }
+        else
+        {
+            return NULL;
+        }
+    }
+
+    //服务器是否回传成功的消息.如果传回的是失败，则在error_info中填入失败信息
+    bool Client_Core::Recive_Success(char *error_info)
+    {
+        char *data_bag = this->Recive_Data();
+        // cout << "recived bag:" << data_bag << endl;
+        Document *d = this->Return_Analysis(data_bag);
+        bool rt_val = false;
+        if (d != NULL)
+        {
+            cout << (*d)[Key_Type::request_type].GetString() << endl;
+            if (strcmp((*d)[Key_Type::request_type].GetString(), Rq_Type::command) == 0)
+            {
+                if (strcmp((*d)[Key_Type::command_type].GetString(), "error") == 0)
+                {
+                    const char *ei = (*d)["error_info"].GetString();
+                    cout << ei << endl;
+                    strcpy(error_info, ei);
+                    cout << error_info << endl;
+                }
+                else if (strcmp((*d)[Key_Type::command_type].GetString(), "success") == 0)
+                {
+                    cout << "success" << endl;
+                    rt_val = true;
+                }
+            }
+            delete d;
+        }
+        else
+        {
+            cout << "No data bag!" << endl;
+            strcpy(error_info, "No data bag!");
+        }
+        if (data_bag != NULL)
+        {
+            delete[] data_bag;
+        }
+
+        return rt_val;
+    }
+
+    //解析返回的信息，记得delete包！
+    rapidjson::Document *Return_Analysis(char *data_bag)
+    {
+        Document *d = new Document;
+        ParseResult ok = d->Parse(data_bag);
+        if (!ok)
+        {
+            return NULL;
+        }
+        else
+        {
+            return d;
+        }
+    }
+
+    Client_Core::Client_Core() : COMMUNI::Communi_Core(CLIENT::CONFIG::server_ip) {}
+    Client_Core::Client_Core(const char *target_ip) : COMMUNI::Communi_Core(target_ip) {}
+    Client_Core::~Client_Core() {}
+
+    //向服务器发送结束线程的信息
+    void Client_Core::Send_Exit()
+    {
+        char *data_bag = DataBag::DataBag_Exit();
+        this->Send_Data(data_bag);
+        delete[] data_bag;
+        close(this->clnt_socket);
+    }
+    int Client_Core::Sign_in(const char *username, const char *password)
+    {
+        //发送请求包
+        char *JSON = DataBag_Sign_in(username, password);
+        this->Send_Data(JSON);
+        delete[] JSON;
+        char *error_info = new char[100];
+        if (this->Recive_Success(error_info))
+        {
+            cout << "success log in" << endl; //debug
+            return 0;
+        }
+        else
+        {
+            cout << "Error:";
+            if (error_info != NULL)
+            {
+                cout << error_info << endl;
+                delete[] error_info;
+            }
+
+            return -1;
+        }
+    }
+    int Client_Core::Sign_up(const char *username, const char *password, const char *phoneum)
+    {
+        //发送请求包
+        char *JSON = DataBag_Sign_up(username, password, phoneum);
+        this->Send_Data(JSON);
+        delete[] JSON;
+        char *error_info = new char[100];
+        if (this->Recive_Success(error_info))
+        {
+            return 0;
+        }
+        else
+        {
+            cout << "Error:";
+            if (error_info != NULL)
+            {
+                cout << error_info << endl;
+                delete[] error_info;
+            }
+            // delete error_info;
+            return -1;
+        }
+    }
+
+    //发送邮件，输入指定内容为服务器插入邮件，返回值为-1时表示注册不成功，返回0为成功
+    int Client_Core::Send_Mail(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content)
+    {
+        char *JSON = DataBag_Sd_Mail(ownerId, targetId, email_type, email_title, email_content);
+        this->Send_Data(JSON);
+        delete[] JSON;
+
+        char *error_info = new char[100];
+        if (this->Recive_Success(error_info))
+        {
+            cout << "success log in" << endl; //debug
+            return 0;
+        }
+        else
+        {
+            cout << "Error:";
+            if (error_info != NULL)
+            {
+                cout << error_info << endl;
+                delete[] error_info;
+            }
+
+            return -1;
+        }
+    }
+
+    //新建联系人，返回值为-1时表示注册不成功，返回0为成功
+    int Client_Core::Send_Contact(const char *userId, const char *contactname, const char *phonenum)
+    {
+        char *JSON = DataBag_Sd_Contact(userId, contactname, phonenum);
+        this->Send_Data(JSON);
+        delete[] JSON;
+
+        char *error_info = new char[100];
+        if (this->Recive_Success(error_info))
+        {
+            cout << "success log in" << endl; //debug
+            return 0;
+        }
+        else
+        {
+            cout << "Error:";
+            if (error_info != NULL)
+            {
+                cout << error_info << endl;
+                delete[] error_info;
+            }
+
+            return -1;
+        }
+    }
+
+    //返回万琦玲式结构数组，详情看定义，第三个参数list_size会返回列表大小
+    EMAIL_INFO *Client_Core::Get_Mail_List(const char *userId, const char *emailType, int *list_size)
+    {
+        char *Request = DataBag_Rq_List(userId, emailType);
+        this->Send_Data(Request);
+        delete[] Request;
+
+        char *JSON = this->Recive_Data();
+        EMAIL_INFO *EI = this->Json_To_Email_List(JSON, list_size);
+        delete[] JSON;
+        return EI;
+    }
+
+    //返回万琦玲式结构体，详情看定义
+    EMAIL_CONTENT *Client_Core::Get_Mail_Detail(const char *emailId, const char *ownerId)
+    {
+        char *Request = DataBag_Rq_Mail(emailId, ownerId);
+        this->Send_Data(Request);
+        delete[] Request;
+        char *JSON = this->Recive_Data();
+        EMAIL_CONTENT *EC = NULL;
+        Document d;
+        d.Parse(JSON);
+        if (d.HasParseError())
+        {
+        }
+        else
+        {
+            if (d.HasMember("emailContent") && d.HasMember("emailTime") && d.HasMember("emailTitle") && d.HasMember("emailType") && d.HasMember("targetUsername"))
+            {
+                EC = new EMAIL_CONTENT;
+                EC->emailContent = new char[d["telephone"].GetStringLength()];
+                strcpy(EC->emailContent, d["telephone"].GetString());
+
+                EC->emailTime = new char[d["emailTime"].GetStringLength()];
+                strcpy(EC->emailTime, d["emailTime"].GetString());
+
+                EC->emailTitle = new char[d["emailTitle"].GetStringLength()];
+                strcpy(EC->emailTitle, d["emailTitle"].GetString());
+
+                EC->emailType = new char[d["emailType"].GetStringLength()];
+                strcpy(EC->emailType, d["emailType"].GetString());
+
+                EC->emailType = new char[d["targetUsername"].GetStringLength()];
+                strcpy(EC->emailType, d["targetUsername"].GetString());
+            }
+        }
+        delete[] JSON;
+        return EC;
+    }
+
+    //返回万琦玲式结构数组，详情看定义，第三个参数list_size会返回列表大小
+    CONTATCT_INFO *Client_Core::Get_Contact(const char *userId, int *list_size)
+    {
+        char *Request = DataBag_Rq_Contact(userId);
+        this->Send_Data(Request);
+        delete[] Request;
+
+        char *JSON = this->Recive_Data();
+        CONTATCT_INFO *EI = this->Json_To_Contact_List(JSON, list_size);
+        delete[] JSON;
+        return EI;
+    }
+
+    //接收文件如何处理待商榷，先做不带附件的吧
+    int Send_File() {}
+    char *Get_File_Info() {}
 } // namespace CLIENT
