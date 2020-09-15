@@ -1,0 +1,105 @@
+#include <iostream>
+#include <string.h>
+#include <arpa/inet.h>
+#include <sys/socket.h> //socket函数
+#include <sys/types.h>
+#include <fcntl.h> //oepn函数
+#include <sys/stat.h>
+#include <stdio.h>
+#include <unistd.h> //read,write
+#include <signal.h>
+
+#include "Dependencies/rapidjson/rapidjson.h"
+#include "Dependencies/rapidjson/document.h"
+#include "Dependencies/rapidjson/reader.h"
+#include "Dependencies/rapidjson/writer.h"
+#include "Dependencies/rapidjson/stringbuffer.h"
+
+#include "Dependencies/Communi_Core.h"
+
+namespace CLIENT
+{
+    struct EMAIL_INFO
+    {
+        char *emailTitle;
+        char *targetUsername;
+        char *emailTime;
+        char *emailId;
+    };
+
+    struct CONTATCT_INFO
+    {
+        char *userId;
+        char *userName;
+        char *telephone;
+    };
+
+    struct EMAIL_FILE_PATH
+    {
+
+        char *filePath;
+    };
+
+    struct EMAIL_CONTENT
+    {
+        char *emailTitle;
+        char *emailContent;
+        char *emailType;
+        char *targetUsername;
+        char *emailTime;
+    };
+
+    namespace CONFIG
+    {
+        const char server_ip[] = "123.57.176.139";
+        const int server_port = APP_PORT;
+        const int buffer_size = BUFFER_SIZE;
+
+    } // namespace CONFIG
+    class Client_Core : protected COMMUNI::Communi_Core
+    {
+    private:
+        //客户端调用者不可见部分
+        //服务器是否回传成功的消息.如果传回的是失败，则在error_info中填入失败信息
+        bool Recive_Success(char *error_info);
+
+        //解析返回的信息，记得delete包！
+        rapidjson::Document *Return_Analysis(char *data_bag);
+
+    public:
+        Client_Core();
+        //重载，可直接连接到指定IP中
+        Client_Core(const char *target_ip);
+
+        ~Client_Core();
+
+        //向服务器发送结束线程的信息
+        void Send_Exit();
+
+        //登陆请求，返回值为-1时表示登陆不成功，返回0为成功
+        int Sign_in(const char *username, const char *password);
+
+        //注册请求，返回值为-1时表示注册不成功，返回0为成功
+        int Sign_up(const char *username, const char *password, const char *phoneum);
+
+        //发送邮件，输入指定内容为服务器插入邮件，返回值为-1时表示注册不成功，返回0为成功
+        int Send_Mail(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content);
+        
+        //新建联系人，返回值为-1时表示注册不成功，返回0为成功
+        int Send_Contact(const char *userId, const char *contactname, const char *phonenum);
+
+        //返回万琦玲式结构数组，详情看定义，第三个参数list_size会返回列表大小
+        EMAIL_INFO *Get_Mail_List(const char *userId, const char *emailType, int *list_size);
+
+        //返回万琦玲式结构体，详情看定义
+        EMAIL_CONTENT *Get_Mail_Detail(const char *emailId, const char *ownerId);
+
+        //返回万琦玲式结构数组，详情看定义，第三个参数list_size会返回列表大小
+        CONTATCT_INFO *Get_Contact(const char *userId, int *list_size);
+
+        //接收文件如何处理待商榷，先做不带附件的吧
+        int Send_File();
+        char *Get_File_Info();
+
+    }; // namespace CLIENT
+} // namespace CLIENT
