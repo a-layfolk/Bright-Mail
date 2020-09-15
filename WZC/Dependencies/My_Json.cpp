@@ -50,35 +50,6 @@ namespace My_Json
 } // namespace My_Json
 namespace DataBag
 {
-    // struct EMAIL_INFO
-    // {
-    //     char *emailTitle;
-    //     char *targetUsername;
-    //     char *emailTime;
-    //     char *emailId;
-    // };
-
-    // struct CONTATCT_INFO
-    // {
-    //     char *userId;
-    //     char *userName;
-    //     char *telephone;
-    // };
-
-    // struct EMAIL_FILE_PATH
-    // {
-
-    //     char *filePath;
-    // };
-
-    // struct EMAIL_CONTENT
-    // {
-    //     char *emailTitle;
-    //     char *emailContent;
-    //     char *emailType;
-    //     char *targetUsername;
-    //     char *emailTime;
-    // };
     using namespace My_Json;
     char *DataBag_Sign_in(const char *username, const char *password)
     {
@@ -182,6 +153,25 @@ namespace DataBag
         *str += Creat_Key("email_type", email_type, true);
         *str += Creat_Key("email_title", email_title, true);
         *str += Creat_Key("email_content", email_content, false);
+
+        str->push_back('}');
+
+        char *JSON = new char[(*str).size()];
+        strcpy(JSON, (*str).c_str());
+        delete str;
+        return JSON;
+    }
+    char *DataBag_Sd_Mail_Server_Core(const char *emailTitle, const char *emailContent, const char *email_type, const char *targetUsername, const char *emailTime)
+    {
+        string *str = new string;
+        str->push_back('{');
+
+        *str += Creat_Key(Key_Type::request_type, Rq_Type::sd_mail, true);
+        *str += Creat_Key("emailTitle", emailTitle, true);
+        *str += Creat_Key("emailContent", emailContent, true);
+        *str += Creat_Key("email_type", email_type, true);
+        *str += Creat_Key("targetUsername", targetUsername, true);
+        *str += Creat_Key("emailTime", emailTime, false);
 
         str->push_back('}');
 
@@ -347,7 +337,7 @@ namespace DataBag
         delete str;
         return JSON;
     }
-    char *DataBag_Rq(const char *userId, const char *emailType)
+    char *DataBag_Rq_List(const char *userId, const char *emailType)
     {
 
         string *str = new string;

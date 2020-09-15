@@ -11,14 +11,14 @@
 #include <signal.h>
 #include <stdlib.h>
 
-#include "Dependencies/rapidjson/rapidjson.h"
-#include "Dependencies/rapidjson/document.h"
-#include "Dependencies/rapidjson/reader.h"
-#include "Dependencies/rapidjson/writer.h"
-#include "Dependencies/rapidjson/stringbuffer.h"
+#include "../Dependencies/rapidjson/rapidjson.h"
+#include "../Dependencies/rapidjson/document.h"
+#include "../Dependencies/rapidjson/reader.h"
+#include "../Dependencies/rapidjson/writer.h"
+#include "../Dependencies/rapidjson/stringbuffer.h"
 
-#include "Dependencies/Communi_Core.h"
-#include "Dependencies/My_Json.h"
+#include "../Dependencies/Communi_Core.h"
+#include "../Dependencies/My_Json.h"
 #include "Client_Core.h"
 
 using namespace My_Json;
@@ -169,7 +169,7 @@ namespace CLIENT
     }
 
     //解析返回的信息，记得delete包！
-    rapidjson::Document *Return_Analysis(char *data_bag)
+    rapidjson::Document *Client_Core::Return_Analysis(char *data_bag)
     {
         Document *d = new Document;
         ParseResult ok = d->Parse(data_bag);

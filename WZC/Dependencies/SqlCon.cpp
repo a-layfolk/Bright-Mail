@@ -2,10 +2,11 @@
 #include "mysql/mysql.h"
 #include <stdio.h>
 #include <string.h>
+#include "My_Json.h"
 #pragma comment(lib, "libmysql.lib")
 
 MYSQL *con = mysql_init(NULL);
-
+using namespace DataBag;
 char *mysql::get_user_id(const char *username, const char *phonenum)
 {
 	char *value = new char[200];
@@ -62,9 +63,9 @@ EMAIL_INFO *mysql::get_email_info(const char *userId, const char *emailType)
 	return emailInfo;
 }
 
-CONTACT_INFO *mysql::get_contact_info(const char *userId)
+DataBag::CONTATCT_INFO *mysql::get_contact_info(const char *userId)
 {
-	CONTACT_INFO *contactInfo = new CONTACT_INFO[200];
+	DataBag::CONTATCT_INFO *contactInfo = new DataBag::CONTATCT_INFO[200];
 
 	return contactInfo;
 }

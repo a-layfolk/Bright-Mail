@@ -11,15 +11,15 @@
 #include <signal.h>
 #include <stdlib.h>
 
-#include "Dependencies/rapidjson/rapidjson.h"
-#include "Dependencies/rapidjson/document.h"
-#include "Dependencies/rapidjson/reader.h"
-#include "Dependencies/rapidjson/writer.h"
-#include "Dependencies/rapidjson/stringbuffer.h"
+#include "../Dependencies/rapidjson/rapidjson.h"
+#include "../Dependencies/rapidjson/document.h"
+#include "../Dependencies/rapidjson/reader.h"
+#include "../Dependencies/rapidjson/writer.h"
+#include "../Dependencies/rapidjson/stringbuffer.h"
+#include "../Dependencies/Communi_Core.h"
+#include "../Dependencies/My_Json.h"
+#include "../Dependencies/SqlCon.h"
 
-#include "Dependencies/Communi_Core.h"
-#include "Dependencies/My_Json.h"
-#include "Dependencies/SqlCon.h"
 #include "Server_Core.h"
 
 using namespace DataBag;
@@ -90,24 +90,51 @@ namespace SERVER
     {
         SQL.add_email_to_db(d["ownerId"].GetString(), d["targetId"].GetString(), d["email_type"].GetString(), d["email_title"].GetString(), d["email_content"].GetString()); //错误处理？
         this->Send_Success();
+        return 0;
     }
     int Server_Core::Add_Contact(rapidjson::Document &d)
     {
         SQL.add_contact_info(d["userId"].GetString(), d["contactname"].GetString(), d["phonenum"].GetString());
         this->Send_Success();
+        return 0;
     }
     int Server_Core::Add_File(rapidjson::Document &d)
     {
-        return 0;
+        //ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content
+        // SQL.add_email_to_db(d["ownerId"].GetString(), d["targetId"].GetString(), d["email_type"].GetString(), d["email_title"].GetString(), d["email_content"].GetString());
+        // this->Send_Success();
+        // return 0;
     }
     int Server_Core::Return_Email_Detail(rapidjson::Document &d)
-    {
+    { // *emailId, const char *ownerId
+        // char *emailTitle;
+        //     char *emailContent;
+        //     char *emailType;
+        //     char *targetUsername;
+        //     char *emailTime;
+        DataBag::EMAIL_CONTENT *EC = SQL.get_one_email(d["emailId"].GetString(), d["ownerId"].GetString());
+        char *JSON = DataBag_Sd_Mail(EC->emailTitle, EC->emailContent, EC->emailType, EC->targetUsername, EC->emailTime); //这个databag需要重新改一下 debug
+        delete[] JSON;
+        this->Send_Data(JSON);
+        return 0;
     }
     int Server_Core::Return_Email_List(rapidjson::Document &d)
     {
+        int size = 2; //debug size需要可变
+        DataBag::EMAIL_INFO *EI = SQL.get_email_info(d["userId"].GetString(), d["emailType"].GetString());
+        char *JSON = DataBag_Sd_Mail_List(size, EI);
+        this->Send_Data(JSON);
+        delete[] JSON;
+        return 0;
     }
     int Server_Core::Return_Contact_List(rapidjson::Document &d)
     {
+        int size = 2; //debug size需要可变
+        DataBag::CONTATCT_INFO *EI = SQL.get_contact_info(d["userId"].GetString());
+        char *JSON = DataBag_Sd_Contact_List(size, EI);
+        this->Send_Data(JSON);
+        delete[] JSON;
+        return 0;
     }
 
     int Server_Core::Request_Analysis()
@@ -126,7 +153,7 @@ namespace SERVER
                 // close(this->clnt_socket);
                 if (databag != NULL)
                 {
-                    delete databag;
+                    delete[] databag;
                 }
 
                 cout << "This is not a Json-data bag!" << endl;
@@ -142,28 +169,46 @@ namespace SERVER
                     if (strcmp(d[Key_Type::command_type].GetString(), "exit") == 0)
                     {
                         // close(this->clnt_socket);
-                        delete databag;
+                        delete[] databag;
                         break;
                     }
                     else
                     {
-                        delete databag;
+                        delete[] databag;
                         break;
                     }
                 }
+                //请求邮件列表
+                else if (strcmp(rq_type, Rq_Type::rq_list) == 0)
+                {
+                    this->Return_Email_List(d);
+                }
+                //请求联系人列表
+                else if (strcmp(rq_type, Rq_Type::rq_contact) == 0)
+                {
+                    this->Return_Contact_List(d);
+                }
+                //请求单个邮件
+                else if (strcmp(rq_type, Rq_Type::rq_mail) == 0)
+                {
+                    this->Return_Email_Detail(d);
+                }
+                //请求添加邮件
                 else if (strcmp(rq_type, Rq_Type::sd_mail) == 0)
                 {
                     this->Add_Email(d);
                 }
+                //请求添加联系人
                 else if (strcmp(rq_type, Rq_Type::sd_contact) == 0)
                 {
                     this->Add_Contact(d);
                 }
-
+                //请求登陆
                 else if (strcmp(rq_type, Rq_Type::sign_in) == 0)
                 {
                     Sign(d, true);
                 }
+                //请求注册
                 else if (strcmp(rq_type, Rq_Type::sign_up) == 0)
                 {
                     Sign(d, false);
@@ -173,7 +218,7 @@ namespace SERVER
                 //拆包
                 //判断request_type
             }
-            delete databag;
+            delete[] databag;
         }
         return 0;
     }

@@ -98,8 +98,8 @@ namespace DataBag
     char *Mail_List_Tag(const char *emailTitle, const char *targetUsername, const char *emailTime, const char *emailId);
     char *DataBag_Sd_Mail_List(int size, DataBag::EMAIL_INFO *E_info);
     char *DataBag_Sd_Contact_List(int size, DataBag::CONTATCT_INFO *C_info);
-
     char *DataBag_Rq_Mail(const char *emailId, const char *ownerId);
+    char *DataBag_Sd_Mail_Server_Core(const char *emailTitle, const char *emailContent, const char *email_type, const char *targetUsername, const char *emailTime);
 
     //先查mailId对应的文件数和文件名，再通过文件名来接收文件
     char *DataBag_Rq_File(const char *ownerId, const char *emailId, const char *fileName);

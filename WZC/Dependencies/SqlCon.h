@@ -3,42 +3,9 @@
 #include <string>
 #include <iostream>
 #include "mysql/mysql.h"
+#include "My_Json.h"
 #pragma comment(lib, "libmysql.lib")
 using namespace std;
-
-typedef struct EMAIL_INFO
-{
-	char *emailTitle;
-	char *targetUsername;
-	char *emailTime;
-	char *emailId;
-} EMAIL_INFO;
-
-typedef struct CONTATCT_INFO
-{
-	char *userId;
-	char *userName;
-	char *telephone;
-
-} CONTACT_INFO;
-
-typedef struct EMAIL_FILE_PATH
-{
-
-	char *filePath;
-
-} EMAIL_FILE_PATH;
-
-typedef struct EMAIL_CONTENT
-{
-	char *emailTitle;
-	char *emailContent;
-	char *emailType;
-	char *targetUsername;
-	char *emailTime;
-
-} EMAIL_CONTENT;
-
 class mysql
 {
 
@@ -73,17 +40,17 @@ public:
 	相关邮件信息预加载
 	 返回  标题，发件人，时间
 	*/
-	EMAIL_INFO *get_email_info(const char *userId, const char *emailType);
+	DataBag::EMAIL_INFO *get_email_info(const char *userId, const char *emailType);
 	/*
 	好友信息预加载
 	返回好友用户名，好友电话
 	*/
-	CONTACT_INFO *get_contact_info(const char *userId);
+	DataBag::CONTATCT_INFO *get_contact_info(const char *userId);
 	/*
 	数据库内邮件具体信息获得
 	返回 所有信息
 	*/
-	EMAIL_CONTENT *get_one_email(const char *emailId, const char *ownerId);
+	DataBag::EMAIL_CONTENT *get_one_email(const char *emailId, const char *ownerId);
 
 	/*
 	发送邮件操作
@@ -116,11 +83,11 @@ public:
 	/*
 	获得邮件附件路径
 	*/
-	EMAIL_FILE_PATH * get_email_filepath(const char*emailId,int * num);
+	EMAIL_FILE_PATH *get_email_filepath(const char *emailId, int *num);
 	/*
 	删除邮件路径,先查找以前的，若存在则删除，再直接添加
 	*/
-	bool alter_email_filepath(const char*emailId,EMAIL_FILE_PATH *filePath,int * num);
+	bool alter_email_filepath(const char *emailId, EMAIL_FILE_PATH *filePath, int *num);
 
 	void close();
 };

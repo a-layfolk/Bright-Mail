@@ -9,14 +9,14 @@
 #include <unistd.h> //read,write
 #include <signal.h>
 
-#include "Dependencies/rapidjson/rapidjson.h"
-#include "Dependencies/rapidjson/document.h"
-#include "Dependencies/rapidjson/reader.h"
-#include "Dependencies/rapidjson/writer.h"
-#include "Dependencies/rapidjson/stringbuffer.h"
+#include "../Dependencies/rapidjson/rapidjson.h"
+#include "../Dependencies/rapidjson/document.h"
+#include "../Dependencies/rapidjson/reader.h"
+#include "../Dependencies/rapidjson/writer.h"
+#include "../Dependencies/rapidjson/stringbuffer.h"
+#include "../Dependencies/Communi_Core.h"
+#include "../Dependencies/SqlCon.h"
 
-#include "Dependencies/Communi_Core.h"
-#include "Dependencies/SqlCon.h"
 
 #define APP_PORT 8888
 #define BUFFER_SIZE 1000
