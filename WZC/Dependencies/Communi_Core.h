@@ -37,7 +37,7 @@ namespace COMMUNI
         //获取对应路径下文件的名字
         char *Get_File_Name(const char *file_path);
 
-    public:
+    protected:
         int clnt_socket;
         //输入服务器地址,连接服务器
         Communi_Core(const char *server_ip);

@@ -58,27 +58,40 @@ bool mysql::sign_up(const char *username, const char *password, const char *phon
 //email info size?
 EMAIL_INFO *mysql::get_email_info(const char *userId, const char *emailType)
 {
-	EMAIL_INFO *emailInfo = new EMAIL_INFO[200];
+	EMAIL_INFO *emailInfo = new EMAIL_INFO[2];
+	for (int i = 0; i < 2; i++)
+	{
+		emailInfo[i].emailId = NULL;
+		emailInfo[i].emailTime = NULL;
+		emailInfo[i].emailTime = NULL;
+		emailInfo[i].targetUsername = NULL;
+	}
 
 	return emailInfo;
 }
 
 DataBag::CONTATCT_INFO *mysql::get_contact_info(const char *userId)
 {
-	DataBag::CONTATCT_INFO *contactInfo = new DataBag::CONTATCT_INFO[200];
+	DataBag::CONTATCT_INFO *contactInfo = new DataBag::CONTATCT_INFO[2];
+	for (int i = 0; i < 2; i++)
+	{
+		contactInfo[i].telephone = NULL;
+		contactInfo[i].userId = NULL;
+		contactInfo[i].userName = NULL;
+	}
 
 	return contactInfo;
 }
 
 EMAIL_CONTENT *mysql::get_one_email(const char *emailId, const char *ownerId)
 {
-	EMAIL_CONTENT *emailContent = new EMAIL_CONTENT;
-	emailContent->emailContent = "emailContent";
-	emailContent->emailTime = "12:00";
-	emailContent->emailTitle = "title";
-	emailContent->emailType = "type";
-	emailContent->targetUsername = "username";
-	return emailContent;
+	EMAIL_CONTENT *EC = new EMAIL_CONTENT;
+	EC->targetUsername = NULL;
+	EC->emailType = NULL;
+	EC->emailTitle = NULL;
+	EC->emailTime = NULL;
+	EC->emailContent = NULL;
+	return EC;
 }
 
 //判断呢？

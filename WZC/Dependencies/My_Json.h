@@ -38,10 +38,10 @@ namespace My_Json
         const char sd_file[] = "sd_file";
         const char sd_list[] = "sd_list";
         const char sd_contact[] = "sd_contact";
-        const char rq_mail[] = "rc_mail";
-        const char rq_file[] = "rc_file";
-        const char rq_contact[] = "rc_contact";
-        const char rq_list[] = "rc_list";
+        const char rq_mail[] = "rq_mail";
+        const char rq_file[] = "rq_file";
+        const char rq_contact[] = "rq_contact";
+        const char rq_list[] = "rq_list";
 
     } // namespace Rq_Type
 

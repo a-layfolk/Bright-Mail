@@ -132,7 +132,6 @@ namespace CLIENT
     bool Client_Core::Recive_Success(char *error_info)
     {
         char *data_bag = this->Recive_Data();
-        // cout << "recived bag:" << data_bag << endl;
         Document *d = this->Return_Analysis(data_bag);
         bool rt_val = false;
         if (d != NULL)
@@ -204,7 +203,7 @@ namespace CLIENT
         char *error_info = new char[100];
         if (this->Recive_Success(error_info))
         {
-            cout << "success log in" << endl; //debug
+            cout << "success log in" << endl;
             return 0;
         }
         else
@@ -253,7 +252,6 @@ namespace CLIENT
         char *error_info = new char[100];
         if (this->Recive_Success(error_info))
         {
-            cout << "success log in" << endl; //debug
             return 0;
         }
         else
@@ -279,7 +277,6 @@ namespace CLIENT
         char *error_info = new char[100];
         if (this->Recive_Success(error_info))
         {
-            cout << "success log in" << endl; //debug
             return 0;
         }
         else
@@ -326,8 +323,8 @@ namespace CLIENT
             if (d.HasMember("emailContent") && d.HasMember("emailTime") && d.HasMember("emailTitle") && d.HasMember("emailType") && d.HasMember("targetUsername"))
             {
                 EC = new EMAIL_CONTENT;
-                EC->emailContent = new char[d["telephone"].GetStringLength()];
-                strcpy(EC->emailContent, d["telephone"].GetString());
+                EC->emailContent = new char[d["emailContent"].GetStringLength()];
+                strcpy(EC->emailContent, d["emailContent"].GetString());
 
                 EC->emailTime = new char[d["emailTime"].GetStringLength()];
                 strcpy(EC->emailTime, d["emailTime"].GetString());
@@ -338,8 +335,8 @@ namespace CLIENT
                 EC->emailType = new char[d["emailType"].GetStringLength()];
                 strcpy(EC->emailType, d["emailType"].GetString());
 
-                EC->emailType = new char[d["targetUsername"].GetStringLength()];
-                strcpy(EC->emailType, d["targetUsername"].GetString());
+                EC->targetUsername = new char[d["targetUsername"].GetStringLength()];
+                strcpy(EC->targetUsername, d["targetUsername"].GetString());
             }
         }
         delete[] JSON;
@@ -351,9 +348,11 @@ namespace CLIENT
     {
         char *Request = DataBag_Rq_Contact(userId);
         this->Send_Data(Request);
+        // cout << Request << endl;
         delete[] Request;
 
         char *JSON = this->Recive_Data();
+        cout << "RCV:JSON:" << JSON << endl;//debug
         CONTATCT_INFO *EI = this->Json_To_Contact_List(JSON, list_size);
         delete[] JSON;
         return EI;

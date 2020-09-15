@@ -88,15 +88,33 @@ namespace SERVER
 
     int Server_Core::Add_Email(rapidjson::Document &d)
     {
-        SQL.add_email_to_db(d["ownerId"].GetString(), d["targetId"].GetString(), d["email_type"].GetString(), d["email_title"].GetString(), d["email_content"].GetString()); //错误处理？
-        this->Send_Success();
-        return 0;
+        if (d.HasMember("ownerId") && d.HasMember("targetId") && d.HasMember("emailType") && d.HasMember("emailTitle") && d.HasMember("emailContent"))
+        {
+            SQL.add_email_to_db(d["ownerId"].GetString(), d["targetId"].GetString(), d["emailType"].GetString(), d["emailTitle"].GetString(), d["emailContent"].GetString()); //错误处理？
+            this->Send_Success();
+            return 0;
+        }
+        else
+        {
+            cout << "JSON ERROR" << endl; //debug
+            this->Send_Error("JSON ERROR");
+            return -1;
+        }
     }
     int Server_Core::Add_Contact(rapidjson::Document &d)
     {
-        SQL.add_contact_info(d["userId"].GetString(), d["contactname"].GetString(), d["phonenum"].GetString());
-        this->Send_Success();
-        return 0;
+        if (d.HasMember("userId") && d.HasMember("contactname") && d.HasMember("phonenum"))
+        {
+            SQL.add_contact_info(d["userId"].GetString(), d["contactname"].GetString(), d["phonenum"].GetString());
+            this->Send_Success();
+            return 0;
+        }
+        else
+        {
+            cout << "JSON ERROR" << endl; //debug
+            this->Send_Error("JSON ERROR");
+            return -1;
+        }
     }
     int Server_Core::Add_File(rapidjson::Document &d)
     {
@@ -106,35 +124,63 @@ namespace SERVER
         // return 0;
     }
     int Server_Core::Return_Email_Detail(rapidjson::Document &d)
-    { // *emailId, const char *ownerId
-        // char *emailTitle;
-        //     char *emailContent;
-        //     char *emailType;
-        //     char *targetUsername;
-        //     char *emailTime;
-        DataBag::EMAIL_CONTENT *EC = SQL.get_one_email(d["emailId"].GetString(), d["ownerId"].GetString());
-        char *JSON = DataBag_Sd_Mail(EC->emailTitle, EC->emailContent, EC->emailType, EC->targetUsername, EC->emailTime); //这个databag需要重新改一下 debug
-        delete[] JSON;
-        this->Send_Data(JSON);
-        return 0;
+    {
+        if (d.HasMember("emailId") && d.HasMember("ownerId"))
+        {
+            DataBag::EMAIL_CONTENT *EC = SQL.get_one_email(d["emailId"].GetString(), d["ownerId"].GetString());
+            char *JSON = DataBag_Sd_Mail_Server_Core(EC->emailTitle, EC->emailContent, EC->emailType, EC->targetUsername, EC->emailTime); //这个databag需要重新改一下 debug
+            cout << "ED JSON:" << JSON << endl;
+            this->Send_Data(JSON);
+            delete[] JSON;
+            delete EC;
+            return 0;
+        }
+        else
+        {
+            cout << "JSON ERROR" << endl; //debug
+            this->Send_Error("JSON ERROR");
+            return -1;
+        }
     }
     int Server_Core::Return_Email_List(rapidjson::Document &d)
     {
         int size = 2; //debug size需要可变
-        DataBag::EMAIL_INFO *EI = SQL.get_email_info(d["userId"].GetString(), d["emailType"].GetString());
-        char *JSON = DataBag_Sd_Mail_List(size, EI);
-        this->Send_Data(JSON);
-        delete[] JSON;
-        return 0;
+        if (d.HasMember("userId") && d.HasMember("emailType"))
+        {
+            DataBag::EMAIL_INFO *EI = SQL.get_email_info(d["userId"].GetString(), d["emailType"].GetString());
+            char *JSON = DataBag_Sd_Mail_List(size, EI);
+            this->Send_Data(JSON);
+            delete[] EI;
+            delete[] JSON;
+            return 0;
+        }
+        else
+        {
+            cout << "JSON ERROR" << endl; //debug
+            this->Send_Error("JSON ERROR");
+            return -1;
+        }
     }
+
     int Server_Core::Return_Contact_List(rapidjson::Document &d)
     {
-        int size = 2; //debug size需要可变
-        DataBag::CONTATCT_INFO *EI = SQL.get_contact_info(d["userId"].GetString());
-        char *JSON = DataBag_Sd_Contact_List(size, EI);
-        this->Send_Data(JSON);
-        delete[] JSON;
-        return 0;
+        if (d.HasMember("userId"))
+        {
+            int size = 2; //debug size需要可变
+            DataBag::CONTATCT_INFO *EI = SQL.get_contact_info(d["userId"].GetString());
+            char *JSON = DataBag_Sd_Contact_List(size, EI);
+            cout << "JSON:" << JSON << endl;
+            this->Send_Data(JSON);
+            delete[] EI;
+            delete[] JSON;
+            return 0;
+        }
+        else
+        {
+            cout << "JSON ERROR" << endl; //debug
+            this->Send_Error("JSON ERROR");
+            return -1;
+        }
     }
 
     int Server_Core::Request_Analysis()
@@ -143,8 +189,8 @@ namespace SERVER
         while (1)
         {
             //接收请求包
-            cout << "into request" << endl;
             char *databag = this->Recive_Data();
+            cout << "databag" << databag << endl;
             rapidjson::Document d;
             ParseResult ok = d.Parse(databag); //解析的错误处理
             if (!ok)
@@ -227,5 +273,4 @@ namespace SERVER
 
         this->Request_Analysis();
     }
-
 }; // namespace SERVER
