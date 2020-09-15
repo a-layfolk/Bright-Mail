@@ -83,11 +83,11 @@ public:
 	/*
 	获得邮件附件路径
 	*/
-	EMAIL_FILE_PATH *get_email_filepath(const char *emailId, int *num);
+	// EMAIL_FILE_PATH *get_email_filepath(const char *emailId, int *num);
 	/*
 	删除邮件路径,先查找以前的，若存在则删除，再直接添加
 	*/
-	bool alter_email_filepath(const char *emailId, EMAIL_FILE_PATH *filePath, int *num);
+	// bool alter_email_filepath(const char *emailId, EMAIL_FILE_PATH *filePath, int *num);
 
 	void close();
 };

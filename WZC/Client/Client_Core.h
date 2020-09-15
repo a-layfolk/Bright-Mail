@@ -1,3 +1,5 @@
+#ifndef CLC_H
+#define CLC_H
 #include <iostream>
 #include <string.h>
 #include <arpa/inet.h>
@@ -77,3 +79,4 @@ namespace CLIENT
 
     }; // namespace CLIENT
 } // namespace CLIENT
+#endif

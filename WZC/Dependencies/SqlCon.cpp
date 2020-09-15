@@ -110,18 +110,18 @@ bool mysql::delete_contatc_info(const char *userId, const char *contactname, con
 {
 	return true;
 }
-EMAIL_FILE_PATH *mysql::get_email_filepath(const char *emailId, int *num)
-{
-	*num = 1;
-	EMAIL_FILE_PATH *filePath = new EMAIL_FILE_PATH[200];
-	strcpy(filePath[0].filePath, "filePath");
-	return filePath;
-}
+// EMAIL_FILE_PATH *mysql::get_email_filepath(const char *emailId, int *num)
+// {
+// 	*num = 1;
+// 	EMAIL_FILE_PATH *filePath = new EMAIL_FILE_PATH[200];
+// 	strcpy(filePath[0].filePath, "filePath");
+// 	return filePath;
+// }
 //????这是做什么的？删除文件？
-bool mysql::alter_email_filepath(const char *emailId, EMAIL_FILE_PATH *filePath, int *num)
-{
-	return true;
-}
+// bool mysql::alter_email_filepath(const char *emailId, EMAIL_FILE_PATH *filePath, int *num)
+// {
+// 	return true;
+// }
 
 void mysql::close()
 {

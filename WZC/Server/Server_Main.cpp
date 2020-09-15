@@ -10,11 +10,11 @@
 #include <unistd.h> //read,write
 #include <signal.h>
 #include <stdlib.h>
-#include "Dependencies/rapidjson/rapidjson.h"
-#include "Dependencies/rapidjson/document.h"
-#include "Dependencies/rapidjson/reader.h"
-#include "Dependencies/rapidjson/writer.h"
-#include "Dependencies/rapidjson/stringbuffer.h"
+#include "../Dependencies/rapidjson/rapidjson.h"
+#include "../Dependencies/rapidjson/document.h"
+#include "../Dependencies/rapidjson/reader.h"
+#include "../Dependencies/rapidjson/writer.h"
+#include "../Dependencies/rapidjson/stringbuffer.h"
 #include "Server_Core.h"
 
 using namespace SERVER;
