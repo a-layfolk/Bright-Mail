@@ -144,10 +144,10 @@ namespace SERVER
     }
     int Server_Core::Return_Email_List(rapidjson::Document &d)
     {
-        int size = 2; //debug size需要可变
+        int size = 0; //debug size需要可变
         if (d.HasMember("userId") && d.HasMember("emailType"))
         {
-            DataBag::EMAIL_INFO *EI = SQL.get_email_info(d["userId"].GetString(), d["emailType"].GetString());
+            DataBag::EMAIL_INFO *EI = SQL.get_email_info(d["userId"].GetString(), d["emailType"].GetString(), &size);
             char *JSON = DataBag_Sd_Mail_List(size, EI);
             this->Send_Data(JSON);
             delete[] EI;
@@ -166,8 +166,8 @@ namespace SERVER
     {
         if (d.HasMember("userId"))
         {
-            int size = 2; //debug size需要可变
-            DataBag::CONTATCT_INFO *EI = SQL.get_contact_info(d["userId"].GetString());
+            int size = 0; //debug size需要可变
+            DataBag::CONTATCT_INFO *EI = SQL.get_contact_info(d["userId"].GetString(), &size);
             char *JSON = DataBag_Sd_Contact_List(size, EI);
             cout << "JSON:" << JSON << endl;
             this->Send_Data(JSON);

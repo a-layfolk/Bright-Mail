@@ -18,8 +18,6 @@
 #include "../Dependencies/SqlCon.h"
 
 
-#define APP_PORT 8888
-#define BUFFER_SIZE 1000
 
 namespace SERVER
 {
