@@ -33,32 +33,22 @@ namespace CLIENT
     {
         Document d;
         ParseResult ok = d.Parse(JSON);
-        cout << "1" << endl;
         EMAIL_INFO *CI = NULL;
         if (!ok)
         {
-            cout << "2" << endl;
         }
         else
         {
-            cout << "1" << endl;
             if (d.HasMember("info"))
             {
-                cout << "1" << endl;
                 if (d["info"].IsArray())
                 {
-                    cout << "1" << endl;
                     if (d["info"].Size() > 0 && d["info"][0].HasMember("emailTitle") && d["info"][0].HasMember("targetUsername") && d["info"][0].HasMember("emailTime") && d["info"][0].HasMember("emailId"))
                     {
 
-                        cout << "2" << endl;
                         int size = d["info"].Size();
-                        cout << "3" << endl;
                         *list_size = size;
-                        cout << "size:" << size << endl;
-                        cout << d["info"].Size() << endl;
                         CI = new EMAIL_INFO[size];
-                        cout << "4" << endl;
                         for (int i = 0; i < d["info"].Size(); i++)
                         {
                             CI[i].emailTitle = new char[d["info"][i]["emailTitle"].GetStringLength()];
@@ -136,7 +126,7 @@ namespace CLIENT
         bool rt_val = false;
         if (d != NULL)
         {
-            cout << (*d)[Key_Type::request_type].GetString() << endl;
+            // cout << (*d)[Key_Type::request_type].GetString() << endl;//debug
             if (strcmp((*d)[Key_Type::request_type].GetString(), Rq_Type::command) == 0)
             {
                 if (strcmp((*d)[Key_Type::command_type].GetString(), "error") == 0)
@@ -148,7 +138,7 @@ namespace CLIENT
                 }
                 else if (strcmp((*d)[Key_Type::command_type].GetString(), "success") == 0)
                 {
-                    cout << "success" << endl;
+                    cout << "success send data" << endl;
                     rt_val = true;
                 }
             }
@@ -180,7 +170,7 @@ namespace CLIENT
         }
         if (d != NULL)
         {
-            cout << (*d)[Key_Type::request_type].GetString() << endl;
+            // cout << (*d)[Key_Type::request_type].GetString() << endl;
             if (strcmp((*d)[Key_Type::request_type].GetString(), Rq_Type::command) == 0)
             {
                 if (strcmp((*d)[Key_Type::command_type].GetString(), "error") == 0)
@@ -291,9 +281,9 @@ namespace CLIENT
     }
 
     //发送邮件，输入指定内容为服务器插入邮件，返回值为-1时表示注册不成功，返回0为成功
-    int Client_Core::Send_Mail(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content)
+    int Client_Core::Send_Mail(const char *ownerId, const char *targetTelephone, const char *email_type, const char *email_title, const char *email_content)
     {
-        char *JSON = DataBag_Sd_Mail(ownerId, targetId, email_type, email_title, email_content);
+        char *JSON = DataBag_Sd_Mail(ownerId, targetTelephone, email_type, email_title, email_content);
         this->Send_Data(JSON);
         delete[] JSON;
 
@@ -316,9 +306,9 @@ namespace CLIENT
     }
 
     //新建联系人，返回值为-1时表示注册不成功，返回0为成功
-    int Client_Core::Send_Contact(const char *userId, const char *targetName, const char *targetTelephone)
+    int Client_Core::Send_Contact(const char *myId, const char *targetName, const char *targetTelephone)
     {
-        char *JSON = DataBag_Sd_Contact(userId, targetName, targetTelephone);
+        char *JSON = DataBag_Sd_Contact(myId, targetName, targetTelephone);
         this->Send_Data(JSON);
         delete[] JSON;
 
@@ -347,7 +337,7 @@ namespace CLIENT
         this->Send_Data(Request);
         delete[] Request;
         char *JSON = this->Recive_Data();
-        cout << JSON << endl;
+        // cout << JSON << endl;//debug
         EMAIL_INFO *EI = this->Json_To_Email_List(JSON, list_size);
         delete[] JSON;
         return EI;
@@ -400,7 +390,6 @@ namespace CLIENT
         delete[] Request;
 
         char *JSON = this->Recive_Data();
-        cout << "RCV:JSON:" << JSON << endl; //debug
         CONTATCT_INFO *EI = this->Json_To_Contact_List(JSON, list_size);
         delete[] JSON;
         return EI;

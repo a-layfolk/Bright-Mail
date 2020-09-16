@@ -64,7 +64,7 @@ namespace CLIENT
         int Send_Mail_With_File(const char *ownerId, const char *targetTelephone, const char *email_type, const char *email_title, const char *email_content, const char *file_name);
 
         //新建联系人，返回值为-1时表示注册不成功，返回0为成功
-        int Send_Contact(const char *userId, const char *contactname, const char *phonenum);
+        int Send_Contact(const char *myId, const char *targetName, const char *targetTelephone);
 
         //返回万琦玲式结构数组，详情看定义，第三个参数list_size会返回列表大小
         EMAIL_INFO *Get_Mail_List(const char *userId, const char *emailType, int *list_size);
