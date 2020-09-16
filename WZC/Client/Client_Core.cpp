@@ -33,24 +33,32 @@ namespace CLIENT
     {
         Document d;
         ParseResult ok = d.Parse(JSON);
+        cout << "1" << endl;
         EMAIL_INFO *CI = NULL;
-        bool is_ok = false;
         if (!ok)
         {
-            is_ok = false;
+            cout << "2" << endl;
         }
         else
         {
-            if (d.HasMember("info") && d.HasMember("size"))
+            cout << "1" << endl;
+            if (d.HasMember("info"))
             {
+                cout << "1" << endl;
                 if (d["info"].IsArray())
                 {
+                    cout << "1" << endl;
                     if (d["info"].Size() > 0 && d["info"][0].HasMember("emailTitle") && d["info"][0].HasMember("targetUsername") && d["info"][0].HasMember("emailTime") && d["info"][0].HasMember("emailId"))
                     {
 
-                        int size = d["size"].GetInt();
+                        cout << "2" << endl;
+                        int size = d["info"].Size();
+                        cout << "3" << endl;
                         *list_size = size;
+                        cout << "size:" << size << endl;
+                        cout << d["info"].Size() << endl;
                         CI = new EMAIL_INFO[size];
+                        cout << "4" << endl;
                         for (int i = 0; i < d["info"].Size(); i++)
                         {
                             CI[i].emailTitle = new char[d["info"][i]["emailTitle"].GetStringLength()];
@@ -65,19 +73,11 @@ namespace CLIENT
                             CI[i].emailId = new char[d["info"][i]["emailId"].GetStringLength()];
                             strcpy(CI[i].emailId, d["info"][i]["emailId"].GetString());
                         }
-                        is_ok = true;
                     }
                 }
             }
         }
-        if (is_ok)
-        {
-            return CI;
-        }
-        else
-        {
-            return NULL;
-        }
+        return CI;
     }
 
     CONTATCT_INFO *Client_Core::Json_To_Contact_List(const char *JSON, int *list_size)
@@ -346,8 +346,8 @@ namespace CLIENT
         char *Request = DataBag_Rq_List(userId, emailType);
         this->Send_Data(Request);
         delete[] Request;
-
         char *JSON = this->Recive_Data();
+        cout << JSON << endl;
         EMAIL_INFO *EI = this->Json_To_Email_List(JSON, list_size);
         delete[] JSON;
         return EI;

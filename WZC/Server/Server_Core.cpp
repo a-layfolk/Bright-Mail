@@ -146,8 +146,13 @@ namespace SERVER
     {
         if (d.HasMember("emailId")) //这里数据库还没写
         {
-
+            cout << "in here" << endl;
             char *JSON = SQL->Get_Email_Detail_JSON(d["emailId"].GetString());
+            if (JSON == NULL)
+            {
+                return -1;
+            }
+
             this->Send_Data(JSON);
             delete[] JSON;
             return 0;

@@ -289,7 +289,7 @@ public:
         sprintf(query, "select emailTitle,targetTelephone,emailTime,emailId from Email where myId=%s and emailType='%s';", userId, emailType);
         MYSQL_RES *res;
         MYSQL_ROW row;
-        
+
         cout << "query:" << query << endl;
         mysql_query(con, query);
         res = mysql_store_result(con);
@@ -314,9 +314,10 @@ public:
 
             writer.EndObject();
         }
-        writer.Key("size");
-        writer.Int(size);
         writer.EndArray();
+
+        // writer.Key("size");
+        // writer.Int(2);
 
         writer.EndObject();
 
@@ -325,81 +326,69 @@ public:
         std::cout << JSON;
         return JSON;
     }
-    // char *Get_Email_List_JSON(const char *userId, const char *emailType)
-    // {
-    //     string *str = new string;
 
-    //     str->push_back('{');
-    //     *str += Creat_Key(Key_Type::request_type, Rq_Type::sd_list, true);
-    //     *str += "\"info\":[";
-    //     cout << "2" << endl;
-    //     char *query = new char[200];
-    //     sprintf(query, "select emailTitle,targetTelephone,emailTime,emailId from Email where myId=%s and emailType='%s';", userId, emailType);
-    //     MYSQL_RES *res;
-    //     MYSQL_ROW row;
-    //     mysql_query(con, query);
-    //     cout << "3" << endl;
-    //     res = mysql_store_result(con);
-
-    //     int size = 0;
-    //     while ((row = mysql_fetch_row(res)) != NULL)
-    //     {
-    //         cout << "4" << endl;
-    //         if (size != 0)
-    //         {
-    //             str->push_back(',');
-    //         }
-    //         cout << "size:" << size; //debug
-
-    // char *tag = DataBag::Mail_List_Tag(row[0], row[1], row[2], row[3]);
-    //         *str += tag;
-    //         delete[] tag;
-    //         size++;
-    //     }
-
-    //     delete[] query;
-    //     str->push_back(']');
-    //     char *size_temp = new char[10];
-    //     sprintf(size_temp, ",\"size\":%d", size);
-    //     *str += size_temp;
-    //     delete size_temp;
-
-    //     str->push_back('}');
-    //     char *JSON = new char[(*str).size()];
-    //     strcpy(JSON, (*str).c_str());
-    //     delete str;
-    //     cout << JSON; //debug
-    //     return JSON;
-    // }
     char *Get_Email_Detail_JSON(const char *emailId)
     {
-        string *str = new string;
-        str->push_back('{');
+        // string *str = new string;
+        // str->push_back('{');
 
-        *str += Creat_Key(Key_Type::request_type, Rq_Type::sd_mail, true);
+        // *str += Creat_Key(Key_Type::request_type, Rq_Type::sd_mail, true);
         char *query = new char[300];
         MYSQL_ROW row;
+        cout << "1" << endl;
+        StringBuffer s;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+        writer.StartObject();
+        writer.Key(Key_Type::request_type);
+        writer.String(Rq_Type::rq_mail);
 
+        cout << "1" << endl;
         sprintf(query, "select  Email.emailTitle, Email.emailContent, Bright_Mail.User.userName,Email.emailType,Email.emailTime,Email.attachedFile from Email,User where emailId=%s AND Email.targetTelephone= Bright_Mail.User.telephone;", emailId);
         mysql_query(con, query);
+        cout << query << endl;
+        cout << "1" << endl;
+        if (row != NULL)
+        {
 
-        MYSQL_RES *res = mysql_store_result(con);
-        row = mysql_fetch_row(res);
-        int num = mysql_num_fields(res);
+            MYSQL_RES *res = mysql_store_result(con);
+            row = mysql_fetch_row(res);
+            int num = mysql_num_fields(res);
+            writer.Key("emailTitle");
+            writer.String(row[0]);
 
-        *str += Creat_Key("emailTitle", row[0], true);
-        *str += Creat_Key("emailContent", row[1], true);
-        *str += Creat_Key("targetUsername", row[2], true);
-        *str += Creat_Key("emailType", row[3], true);
-        *str += Creat_Key("emailTime", row[4], true);
-        *str += Creat_Key("attachedFile", row[5], false);
+            writer.Key("emailContent");
+            writer.String(row[1]);
 
-        delete[] query;
-        str->push_back('}');
-        char *JSON = new char[(*str).size()];
-        strcpy(JSON, (*str).c_str());
-        delete str;
-        return JSON;
+            writer.Key("targetUsername");
+            writer.String(row[2]);
+
+            writer.Key("emailType");
+            writer.String(row[3]);
+
+            writer.Key("emailTime");
+            writer.String(row[4]);
+
+            // *str += Creat_Key("emailTitle", row[0], true);
+            // *str += Creat_Key("emailContent", row[1], true);
+            // *str += Creat_Key("targetUsername", row[2], true);
+            // *str += Creat_Key("emailType", row[3], true);
+            // *str += Creat_Key("emailTime", row[4], true);
+            // *str += Creat_Key("attachedFile", row[5], false);
+
+            // delete[] query;
+            // str->push_back('}');
+            // char *JSON = new char[(*str).size()];
+            // strcpy(JSON, (*str).c_str());
+            // delete str;
+            // return JSON;
+            writer.EndObject();
+
+            char *JSON = new char[s.GetSize()];
+            strcpy(JSON, s.GetString());
+            std::cout << JSON;
+            return JSON;
+        }
+        return NULL;
     }
 
     char *Get_Contact_List_JSON(const char *userId)
