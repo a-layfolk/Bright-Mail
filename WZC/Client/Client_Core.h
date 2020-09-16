@@ -35,7 +35,7 @@ namespace CLIENT
         //客户端调用者不可见部分
         //服务器是否回传成功的消息.如果传回的是失败，则在error_info中填入失败信息
         bool Recive_Success(char *error_info);
-
+        char *Recive_Success_Data(char *error_info);
         CONTATCT_INFO *Json_To_Contact_List(const char *JSON, int *list_size);
         EMAIL_INFO *Json_To_Email_List(const char *JSON, int *list_size);
 
@@ -53,15 +53,15 @@ namespace CLIENT
         void Send_Exit();
 
         //登陆请求，返回值为NULL时表示登陆不成功，成功时返回用户id
-        char* Sign_in(const char *username, const char *password);
+        char *Sign_in(const char *username, const char *password);
         //注册请求，返回值为NULL时表示注册不成功，成功时返回用户id
-        char* Sign_up(const char *username, const char *password, const char *phoneum);
+        char *Sign_up(const char *username, const char *password, const char *phoneum);
 
         //发送邮件，输入指定内容为服务器插入邮件，返回值为-1时表示注册不成功，返回0为成功
         int Send_Mail(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content);
-        
+
         //发送邮件，输入指定内容为服务器插入邮件，返回值为-1时表示注册不成功，返回0为成功
-        int Send_Mail_With_File(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content,const char*file_name);
+        int Send_Mail_With_File(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content, const char *file_name);
 
         //新建联系人，返回值为-1时表示注册不成功，返回0为成功
         int Send_Contact(const char *userId, const char *contactname, const char *phonenum);
@@ -77,9 +77,8 @@ namespace CLIENT
 
         //接收文件如何处理待商榷，先做不带附件的吧
 
-
         //输入相对地址或者绝对地址//email id我自己查，SQL add todb时会返回
-        int Send_File(const char *file_path);//我需要
+        int Send_File(const char *file_path); //我需要
 
         //在执行文件当前目录放文件
         int Get_File();

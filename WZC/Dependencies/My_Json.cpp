@@ -239,6 +239,7 @@ namespace DataBag
         char *JSON = new char[(*str).size()];
         strcpy(JSON, (*str).c_str());
         delete str;
+        cout<<"MLT:"<<JSON<<endl;//debug
         return JSON;
     }
 
@@ -285,15 +286,15 @@ namespace DataBag
         delete str;
         return JSON;
     }
-    char *DataBag_Sd_Contact(const char *userId, const char *targetTelephone, const char *phonenum)
+    char *DataBag_Sd_Contact(const char *userId, const char *targetName, const char *targetTelephone)
     {
         string *str = new string;
         str->push_back('{');
 
         *str += Creat_Key(Key_Type::request_type, Rq_Type::sd_contact, true);
         *str += Creat_Key("userId", userId, true);
-        *str += Creat_Key("targetTelephone", targetTelephone, true);
-        *str += Creat_Key("phonenum", phonenum, false);
+        *str += Creat_Key("targetName", targetName, true);
+        *str += Creat_Key("targetTelephone", targetTelephone, false);
 
         str->push_back('}');
 

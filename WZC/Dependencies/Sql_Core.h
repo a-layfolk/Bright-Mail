@@ -180,11 +180,11 @@ public:
         char *time = this->Get_Time();
         if (attachedFile == NULL)
         {
-            sprintf(query, "Insert into Email(myId,targetTelephone,emailType,emailTitle,emailContent,emailTime)values(%s,%s,'%s','%s','%s','%s');", myId, targetTelephone, emailType, emailTitle, emailContent, time);
+            sprintf(query, "Insert into Email(myId,targetTelephone,emailType,emailTitle,emailContent,emailTime)values(%s,'%s','%s','%s','%s','%s');", myId, targetTelephone, emailType, emailTitle, emailContent, time);
         }
         else
         {
-            sprintf(query, "Insert into Email(myId,targetTelephone,emailType,emailTitle,emailContent,emailTime,attachedFile)values(%s,%s,'%s','%s','%s','%s','%s');", myId, targetTelephone, emailType, emailTitle, emailContent, time, attachedFile);
+            sprintf(query, "Insert into Email(myId,targetTelephone,emailType,emailTitle,emailContent,emailTime,attachedFile)values(%s,'%s','%s','%s','%s','%s','%s');", myId, targetTelephone, emailType, emailTitle, emailContent, time, attachedFile);
         }
 
         delete[] time;
@@ -211,11 +211,11 @@ public:
         if (attachedFile == NULL)
         {
 
-            sprintf(query, "Insert into Email(myId,targetTelephone,emailType,emailTitle,emailContent,emailTime)values(%s,%s,'%s','%s','%s','%s');", myId, targetTelephone, "received_unread", emailTitle, emailContent, time);
+            sprintf(query, "Insert into Email(myId,targetTelephone,emailType,emailTitle,emailContent,emailTime)values(%s,'%s','%s','%s','%s','%s');", myId, targetTelephone, "received_unread", emailTitle, emailContent, time);
         }
         else
         {
-            sprintf(query, "Insert into Email(myId,targetTelephone,emailType,emailTitle,emailContent,emailTime,attachedFile)values(%s,%s,'%s','%s','%s','%s','%s);", myId, targetTelephone, "received_unread", emailTitle, emailContent, time, attachedFile);
+            sprintf(query, "Insert into Email(myId,targetTelephone,emailType,emailTitle,emailContent,emailTime,attachedFile)values(%s,'%s','%s','%s','%s','%s','%s);", myId, targetTelephone, "received_unread", emailTitle, emailContent, time, attachedFile);
         }
 
         delete[] time;
@@ -279,27 +279,32 @@ public:
         str->push_back('{');
         *str += Creat_Key(Key_Type::request_type, Rq_Type::sd_list, true);
         *str += "\"info\":[";
-
+        cout << "2" << endl;
         char *query = new char[200];
         sprintf(query, "select emailTitle,targetTelephone,emailTime,emailId from Email where myId=%s and emailType='%s';", userId, emailType);
         MYSQL_RES *res;
         MYSQL_ROW row;
         mysql_query(con, query);
+        cout << "3" << endl;
         res = mysql_store_result(con);
 
         int size = 0;
         while ((row = mysql_fetch_row(res)) != NULL)
         {
+            cout << "4" << endl;
             if (size != 0)
             {
                 str->push_back(',');
             }
+            cout << "size:" << size; //debug
+            
             char *tag = DataBag::Mail_List_Tag(row[0], row[1], row[2], row[3]);
             *str += tag;
             delete[] tag;
             size++;
         }
 
+        delete[] query;
         str->push_back(']');
         char *size_temp = new char[10];
         sprintf(size_temp, ",\"size\":%d", size);
@@ -310,8 +315,7 @@ public:
         char *JSON = new char[(*str).size()];
         strcpy(JSON, (*str).c_str());
         delete str;
-        return JSON;
-        delete[] query;
+        cout << JSON; //debug
         return JSON;
     }
     char *Get_Email_Detail_JSON(const char *emailId)

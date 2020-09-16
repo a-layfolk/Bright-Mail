@@ -167,6 +167,50 @@ namespace CLIENT
         return rt_val;
     }
 
+    //以后如果返回的成功信息有别的，可以在这里加
+    char *Client_Core::Recive_Success_Data(char *error_info)
+    {
+        char *data_bag = this->Recive_Data();
+        Document *d = this->Return_Analysis(data_bag);
+        char *extra = NULL;
+        if (d->HasMember("id"))
+        {
+            extra = new char[(*d)["id"].GetStringLength()];
+            strcpy(extra, (*d)["id"].GetString());
+        }
+        if (d != NULL)
+        {
+            cout << (*d)[Key_Type::request_type].GetString() << endl;
+            if (strcmp((*d)[Key_Type::request_type].GetString(), Rq_Type::command) == 0)
+            {
+                if (strcmp((*d)[Key_Type::command_type].GetString(), "error") == 0)
+                {
+                    const char *ei = (*d)["error_info"].GetString();
+                    cout << ei << endl;
+                    strcpy(error_info, ei);
+                    cout << error_info << endl;
+                }
+                else if (strcmp((*d)[Key_Type::command_type].GetString(), "success") == 0)
+                {
+                    cout << "success" << endl;
+                    return extra;
+                }
+            }
+            delete d;
+        }
+        else
+        {
+            cout << "No data bag!" << endl;
+            strcpy(error_info, "No data bag!");
+        }
+        if (data_bag != NULL)
+        {
+            delete[] data_bag;
+        }
+
+        return extra;
+    }
+
     //解析返回的信息，记得delete包！
     rapidjson::Document *Client_Core::Return_Analysis(char *data_bag)
     {
@@ -196,12 +240,13 @@ namespace CLIENT
     }
     char *Client_Core::Sign_in(const char *username, const char *password)
     {
+        char *id = NULL;
         //发送请求包
         char *JSON = DataBag_Sign_in(username, password);
         this->Send_Data(JSON);
         delete[] JSON;
         char *error_info = new char[100];
-        if (this->Recive_Success(error_info))
+        if ((id = this->Recive_Success_Data(error_info)) != NULL)
         {
             cout << "success log in" << endl;
             // return 0;
@@ -217,16 +262,17 @@ namespace CLIENT
 
             // return -1;
         }
-        return NULL;
+        return id;
     }
     char *Client_Core::Sign_up(const char *username, const char *password, const char *phoneum)
     {
         //发送请求包
+        char *id = NULL;
         char *JSON = DataBag_Sign_up(username, password, phoneum);
         this->Send_Data(JSON);
         delete[] JSON;
         char *error_info = new char[100];
-        if (this->Recive_Success(error_info))
+        if ((id = this->Recive_Success_Data(error_info)) != NULL)
         {
             // return 0;
         }
@@ -241,7 +287,7 @@ namespace CLIENT
             // delete error_info;
             // return -1;
         }
-        return NULL;
+        return id;
     }
 
     //发送邮件，输入指定内容为服务器插入邮件，返回值为-1时表示注册不成功，返回0为成功
@@ -270,9 +316,9 @@ namespace CLIENT
     }
 
     //新建联系人，返回值为-1时表示注册不成功，返回0为成功
-    int Client_Core::Send_Contact(const char *userId, const char *contactname, const char *phonenum)
+    int Client_Core::Send_Contact(const char *userId, const char *targetName, const char *targetTelephone)
     {
-        char *JSON = DataBag_Sd_Contact(userId, contactname, phonenum);
+        char *JSON = DataBag_Sd_Contact(userId, targetName, targetTelephone);
         this->Send_Data(JSON);
         delete[] JSON;
 

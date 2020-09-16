@@ -164,7 +164,9 @@ namespace SERVER
         int size = 0; //debug size需要可变
         if (d.HasMember("userId") && d.HasMember("emailType"))
         {
+            cout<<"1"<<endl;
             char *JSON = SQL->Get_Email_List_JSON(d["userId"].GetString(), d["emailType"].GetString());
+            cout<<"10"<<endl;
             this->Send_Data(JSON);
             delete[] JSON;
             return 0;

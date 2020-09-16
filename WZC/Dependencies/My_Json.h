@@ -26,7 +26,7 @@ namespace My_Json
         const char sql_targetUsername[] = "targetUsername";
         const char sql_targetId[] = "targetId";
         const char sql_ownerId[] = "ownerId";
-        const char sql_contactname[] = "contactname";
+        const char sql_targetName[] = "targetName";
         const char sql_newState[] = "newState";
     } // namespace Key_Type
     namespace Rq_Type
@@ -95,7 +95,7 @@ namespace DataBag
     char *DataBa_Sd_File(const char *ownerId, const char *emailId, const char *fileName);
 
     //需要做一个可以制造JSON列表的函数
-    char *DataBag_Sd_Contact(const char *userId, const char *contactname, const char *phonenum);
+    char *DataBag_Sd_Contact(const char *userId, const char *targetName, const char *targetTelephone);
 
     //需要做一个可以制造JSON列表的函数
     char *Mail_List_Tag(const char *emailTitle, const char *targetUsername, const char *emailTime, const char *emailId);
