@@ -46,6 +46,13 @@ namespace SERVER
         this->Send_Data(DB);
         delete DB;
     }
+    void Server_Core::Send_Success_sign(const char *id)
+    {
+        char *DB = DataBag::DataBag_Success_sign(id);
+        cout << "success data:" << DB << endl;
+        this->Send_Data(DB);
+        delete DB;
+    }
     void Server_Core::Send_Error(const char *error_info)
     {
         char *DB = DataBag::DataBag_Error(error_info);
@@ -69,7 +76,8 @@ namespace SERVER
         if (is_passed)
         {
             cout << "pass!" << endl; //debug
-            this->Send_Success();
+            char *id = SQL.get_user_id(d[Key_Type::sql_phoneum].GetString());
+            this->Send_Success_sign(id);
             return true;
         }
         else
@@ -92,7 +100,9 @@ namespace SERVER
         if (d.HasMember("ownerId") && d.HasMember("targetId") && d.HasMember("emailType") && d.HasMember("emailTitle") && d.HasMember("emailContent"))
         {
             SQL.add_email_to_db(d["ownerId"].GetString(), d["targetId"].GetString(), d["emailType"].GetString(), d["emailTitle"].GetString(), d["emailContent"].GetString()); //错误处理？
+            cout << "sending" << endl;
             this->Send_Success();
+            cout << "sended" << endl;
             return 0;
         }
         else
@@ -106,24 +116,22 @@ namespace SERVER
     {
         if (d.HasMember("userId") && d.HasMember("contactname") && d.HasMember("phonenum"))
         {
+            cout << "1" << endl;
             SQL.add_contact_info(d["userId"].GetString(), d["contactname"].GetString(), d["phonenum"].GetString());
+            cout << "10" << endl;
             this->Send_Success();
+            cout << "11" << endl;
             return 0;
         }
         else
         {
             cout << "JSON ERROR" << endl; //debug
+            cout << "12" << endl;
             this->Send_Error("JSON ERROR");
             return -1;
         }
     }
-    int Server_Core::Add_File(rapidjson::Document &d)
-    {
-        //ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content
-        // SQL.add_email_to_db(d["ownerId"].GetString(), d["targetId"].GetString(), d["email_type"].GetString(), d["email_title"].GetString(), d["email_content"].GetString());
-        // this->Send_Success();
-        // return 0;
-    }
+
     int Server_Core::Return_Email_Detail(rapidjson::Document &d)
     {
         if (d.HasMember("emailId") && d.HasMember("ownerId"))
@@ -186,6 +194,17 @@ namespace SERVER
         }
     }
 
+    int Server_Core::Add_File(rapidjson::Document &d)
+    {
+        this->Send_Success();
+        this->Recive_File("MY_FILE");
+        this->Send_Success();
+    }
+    int Server_Core::Return_File(rapidjson::Document &d)
+    {
+        this->Sd_File("./MY_FILE");
+        this->Recive_Data();
+    }
     int Server_Core::Request_Analysis()
     {
         int wrong_num = 0;
@@ -262,6 +281,15 @@ namespace SERVER
                 {
                     Sign(d, false);
                 }
+                else if (strcmp(rq_type, Rq_Type::sd_file) == 0)
+                {
+                    this->Add_File(d);
+                }
+                else if (strcmp(rq_type, Rq_Type::sd_file))
+                {
+                    this->Return_File(d);
+                }
+
                 /* data */
 
                 //拆包

@@ -38,7 +38,7 @@ namespace COMMUNI
         return Bytes;
     }
 
-    int Communi_Core::Write_File(char *save_path)
+    int Communi_Core::Write_File(const char *save_path)
     {
         //debug path
         std::cout << save_path << std::endl;
@@ -58,6 +58,11 @@ namespace COMMUNI
             {
                 fwrite(buffer, sizeof(char), read_len, out_file);
                 memset(buffer, 0, sizeof(buffer));
+                std::cout << "writing" << std::endl; //debug
+                if (read_len < CONFIG::buffer_size)
+                {
+                    break;
+                }
             }
         }
         fclose(out_file);
@@ -161,17 +166,15 @@ namespace COMMUNI
     }
 
     //给服务器发送文件
-    int Communi_Core::Send_File(const char *file_path)
+    int Communi_Core::Sd_File(const char *file_path)
     {
-
+        write(this->clnt_socket, "MY_FILE", CONFIG::buffer_size);
         //写一个发送文件名的？
-        char *file_name = this->Get_File_Name(file_path);
-        write(this->clnt_socket, file_name, CONFIG::buffer_size);
-        delete[] file_name;
         FILE *fp;
         fp = fopen((char *)file_path, "rb");
         if (fp == NULL)
         {
+            write(this->clnt_socket, "Failed", CONFIG::buffer_size);
             std::cout << "ERROR" << std::endl;
             return -1;
         }
@@ -192,25 +195,15 @@ namespace COMMUNI
         }
     }
 
-    //接收服务器端发送的文件
-    int Communi_Core::Recive_File()
+    //save_path是文件保存的地址
+    int Communi_Core::Recive_File(const char *save_path)
     {
-        char file_name[CONFIG::buffer_size];
-        memset(file_name, 0, CONFIG::buffer_size);
-        recv(this->clnt_socket, file_name, CONFIG::buffer_size, 0);
-
-        char file_path[CONFIG::buffer_size * 2] = "./recived/";
-        strcat(file_path, file_name);
-        return this->Write_File(file_path);
-    }
-
-    //重载，save_path是文件保存的地址
-    int Communi_Core::Recive_File(char *save_path)
-    {
-        char file_name[CONFIG::buffer_size];
-        memset(file_name, 0, CONFIG::buffer_size);
-        recv(this->clnt_socket, file_name, CONFIG::buffer_size, 0);
-
+        char buffer[CONFIG::buffer_size];
+        read(this->clnt_socket, buffer, CONFIG::buffer_size);
+        if (strcmp(buffer, "Failed") == 0)
+        {
+            return -1;
+        }
         return this->Write_File(save_path);
     }
 }; // namespace COMMUNI

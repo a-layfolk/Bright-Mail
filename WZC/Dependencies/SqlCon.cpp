@@ -6,23 +6,37 @@
 #pragma comment(lib, "libmysql.lib")
 
 MYSQL *con = mysql_init(NULL);
-
+char *mysql::mycpy(const char *row)
+{
+	char *rt_v = new char[100];
+	strcpy(rt_v, row);
+	return rt_v;
+}
 char *mysql::get_user_id(const char *phonenum)
 {
 	char *query = new char[100];
 	char *userId = new char[100];
 	MYSQL_RES *res;
 	MYSQL_ROW row;
-
+	cout << "2.1" << endl;
 	sprintf(query, "select userId from UserTable where  telephone= '%s'", phonenum);
+	cout << "2.2" << endl;
 	mysql_query(con, query);
 
+	cout << "2.3" << endl;
 	res = mysql_store_result(con);
 	row = mysql_fetch_row(res);
 
-	userId = row[0];
+	cout << "2.4" << endl;
+	if (row != NULL)
+	{
+		cout << "2.4.1" << endl;
+		strcpy(userId, row[0]);
+	}
 
-	delete[] query;
+	cout << "2.5" << endl;
+
+	// delete[] query;
 	return userId;
 }
 
@@ -37,7 +51,7 @@ char *mysql::get_time()
 
 	res = mysql_store_result(con);
 	row = mysql_fetch_row(res);
-	time = row[0];
+	strcpy(time, row[0]);
 
 	delete[] query;
 	return time;
@@ -54,7 +68,7 @@ char *mysql::get_user_name(const char *userId)
 
 	res = mysql_store_result(con);
 	row = mysql_fetch_row(res);
-	username = row[0];
+	username = mycpy(row[0]);
 
 	delete[] query;
 	return username;
@@ -119,9 +133,9 @@ EMAIL_INFO *mysql::get_email_info(const char *userId, const char *emailType, int
 	while ((row = mysql_fetch_row(res)) != NULL)
 	{
 
-		emailInfo[i].emailId = row[3];
-		emailInfo[i].emailTitle = row[0];
-		emailInfo[i].emailTime = row[2];
+		emailInfo[i].emailId = mycpy(row[3]);
+		emailInfo[i].emailTitle = mycpy(row[0]);
+		emailInfo[i].emailTime = mycpy(row[2]);
 		emailInfo[i].targetUsername = get_user_name(row[1]);
 
 		i++;
@@ -137,8 +151,10 @@ EMAIL_INFO *mysql::get_email_info(const char *userId, const char *emailType, int
 
 void mysql::De_EMAIL_INFO(EMAIL_INFO *ptr)
 {
-
-	delete ptr;
+	delete ptr->emailId;
+	delete ptr->emailTime;
+	delete ptr->emailTitle;
+	delete ptr->targetUsername;
 }
 
 CONTATCT_INFO *mysql::get_contact_info(const char *userId, int *num)
@@ -162,9 +178,9 @@ CONTATCT_INFO *mysql::get_contact_info(const char *userId, int *num)
 
 		while ((row_1 = mysql_fetch_row(res_1)) != NULL)
 		{
-			contactInfo[j].userId = row_1[0];
-			contactInfo[j].userName = row_1[1];
-			contactInfo[j].telephone = row_1[2];
+			contactInfo[j].userId = mycpy(row_1[0]);
+			contactInfo[j].userName = mycpy(row_1[1]);
+			contactInfo[j].telephone = mycpy(row_1[1]);
 			j++;
 		}
 		if (j)
@@ -195,9 +211,9 @@ EMAIL_CONTENT *mysql::get_one_email(const char *emailId, const char *ownerId)
 	MYSQL_RES *res = mysql_store_result(con);
 	row = mysql_fetch_row(res);
 	int num = mysql_num_fields(res);
-	emailInfo->emailContent = row[1];
-	emailInfo->emailTitle = row[0];
-	emailInfo->emailType = row[2];
+	emailInfo->emailContent = mycpy(row[1]);
+	emailInfo->emailTitle = mycpy(row[0]);
+	emailInfo->emailType = mycpy(row[2]);
 	delete[] query;
 	return emailInfo;
 }
@@ -222,7 +238,29 @@ char *mysql::add_email_to_db(const char *ownerId, const char *targetId, const ch
 	row = mysql_fetch_row(res);
 	//	delete[] time;
 	delete[] query;
-	return row[0];
+	char *ans = new char[10];
+	strcpy(ans, row[0]);
+	// return row[0];
+	return ans;
+}
+char *mysql::add_email_to_db_with_file(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content,const char*file_name)
+{
+	MYSQL_RES *res;
+	MYSQL_ROW row;
+	char *query = new char[2048];
+	char *time = mysql::get_time();
+	sprintf(query, "insert into EmailTable(ownerId,TargetUserId,emailTitle,emailType,emailContent,emailTime,attachedFilePath)values(%s,%s,'%s','%s','%s','%s','%s');", ownerId, targetId, email_title, email_type, email_content, time,file_name);
+	mysql_query(con, query);
+	sprintf(query, "select emailId from EmailTable where emailTime='%s';", time);
+	mysql_query(con, query);
+	res = mysql_store_result(con);
+	row = mysql_fetch_row(res);
+	//	delete[] time;
+	delete[] query;
+	char *ans = new char[10];
+	strcpy(ans, row[0]);
+	// return row[0];
+	return ans;
 }
 
 bool mysql::change_email_content(const char *emailId, const char *ownerId, const char *targetId, const char *emailType, const char *emailTitle, const char *emailContent)
@@ -250,20 +288,30 @@ bool mysql::change_email_state(const char *emailId, const char *newType)
 bool mysql::add_contact_info(const char *userId, const char *contactname, const char *phonenum)
 {
 	char *contactId = NULL;
+	cout << "2" << endl;
 	contactId = get_user_id(phonenum);
-
+	cout << "3" << endl;
 	if (contactId != "false")
 	{
+		cout << "4" << endl;
 		char *query = new char[100];
 		sprintf(query, "insert into ContactTable(userId,contactId) values(%s,%s);", userId, contactId);
+		cout << "5" << endl;
 		mysql_query(con, query);
+		cout << "6" << endl;
 		delete[] query;
+		cout << "7" << endl;
+		delete[] contactId;
 		return true;
 	}
 	else
 	{
+		delete[] contactId;
+		cout << "8" << endl;
 		return false;
 	}
+	delete[] contactId;
+	cout << "9" << endl;
 	return true;
 }
 
@@ -300,7 +348,7 @@ char *mysql::get_email_filepath(const char *emailId)
 	res = mysql_store_result(con);
 	row = mysql_fetch_row(res);
 
-	filePath = row[0];
+	filePath = mycpy(row[0]);
 
 	delete[] query;
 	return filePath;

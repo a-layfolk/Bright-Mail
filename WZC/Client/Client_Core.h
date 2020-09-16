@@ -52,14 +52,16 @@ namespace CLIENT
         //向服务器发送结束线程的信息
         void Send_Exit();
 
-        //登陆请求，返回值为-1时表示登陆不成功，返回0为成功
-        int Sign_in(const char *username, const char *password);
-
-        //注册请求，返回值为-1时表示注册不成功，返回0为成功
-        int Sign_up(const char *username, const char *password, const char *phoneum);
+        //登陆请求，返回值为NULL时表示登陆不成功，成功时返回用户id
+        char* Sign_in(const char *username, const char *password);
+        //注册请求，返回值为NULL时表示注册不成功，成功时返回用户id
+        char* Sign_up(const char *username, const char *password, const char *phoneum);
 
         //发送邮件，输入指定内容为服务器插入邮件，返回值为-1时表示注册不成功，返回0为成功
         int Send_Mail(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content);
+        
+        //发送邮件，输入指定内容为服务器插入邮件，返回值为-1时表示注册不成功，返回0为成功
+        int Send_Mail_With_File(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content,const char*file_name);
 
         //新建联系人，返回值为-1时表示注册不成功，返回0为成功
         int Send_Contact(const char *userId, const char *contactname, const char *phonenum);

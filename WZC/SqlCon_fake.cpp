@@ -1,4 +1,4 @@
-#include "SqlCon.h"
+#include "Dependencies/SqlCon.h"
 #include "mysql/mysql.h"
 #include <stdio.h>
 #include <string.h>

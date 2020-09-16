@@ -39,6 +39,7 @@ namespace SERVER
     private:
         void Send_Error(const char *error_info);
         void Send_Success();
+        void Send_Success_sign(const char *id);
         DataBag::EMAIL_CONTENT *EC;
         DataBag::EMAIL_INFO *EI;
         DataBag::CONTATCT_INFO *CI;

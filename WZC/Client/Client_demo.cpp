@@ -82,7 +82,7 @@ int main(int argc, char const *argv[])
         // /*------------------获取邮件列表测试-------------------
         // */
         // int size2;
-        // DataBag::EMAIL_INFO *EI = CC.Get_Mail_List("userid", "emaityoe", &size2);
+        // DataBag::EMAIL_INFO *EI = CC.Get_Mail_List("1006", "send", &size2);
         // for (int i = 0; i < size2; i++)
         // {
         //     cout << EI[i].emailId << EI[i].emailTime << EI[i].emailTitle << EI[i].targetUsername << endl;
@@ -91,28 +91,41 @@ int main(int argc, char const *argv[])
         // cout<<"添加联系人"<<endl;
         // /*------------------添加联系人-------------------
         // */
-        // CC.Send_Contact("user_id", "contact_name", "phone_num");
+        // char one[10];
+        // cin >> one;
+        // char two[10];
+        // char three[10];
+        // cin >> two;
+        // cin >> three;
 
-        cout << "发送邮件" << endl;
-        /*------------------发送邮件-------------------
-        */
-        char ownerId[10];
-        char targetId[10];
-        char emailType[10];
-        char emailTitle[10];
-        char emailContent[10];
-        cin >> ownerId;
-        cin >> targetId;
-        cin >> emailType;
-        cin >> emailTitle;
-        cin >> emailContent;
-        
-        CC.Send_Mail("ownerId", "targetId", "email_type", "email_title", "email_content");
+        // CC.Send_Contact(one,two,three);
+
+        // cout << "发送邮件" << endl;
+        // /*------------------发送邮件-------------------
+        // */
+        // char ownerId[10];
+        // char targetId[10];
+        // char emailType[10];
+        // char emailTitle[10];
+        // char emailContent[10];
+        // cin >> ownerId;
+        // cin >> targetId;
+        // cin >> emailType;
+        // cin >> emailTitle;
+        // cin >> emailContent;
+
+        // CC.Send_Mail("ownerId", "targetId", "email_type", "email_title", "email_content");
+
+        //获取文件测试
+        // char one[10];
+        // cin >> one;
+        // CC.Send_File(one);
+        // signal(SIGINT, );
+        CC.Get_File();
     }
-    // signal(SIGINT, );
+    //所有ID都改为电话号码
+    //ownerId=>ownerTele
+    //targetId=>targetTele
     CC.Send_Exit();
     return 0;
 }
-//所有ID都改为电话号码
-//ownerId=>ownerTele
-//targetId=>targetTele

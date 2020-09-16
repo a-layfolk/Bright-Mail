@@ -51,6 +51,13 @@ namespace My_Json
 namespace DataBag
 {
     using namespace My_Json;
+    void De_EMAIL_INFO(EMAIL_INFO *ptr)
+    {
+        delete ptr->emailId;
+        delete ptr->emailTime;
+        delete ptr->emailTitle;
+        delete ptr->targetUsername;
+    }
     char *DataBag_Sign_in(const char *username, const char *password)
     {
         string *str = new string;
@@ -113,6 +120,25 @@ namespace DataBag
 
         *str += Creat_Key(Key_Type::request_type, Rq_Type::command, true);
         *str += Creat_Key(Key_Type::command_type, "success", true);
+        *str += Creat_Key("error_info", "success", false);
+
+        str->push_back('}');
+
+        int l = str->length();
+        char *JSON = new char[l];
+        memset(JSON, 0, l);
+        strcpy(JSON, str->c_str());
+        delete str;
+        return JSON;
+    }
+    char *DataBag_Success_sign(const char *id)
+    {
+        string *str = new string;
+        str->push_back('{');
+
+        *str += Creat_Key(Key_Type::request_type, Rq_Type::command, true);
+        *str += Creat_Key(Key_Type::command_type, "success", true);
+        *str += Creat_Key("id", id, true);
         *str += Creat_Key("error_info", "success", false);
 
         str->push_back('}');
@@ -227,6 +253,7 @@ namespace DataBag
         for (int i = 0; i < size; i++)
         {
             char *tag = Mail_List_Tag(((EMAIL_INFO *)E_info + i)->targetUsername, ((EMAIL_INFO *)E_info + i)->targetUsername, ((EMAIL_INFO *)E_info + i)->emailTime, ((EMAIL_INFO *)E_info + i)->emailId);
+            De_EMAIL_INFO(E_info + i);
             *str += tag;
             delete[] tag;
             if (i != size - 1)
@@ -361,6 +388,34 @@ namespace DataBag
 
         *str += Creat_Key("userId", userId, true);
         *str += Creat_Key("emailType", emailType, false);
+
+        str->push_back('}');
+
+        char *JSON = new char[(*str).size()];
+        strcpy(JSON, (*str).c_str());
+        delete str;
+        return JSON;
+    }
+    char *DataBag_Rq_File_Simple()
+    {
+        string *str = new string;
+        str->push_back('{');
+        *str += Creat_Key(Key_Type::request_type, Rq_Type::rq_file, false);
+        str->push_back('}');
+
+        char *JSON = new char[(*str).size()];
+        strcpy(JSON, (*str).c_str());
+        delete str;
+        return JSON;
+    }
+
+    char *DataBa_Sd_File_Simple(const char *fileName)
+    {
+        string *str = new string;
+        str->push_back('{');
+        *str += Creat_Key(Key_Type::request_type, Rq_Type::sd_file, true);
+
+        *str += Creat_Key("fileName", fileName, false);
 
         str->push_back('}');
 

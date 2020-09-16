@@ -32,12 +32,11 @@ namespace COMMUNI
         //模仿read，content输入需要读取的字符串，并将读取的内容转移至较小的buffer中，方便数据包的分批发送。函数返回读取的字节数。注意，cursor在传入函数后会发生改变
         int ChRead(char *&cursor, char *buffer, int buffer_size);
 
-        int Write_File(char *save_path);
-
-        //获取对应路径下文件的名字
-        char *Get_File_Name(const char *file_path);
+        int Write_File(const char *save_path);
 
     protected:
+        //获取对应路径下文件的名字
+        char *Get_File_Name(const char *file_path);
         int clnt_socket;
         //输入服务器地址,连接服务器
         Communi_Core(const char *server_ip);
@@ -51,14 +50,14 @@ namespace COMMUNI
         //取得服务器数据，数据格式为JSON的字符串
         char *Recive_Data();
 
-        //给服务器发送文件
-        int Send_File(const char *file_path);
+        //给服务器发送文件,返回文件的名字
+        int Sd_File(const char *file_path);
 
         //接收服务器端发送的文件
-        int Recive_File();
-        
+        // int Recive_File();
+
         //重载，save_path是文件保存的地址
-        int Recive_File(char *save_path);
+        int Recive_File(const char *save_path);
     };
 } // namespace COMMUNI
 

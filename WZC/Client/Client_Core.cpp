@@ -352,13 +352,35 @@ namespace CLIENT
         delete[] Request;
 
         char *JSON = this->Recive_Data();
-        cout << "RCV:JSON:" << JSON << endl;//debug
+        cout << "RCV:JSON:" << JSON << endl; //debug
         CONTATCT_INFO *EI = this->Json_To_Contact_List(JSON, list_size);
         delete[] JSON;
         return EI;
     }
 
     //接收文件如何处理待商榷，先做不带附件的吧
-    int Send_File() {}
-    char *Get_File_Info() {}
+    int Client_Core::Send_File(const char *file_path)
+    {
+        char *file_name = this->Get_File_Name(file_path);
+        char *Request = DataBa_Sd_File_Simple(file_name);
+        this->Send_Data(Request);
+        char*error=new char[10];
+        this->Recive_Success(error);
+        this->Sd_File(file_path);
+        this->Recive_Success(error);
+        delete[] file_name;
+        delete[] Request;
+        return 0;
+    }
+
+    //最好添加个文件名
+    int Client_Core::Get_File()
+    {
+        char *Request = DataBag_Rq_File_Simple();
+        this->Send_Data(Request);
+        this->Recive_File("MY_FILE_CLIENT");
+        delete[] Request;
+        return 0;
+    }
+
 } // namespace CLIENT

@@ -16,10 +16,10 @@ public:
 	通过 用户名 及 电话 获取用户ID
 	返回 用户ID(char*)
 	*/
+	char *mycpy(const char *row);
 	char *get_user_id(const char *phonenum);
 	char *get_time();
 	char *get_user_name(const char *userId);
-
 	/*
 	数据库连接
 	参数：ip,username,psw,db,port
@@ -69,6 +69,8 @@ public:
 	返回布尔值 返回邮件ID ,便于后序insert邮件附件
 	*/
 	char *add_email_to_db(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content);
+
+	char *add_email_to_db_with_file(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content, const char *file_name);
 	/*
 	增加好友
 	返回布尔值 成功返回true，失败返回false
