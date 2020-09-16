@@ -43,11 +43,11 @@ int main(int argc, char const *argv[])
     {
         cout << "scd operate" << endl;
         //发送邮件成功
-        // CC.Send_Mail(id, "158", "send", "Title", "Content");
+        // CC.Send_Mail(id, "158", "send", "DEBUG Hai mei nong", "tai keng die le CPP");
 
-        //添加联系人成功
-        // CC.Send_Contact(id,"WZC","15815589508");
-
+        // 添加联系人成功
+        // CC.Send_Contact(id,"STR","1589");
+        // CC.Send_Contact(id,"FR","188");
         //获取邮件详情成功
         // DataBag::EMAIL_CONTENT *EC =
         //     CC.Get_Mail_Detail("2", "1");
@@ -62,12 +62,24 @@ int main(int argc, char const *argv[])
         // }
 
         //
+
+        // 获取邮件列表不成功
         int size;
         DataBag::EMAIL_INFO *EI = CC.Get_Mail_List(id, "send", &size);
         for (int i = 0; i < size; i++)
         {
-            cout << EI[i].emailTime << "id:" << EI[i].emailId << "title:" << EI[i].emailTitle << "target:" << EI[i].targetUsername << endl;
+        cout << EI[i].emailTime << "id:" << EI[i].emailId << "title:" << EI[i].emailTitle << "target:" << EI[i].targetUsername << endl;
         }
+
+        
+        // int size;
+        // DataBag::CONTATCT_INFO *CI = CC.Get_Contact(id, &size);
+        // for (int i = 0; i < size; i++)
+        // {
+        //     cout << CI[i].telephone << CI[i].userId << CI[i].userName << endl;
+        // }
+
+        // CC.
     }
 
     CC.Send_Exit();

@@ -3,9 +3,12 @@
 #include <stdio.h>
 #include "mysql/mysql.h"
 #include "../Dependencies/My_Json.h"
+#include "../Dependencies/rapidjson/stringbuffer.h"
+#include "../Dependencies/rapidjson/writer.h"
+#include "../Dependencies/rapidjson/rapidjson.h"
 using namespace DataBag;
 using namespace My_Json;
-
+using namespace rapidjson;
 class Sql_Core
 {
 private:
@@ -275,49 +278,99 @@ public:
 
     char *Get_Email_List_JSON(const char *userId, const char *emailType)
     {
-        string *str = new string;
-        str->push_back('{');
-        *str += Creat_Key(Key_Type::request_type, Rq_Type::sd_list, true);
-        *str += "\"info\":[";
-        cout << "2" << endl;
+        rapidjson::StringBuffer s;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+        writer.StartObject();
+        writer.Key(Key_Type::request_type);
+        writer.String(Rq_Type::sd_list);
+        writer.Key("info");
+        writer.StartArray();
         char *query = new char[200];
         sprintf(query, "select emailTitle,targetTelephone,emailTime,emailId from Email where myId=%s and emailType='%s';", userId, emailType);
         MYSQL_RES *res;
         MYSQL_ROW row;
+        
+        cout << "query:" << query << endl;
         mysql_query(con, query);
-        cout << "3" << endl;
         res = mysql_store_result(con);
+        delete[] query;
 
         int size = 0;
         while ((row = mysql_fetch_row(res)) != NULL)
         {
-            cout << "4" << endl;
-            if (size != 0)
-            {
-                str->push_back(',');
-            }
-            cout << "size:" << size; //debug
-            
-            char *tag = DataBag::Mail_List_Tag(row[0], row[1], row[2], row[3]);
-            *str += tag;
-            delete[] tag;
             size++;
+            writer.StartObject();
+
+            writer.Key("emailTitle");
+            writer.String((char *)row[0]);
+
+            writer.Key("targetUsername");
+            writer.String((char *)row[1]);
+
+            writer.Key("emailTime");
+            writer.String((char *)row[2]);
+            writer.Key("emailId");
+            writer.String((char *)row[3]);
+
+            writer.EndObject();
         }
+        writer.Key("size");
+        writer.Int(size);
+        writer.EndArray();
 
-        delete[] query;
-        str->push_back(']');
-        char *size_temp = new char[10];
-        sprintf(size_temp, ",\"size\":%d", size);
-        *str += size_temp;
-        delete size_temp;
+        writer.EndObject();
 
-        str->push_back('}');
-        char *JSON = new char[(*str).size()];
-        strcpy(JSON, (*str).c_str());
-        delete str;
-        cout << JSON; //debug
+        char *JSON = new char[s.GetSize()];
+        strcpy(JSON, s.GetString());
+        std::cout << JSON;
         return JSON;
     }
+    // char *Get_Email_List_JSON(const char *userId, const char *emailType)
+    // {
+    //     string *str = new string;
+
+    //     str->push_back('{');
+    //     *str += Creat_Key(Key_Type::request_type, Rq_Type::sd_list, true);
+    //     *str += "\"info\":[";
+    //     cout << "2" << endl;
+    //     char *query = new char[200];
+    //     sprintf(query, "select emailTitle,targetTelephone,emailTime,emailId from Email where myId=%s and emailType='%s';", userId, emailType);
+    //     MYSQL_RES *res;
+    //     MYSQL_ROW row;
+    //     mysql_query(con, query);
+    //     cout << "3" << endl;
+    //     res = mysql_store_result(con);
+
+    //     int size = 0;
+    //     while ((row = mysql_fetch_row(res)) != NULL)
+    //     {
+    //         cout << "4" << endl;
+    //         if (size != 0)
+    //         {
+    //             str->push_back(',');
+    //         }
+    //         cout << "size:" << size; //debug
+
+    // char *tag = DataBag::Mail_List_Tag(row[0], row[1], row[2], row[3]);
+    //         *str += tag;
+    //         delete[] tag;
+    //         size++;
+    //     }
+
+    //     delete[] query;
+    //     str->push_back(']');
+    //     char *size_temp = new char[10];
+    //     sprintf(size_temp, ",\"size\":%d", size);
+    //     *str += size_temp;
+    //     delete size_temp;
+
+    //     str->push_back('}');
+    //     char *JSON = new char[(*str).size()];
+    //     strcpy(JSON, (*str).c_str());
+    //     delete str;
+    //     cout << JSON; //debug
+    //     return JSON;
+    // }
     char *Get_Email_Detail_JSON(const char *emailId)
     {
         string *str = new string;

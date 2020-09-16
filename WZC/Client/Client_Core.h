@@ -58,10 +58,10 @@ namespace CLIENT
         char *Sign_up(const char *username, const char *password, const char *phoneum);
 
         //发送邮件，输入指定内容为服务器插入邮件，返回值为-1时表示注册不成功，返回0为成功
-        int Send_Mail(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content);
+        int Send_Mail(const char *ownerId, const char *targetTelephone, const char *email_type, const char *email_title, const char *email_content);
 
         //发送邮件，输入指定内容为服务器插入邮件，返回值为-1时表示注册不成功，返回0为成功
-        int Send_Mail_With_File(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content, const char *file_name);
+        int Send_Mail_With_File(const char *ownerId, const char *targetTelephone, const char *email_type, const char *email_title, const char *email_content, const char *file_name);
 
         //新建联系人，返回值为-1时表示注册不成功，返回0为成功
         int Send_Contact(const char *userId, const char *contactname, const char *phonenum);
