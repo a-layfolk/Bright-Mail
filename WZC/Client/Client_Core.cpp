@@ -194,7 +194,7 @@ namespace CLIENT
         delete[] data_bag;
         close(this->clnt_socket);
     }
-    int Client_Core::Sign_in(const char *username, const char *password)
+    char *Client_Core::Sign_in(const char *username, const char *password)
     {
         //发送请求包
         char *JSON = DataBag_Sign_in(username, password);
@@ -204,7 +204,7 @@ namespace CLIENT
         if (this->Recive_Success(error_info))
         {
             cout << "success log in" << endl;
-            return 0;
+            // return 0;
         }
         else
         {
@@ -215,10 +215,11 @@ namespace CLIENT
                 delete[] error_info;
             }
 
-            return -1;
+            // return -1;
         }
+        return NULL;
     }
-    int Client_Core::Sign_up(const char *username, const char *password, const char *phoneum)
+    char *Client_Core::Sign_up(const char *username, const char *password, const char *phoneum)
     {
         //发送请求包
         char *JSON = DataBag_Sign_up(username, password, phoneum);
@@ -227,7 +228,7 @@ namespace CLIENT
         char *error_info = new char[100];
         if (this->Recive_Success(error_info))
         {
-            return 0;
+            // return 0;
         }
         else
         {
@@ -238,8 +239,9 @@ namespace CLIENT
                 delete[] error_info;
             }
             // delete error_info;
-            return -1;
+            // return -1;
         }
+        return NULL;
     }
 
     //发送邮件，输入指定内容为服务器插入邮件，返回值为-1时表示注册不成功，返回0为成功
@@ -364,7 +366,7 @@ namespace CLIENT
         char *file_name = this->Get_File_Name(file_path);
         char *Request = DataBa_Sd_File_Simple(file_name);
         this->Send_Data(Request);
-        char*error=new char[10];
+        char *error = new char[10];
         this->Recive_Success(error);
         this->Sd_File(file_path);
         this->Recive_Success(error);

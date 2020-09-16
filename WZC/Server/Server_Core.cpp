@@ -18,7 +18,7 @@
 #include "../Dependencies/rapidjson/stringbuffer.h"
 #include "../Dependencies/Communi_Core.h"
 #include "../Dependencies/My_Json.h"
-#include "../Dependencies/SqlCon.h"
+#include "../Dependencies/Sql_Core.h"
 
 #include "Server_Core.h"
 
@@ -30,13 +30,15 @@ namespace SERVER
 {
     Server_Core::Server_Core(int client_socket) : COMMUNI::Communi_Core(client_socket)
     {
-        this->SQL.connect(CONFIG::sql_ip, CONFIG::sql_user, CONFIG::sql_password, CONFIG::sql_db, CONFIG::sql_port);
-        cout << "SQL end" << endl;
+        SQL = new Sql_Core(CONFIG::sql_ip, CONFIG::sql_user, CONFIG::sql_password, CONFIG::sql_db, CONFIG::sql_port);
+        this->SQL->Connect();
     }
 
     Server_Core::~Server_Core()
     {
-        this->SQL.close();
+        SQL->Close();
+        cout << "SQL end" << endl;
+        delete SQL;
     }
 
     void Server_Core::Send_Success()
@@ -63,21 +65,23 @@ namespace SERVER
     bool Server_Core::Sign(Document &d, bool is_sign_in)
     {
 
-        bool is_passed = false;
+        char *user_id;
         if (is_sign_in)
         {
-            is_passed = SQL.sign_in(d[Key_Type::sql_username].GetString(), d[Key_Type::sql_password].GetString()); //错误处理？
+            user_id = SQL->Sign_In(d[Key_Type::sql_username].GetString(), d[Key_Type::sql_password].GetString());
+
+            // SQL.sign_in(d[Key_Type::sql_username].GetString(), d[Key_Type::sql_password].GetString()); //错误处理？
         }
         else
         {
-            is_passed = SQL.sign_up(d[Key_Type::sql_username].GetString(), d[Key_Type::sql_password].GetString(), d[Key_Type::sql_phoneum].GetString());
+            user_id = SQL->Sign_Up(d[Key_Type::sql_username].GetString(), d[Key_Type::sql_password].GetString(), d[Key_Type::sql_phoneum].GetString());
+            // is_passed = SQL.sign_up(d[Key_Type::sql_username].GetString(), d[Key_Type::sql_password].GetString(), d[Key_Type::sql_phoneum].GetString());
         }
 
-        if (is_passed)
+        if (user_id != NULL)
         {
             cout << "pass!" << endl; //debug
-            char *id = SQL.get_user_id(d[Key_Type::sql_phoneum].GetString());
-            this->Send_Success_sign(id);
+            this->Send_Success_sign(user_id);
             return true;
         }
         else
@@ -97,9 +101,19 @@ namespace SERVER
 
     int Server_Core::Add_Email(rapidjson::Document &d)
     {
-        if (d.HasMember("ownerId") && d.HasMember("targetId") && d.HasMember("emailType") && d.HasMember("emailTitle") && d.HasMember("emailContent"))
+        if (d.HasMember("ownerId") && d.HasMember("targetTelephone") && d.HasMember("emailType") && d.HasMember("emailTitle") && d.HasMember("emailContent"))
         {
-            SQL.add_email_to_db(d["ownerId"].GetString(), d["targetId"].GetString(), d["emailType"].GetString(), d["emailTitle"].GetString(), d["emailContent"].GetString()); //错误处理？
+            if (d.HasMember("attachedFile"))
+            {
+                SQL->Add_Email(d["ownerId"].GetString(), d["targetTelephone"].GetString(), d["emailType"].GetString(), d["emailTitle"].GetString(), d["emailContent"].GetString(), d["attachedFile"].GetString());
+                SQL->Add_Recived_Email(d["targetTelephone"].GetString(), d["emailTitle"].GetString(), d["emailContent"].GetString(), d["attachedFile"].GetString());
+            }
+            else
+            {
+                SQL->Add_Recived_Email(d["targetTelephone"].GetString(), d["emailTitle"].GetString(), d["emailContent"].GetString(), NULL);
+
+                SQL->Add_Email(d["ownerId"].GetString(), d["targetTelephone"].GetString(), d["emailType"].GetString(), d["emailTitle"].GetString(), d["emailContent"].GetString(), NULL);
+            }
             cout << "sending" << endl;
             this->Send_Success();
             cout << "sended" << endl;
@@ -114,19 +128,15 @@ namespace SERVER
     }
     int Server_Core::Add_Contact(rapidjson::Document &d)
     {
-        if (d.HasMember("userId") && d.HasMember("contactname") && d.HasMember("phonenum"))
+        if (d.HasMember("userId") && d.HasMember("targetName") && d.HasMember("targetTelephone"))
         {
-            cout << "1" << endl;
-            SQL.add_contact_info(d["userId"].GetString(), d["contactname"].GetString(), d["phonenum"].GetString());
-            cout << "10" << endl;
+            SQL->Add_Contact(d["userId"].GetString(), d["targetName"].GetString(), d["targetTelephone"].GetString());
             this->Send_Success();
-            cout << "11" << endl;
             return 0;
         }
         else
         {
             cout << "JSON ERROR" << endl; //debug
-            cout << "12" << endl;
             this->Send_Error("JSON ERROR");
             return -1;
         }
@@ -134,15 +144,12 @@ namespace SERVER
 
     int Server_Core::Return_Email_Detail(rapidjson::Document &d)
     {
-        if (d.HasMember("emailId") && d.HasMember("ownerId"))
+        if (d.HasMember("emailId")) //这里数据库还没写
         {
-            // DataBag::EMAIL_CONTENT *EC = SQL.get_one_email(d["emailId"].GetString(), d["ownerId"].GetString());
-            EC = SQL.get_one_email(d["emailId"].GetString(), d["ownerId"].GetString());
-            char *JSON = DataBag_Sd_Mail_Server_Core(EC->emailTitle, EC->emailContent, EC->emailType, EC->targetUsername, EC->emailTime); //这个databag需要重新改一下 debug
-            cout << "ED JSON:" << JSON << endl;
+
+            char *JSON = SQL->Get_Email_Detail_JSON(d["emailId"].GetString());
             this->Send_Data(JSON);
             delete[] JSON;
-            delete EC;
             return 0;
         }
         else
@@ -157,10 +164,8 @@ namespace SERVER
         int size = 0; //debug size需要可变
         if (d.HasMember("userId") && d.HasMember("emailType"))
         {
-            EI = SQL.get_email_info(d["userId"].GetString(), d["emailType"].GetString(), &size);
-            char *JSON = DataBag_Sd_Mail_List(size, EI);
+            char *JSON = SQL->Get_Email_List_JSON(d["userId"].GetString(), d["emailType"].GetString());
             this->Send_Data(JSON);
-            delete[] EI;
             delete[] JSON;
             return 0;
         }
@@ -176,13 +181,8 @@ namespace SERVER
     {
         if (d.HasMember("userId"))
         {
-            // SQL.
-            int size = 0; //debug size需要可变
-            CI = SQL.get_contact_info(d["userId"].GetString(), &size);
-            char *JSON = DataBag_Sd_Contact_List(size, CI);
-            cout << "JSON:" << JSON << endl;
+            char *JSON = SQL->Get_Contact_List_JSON(d["userId"].GetString());
             this->Send_Data(JSON);
-            delete[] CI;
             delete[] JSON;
             return 0;
         }

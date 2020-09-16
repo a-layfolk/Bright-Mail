@@ -168,14 +168,14 @@ namespace DataBag
         return JSON;
     }
 
-    char *DataBag_Sd_Mail(const char *ownerId, const char *targetId, const char *emailType, const char *emailTitle, const char *emailContent)
+    char *DataBag_Sd_Mail(const char *ownerId, const char *targetTelephone, const char *emailType, const char *emailTitle, const char *emailContent)
     {
         string *str = new string;
         str->push_back('{');
 
         *str += Creat_Key(Key_Type::request_type, Rq_Type::sd_mail, true);
         *str += Creat_Key("ownerId", ownerId, true);
-        *str += Creat_Key("targetId", targetId, true);
+        *str += Creat_Key("targetTelephone", targetTelephone, true);
         *str += Creat_Key("emailType", emailType, true);
         *str += Creat_Key("emailTitle", emailTitle, true);
         *str += Creat_Key("emailContent", emailContent, false);
@@ -187,7 +187,7 @@ namespace DataBag
         delete str;
         return JSON;
     }
-    char *DataBag_Sd_Mail_Server_Core(const char *emailTitle, const char *emailContent, const char *emailType, const char *targetUsername, const char *emailTime)
+    char *DataBag_Sd_Mail_Detail(const char *emailTitle, const char *emailContent, const char *emailType, const char *targetUsername, const char *emailTime)
     {
         string *str = new string;
         str->push_back('{');
@@ -241,33 +241,7 @@ namespace DataBag
         delete str;
         return JSON;
     }
-    char *DataBag_Sd_Mail_List(int size, DataBag::EMAIL_INFO *E_info)
-    {
-        string *str = new string;
-        str->push_back('{');
-        *str += Creat_Key(Key_Type::request_type, Rq_Type::sd_list, true);
-        char *size_tag = new char[20];
-        sprintf(size_tag, "\"size\":%d,\"info\":[", size);
-        *str += size_tag;
-        delete size_tag;
-        for (int i = 0; i < size; i++)
-        {
-            char *tag = Mail_List_Tag(((EMAIL_INFO *)E_info + i)->targetUsername, ((EMAIL_INFO *)E_info + i)->targetUsername, ((EMAIL_INFO *)E_info + i)->emailTime, ((EMAIL_INFO *)E_info + i)->emailId);
-            De_EMAIL_INFO(E_info + i);
-            *str += tag;
-            delete[] tag;
-            if (i != size - 1)
-            {
-                str->push_back(',');
-            }
-        }
-        str->push_back(']');
-        str->push_back('}');
-        char *JSON = new char[(*str).size()];
-        strcpy(JSON, (*str).c_str());
-        delete str;
-        return JSON;
-    }
+
     char *Contact_List_Tag(const char *userId, const char *userName, const char *telephone)
     {
         string *str = new string;
@@ -284,6 +258,7 @@ namespace DataBag
         delete str;
         return JSON;
     }
+
     char *DataBag_Sd_Contact_List(int size, DataBag::CONTATCT_INFO *C_info)
     {
         string *str = new string;
@@ -310,14 +285,14 @@ namespace DataBag
         delete str;
         return JSON;
     }
-    char *DataBag_Sd_Contact(const char *userId, const char *contactname, const char *phonenum)
+    char *DataBag_Sd_Contact(const char *userId, const char *targetTelephone, const char *phonenum)
     {
         string *str = new string;
         str->push_back('{');
 
         *str += Creat_Key(Key_Type::request_type, Rq_Type::sd_contact, true);
         *str += Creat_Key("userId", userId, true);
-        *str += Creat_Key("contactname", contactname, true);
+        *str += Creat_Key("targetTelephone", targetTelephone, true);
         *str += Creat_Key("phonenum", phonenum, false);
 
         str->push_back('}');

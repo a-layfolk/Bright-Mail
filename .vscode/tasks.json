@@ -39,9 +39,11 @@
                 "args": [
                     "-g",
                     "${file}",
+                    "/home/xiabee/Desktop/Bright-Mail/WZC/Dependencies/My_Json.cpp",
                     "-o",
                     "${fileDirname}/${fileBasenameNoExtension}.out",
-                    "-pthread"
+                    "-pthread",
+                    "-lmysqlclient"
                 ]
             },
             "problemMatcher": [
@@ -62,9 +64,11 @@
             "linux": {
                 "args": [
                     "${file}",
+                    "/home/xiabee/Desktop/Bright-Mail/WZC/Dependencies/My_Json.cpp",
                     "-o",
                     "${fileDirname}/${fileBasenameNoExtension}.out",
-                    "-pthread"
+                    "-pthread",
+                    "-lmysqlclient"
                 ]
             },
             "problemMatcher": [

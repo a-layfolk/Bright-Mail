@@ -15,7 +15,7 @@
 #include "../Dependencies/rapidjson/writer.h"
 #include "../Dependencies/rapidjson/stringbuffer.h"
 #include "../Dependencies/Communi_Core.h"
-#include "../Dependencies/SqlCon.h"
+#include "../Dependencies/Sql_Core.h"
 
 namespace SERVER
 {
@@ -30,7 +30,7 @@ namespace SERVER
         const char sql_ip[] = "0.0.0.0";
         const char sql_user[] = "root";
         const char sql_password[] = "1233";
-        const char sql_db[] = "Email_schema";
+        const char sql_db[] = "Bright_Mail";
         const int sql_port = 3306;
     } // namespace CONFIG
 
@@ -59,7 +59,7 @@ namespace SERVER
 
         int Request_Analysis();
         char *user_ip;
-        mysql SQL;
+        Sql_Core *SQL;
 
     public:
         Server_Core(int client_socket);

@@ -232,9 +232,9 @@ EMAIL_CONTENT *mysql::get_one_email(const char *emailId, const char *ownerId)
 			emailContent->emailContent = row[1];
 			emailContent->emailType = row[2];
 			emailContent->targetUsername = row[3];
-			emailContent->emailTime = row[4];
+			emailContent->emailTime = row[4];//时间是自动得到的
 		}
-	}
+	}//直接这里转Json
 	delete query;
 	return emailContent;
 }

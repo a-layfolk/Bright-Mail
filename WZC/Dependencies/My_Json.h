@@ -87,11 +87,11 @@ namespace DataBag
 
     char *DataBag_Exit();
     char *DataBag_Success();
-    char *DataBag_Success_sign(const char*id);
+    char *DataBag_Success_sign(const char *id);
     char *DataBag_Error(const char *error_info);
 
-    char *DataBag_Sd_Mail(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content);
-    char *DataBag_Sd_Mail_with_file(const char *ownerId, const char *targetId, const char *email_type, const char *email_title, const char *email_content,const char*file_name);
+    char *DataBag_Sd_Mail_with_file(const char *ownerId, const char *targetTelephone, const char *email_type, const char *email_title, const char *email_content, const char *file_name);
+    char *DataBag_Sd_Mail(const char *ownerId, const char *targetTelephone, const char *email_type, const char *email_title, const char *email_content);
     char *DataBa_Sd_File(const char *ownerId, const char *emailId, const char *fileName);
 
     //需要做一个可以制造JSON列表的函数
@@ -99,11 +99,10 @@ namespace DataBag
 
     //需要做一个可以制造JSON列表的函数
     char *Mail_List_Tag(const char *emailTitle, const char *targetUsername, const char *emailTime, const char *emailId);
-    char *DataBag_Sd_Mail_List(int size, DataBag::EMAIL_INFO *E_info);
     char *DataBag_Sd_Contact_List(int size, DataBag::CONTATCT_INFO *C_info);
     char *DataBag_Rq_Mail(const char *emailId, const char *ownerId);
-    char *DataBag_Sd_Mail_Server_Core(const char *emailTitle, const char *emailContent, const char *email_type, const char *targetUsername, const char *emailTime);
-
+    char *DataBag_Sd_Mail_Detail(const char *emailTitle, const char *emailContent, const char *email_type, const char *targetUsername, const char *emailTime);
+    char *Contact_List_Tag(const char *userId, const char *userName, const char *telephone);
     //先查mailId对应的文件数和文件名，再通过文件名来接收文件
     char *DataBag_Rq_File(const char *ownerId, const char *emailId, const char *fileName);
     char *DataBag_Rq_Contact(const char *userId);
