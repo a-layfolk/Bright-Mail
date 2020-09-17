@@ -362,19 +362,19 @@ namespace CLIENT
             {
                 EC = new EMAIL_CONTENT;
                 EC->emailContent = new char[d["emailContent"].GetStringLength()];
-                strcpy(EC->emailContent, d["emailContent"].GetString());
+                strncpy(EC->emailContent, d["emailContent"].GetString(),d["emailType"].GetStringLength());
 
                 EC->emailTime = new char[d["emailTime"].GetStringLength()];
-                strcpy(EC->emailTime, d["emailTime"].GetString());
+                strncpy(EC->emailTime, d["emailTime"].GetString(),d["emailType"].GetStringLength());
 
                 EC->emailTitle = new char[d["emailTitle"].GetStringLength()];
-                strcpy(EC->emailTitle, d["emailTitle"].GetString());
+                strncpy(EC->emailTitle, d["emailTitle"].GetString(),d["emailType"].GetStringLength());
 
                 EC->emailType = new char[d["emailType"].GetStringLength()];
-                strcpy(EC->emailType, d["emailType"].GetString());
+                strncpy(EC->emailType, d["emailType"].GetString(),d["emailType"].GetStringLength());
 
                 EC->targetUsername = new char[d["targetUsername"].GetStringLength()];
-                strcpy(EC->targetUsername, d["targetUsername"].GetString());
+                strncpy(EC->targetUsername, d["targetUsername"].GetString(),d["emailType"].GetStringLength());
             }
         }
         delete[] JSON;

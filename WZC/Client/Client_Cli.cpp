@@ -137,7 +137,8 @@ int main(int argc, char const *argv[])
                 if (strcmp(command_one, "id") == 0)
                 {
                     cin >> command_two;
-                    DataBag::EMAIL_CONTENT *EC = CC.Get_Mail_Detail(command_two, id);
+                    DataBag::EMAIL_CONTENT *EC = NULL;
+                    EC = CC.Get_Mail_Detail(command_two, id);
                     if (EC != NULL)
                     {
                         cout << "-------------------------------------------------------------" << endl;
