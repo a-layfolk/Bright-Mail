@@ -90,7 +90,7 @@ namespace DataBag
     char *DataBag_Success_sign(const char *id);
     char *DataBag_Error(const char *error_info);
 
-    char *DataBag_Sd_Mail_with_file(const char *ownerId, const char *targetTelephone, const char *email_type, const char *email_title, const char *email_content, const char *file_name);
+    char *DataBag_Sd_Mail_with_file(const char *ownerId, const char *targetTelephone, const char *email_type, const char *email_title, const char *email_content, const char *attachedFile);
     char *DataBag_Sd_Mail(const char *ownerId, const char *targetTelephone, const char *email_type, const char *email_title, const char *email_content);
     char *DataBa_Sd_File(const char *ownerId, const char *emailId, const char *fileName);
 
@@ -108,7 +108,7 @@ namespace DataBag
     char *DataBag_Rq_Contact(const char *userId);
     char *DataBag_Rq_List(const char *userId, const char *emailType);
     char *DataBa_Sd_File_Simple(const char *fileName);
-    char *DataBag_Rq_File_Simple();
+    char *DataBag_Rq_File_Simple(const char *emaiId);
     //写制作数组的
 } // namespace DataBag
 #endif

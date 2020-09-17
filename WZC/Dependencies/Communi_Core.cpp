@@ -168,7 +168,7 @@ namespace COMMUNI
     //给服务器发送文件
     int Communi_Core::Sd_File(const char *file_path)
     {
-        write(this->clnt_socket, "MY_FILE", CONFIG::buffer_size);
+        write(this->clnt_socket, file_path, CONFIG::buffer_size);
         //写一个发送文件名的？
         FILE *fp;
         fp = fopen((char *)file_path, "rb");

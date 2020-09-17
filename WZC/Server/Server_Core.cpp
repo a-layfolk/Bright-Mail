@@ -153,7 +153,6 @@ namespace SERVER
                 this->Send_Error("Get data SQL Wrong");
                 return -1;
             }
-
             this->Send_Data(JSON);
 
             delete[] JSON;
@@ -218,13 +217,40 @@ namespace SERVER
     int Server_Core::Add_File(rapidjson::Document &d)
     {
         this->Send_Success();
-        this->Recive_File("MY_FILE");
-        this->Send_Success();
+        if (d.HasMember("fileName"))
+        {
+            this->Recive_File(d["fileName"].GetString());
+
+            this->Send_Success();
+        }
+        else
+        {
+            this->Recive_File(d["MY_FILE"].GetString());
+            this->Send_Error("File Fail");
+        }
     }
     int Server_Core::Return_File(rapidjson::Document &d)
     {
-        this->Sd_File("./MY_FILE");
-        this->Recive_Data();
+        if (d.HasMember("emaiId"))
+        {
+            char *fileName = SQL->Get_Attached_File(d["emaiId"].GetString());
+            if (fileName != NULL)
+            {
+                this->Sd_File(fileName);
+                // this->Send_Success();
+            }
+            else
+            {
+                this->Sd_File("./MY_FILE");
+                // this->Send_Error("File Fail");
+            }
+        }
+        else
+        {
+            this->Sd_File("./MY_FILE");
+            // this->Send_Error("File Fail");
+        }
+
     }
     int Server_Core::Request_Analysis()
     {

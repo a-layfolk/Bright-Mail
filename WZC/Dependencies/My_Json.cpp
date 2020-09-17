@@ -205,6 +205,25 @@ namespace DataBag
         delete str;
         return JSON;
     }
+    char *DataBag_Sd_Mail_with_file(const char *emailTitle, const char *emailContent, const char *emailType, const char *targetUsername, const char *emailTime, const char *attachedFile)
+    {
+        string *str = new string;
+        str->push_back('{');
+
+        *str += Creat_Key(Key_Type::request_type, Rq_Type::sd_mail, true);
+        *str += Creat_Key("emailTitle", emailTitle, true);
+        *str += Creat_Key("emailContent", emailContent, true);
+        *str += Creat_Key("emailType", emailType, true);
+        *str += Creat_Key("targetUsername", targetUsername, true);
+        *str += Creat_Key("emailTime", emailTime, true);
+        *str += Creat_Key("attachedFile", attachedFile, false);
+
+        str->push_back('}');
+        char *JSON = new char[(*str).size()];
+        strcpy(JSON, (*str).c_str());
+        delete str;
+        return JSON;
+    }
     char *DataBa_Sd_File(const char *ownerId, const char *emailId, const char *fileName)
     {
         string *str = new string;
@@ -239,7 +258,7 @@ namespace DataBag
         char *JSON = new char[(*str).size()];
         strcpy(JSON, (*str).c_str());
         delete str;
-        cout<<"MLT:"<<JSON<<endl;//debug
+        cout << "MLT:" << JSON << endl; //debug
         return JSON;
     }
 
@@ -268,7 +287,7 @@ namespace DataBag
         char *size_tag = new char[20];
         sprintf(size_tag, "\"size\":%d,\"info\":[", size);
         *str += size_tag;
-        delete size_tag;
+        delete[] size_tag;
         for (int i = 0; i < size; i++)
         {
             char *tag = Contact_List_Tag(((CONTATCT_INFO *)C_info + i)->userId, ((CONTATCT_INFO *)C_info + i)->userName, ((CONTATCT_INFO *)C_info + i)->telephone);
@@ -372,11 +391,12 @@ namespace DataBag
         delete str;
         return JSON;
     }
-    char *DataBag_Rq_File_Simple()
+    char *DataBag_Rq_File_Simple(const char *emaiId)
     {
         string *str = new string;
         str->push_back('{');
-        *str += Creat_Key(Key_Type::request_type, Rq_Type::rq_file, false);
+        *str += Creat_Key(Key_Type::request_type, Rq_Type::rq_file, true);
+        *str += Creat_Key("emaiId", emaiId, false);
         str->push_back('}');
 
         char *JSON = new char[(*str).size()];

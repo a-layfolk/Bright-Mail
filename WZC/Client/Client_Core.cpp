@@ -304,7 +304,33 @@ namespace CLIENT
             return -1;
         }
     }
+    int Client_Core::Send_Mail_With_File(const char *ownerId, const char *targetTelephone, const char *email_type, const char *email_title, const char *email_content, const char *file_name)
+    {
+        // this->Send_Mail(ownerId, targetTelephone, email_type, email_title, email_content);
+        // char *JSON = DataBag_Sd_Mail_with_file(ownerId, targetTelephone, email_type, email_title, email_content, file_name);
+        char*JSON=DataBag::DataBag_Sd_Mail_with_file(ownerId,targetTelephone,email_type,email_title,email_content,file_name);
+            //   DataBag_Sd_Mail_with_file(const char *ownerId, const char *targetTelephone, const char *email_type, const char *email_title, const char *email_content, const char *attachedFile)
+        this->Send_Data(JSON);
+        delete[] JSON;
 
+        char *error_info = new char[100];
+        if (this->Recive_Success(error_info))
+        {
+            return 0;
+        }
+        else
+        {
+            cout << "Error:";
+            if (error_info != NULL)
+            {
+                cout << error_info << endl;
+                delete[] error_info;
+            }
+
+            return -1;
+        }
+        this->Send_File(file_name);
+    }
     //新建联系人，返回值为-1时表示注册不成功，返回0为成功
     int Client_Core::Send_Contact(const char *myId, const char *targetName, const char *targetTelephone)
     {
@@ -362,19 +388,19 @@ namespace CLIENT
             {
                 EC = new EMAIL_CONTENT;
                 EC->emailContent = new char[d["emailContent"].GetStringLength()];
-                strncpy(EC->emailContent, d["emailContent"].GetString(),d["emailType"].GetStringLength());
+                strncpy(EC->emailContent, d["emailContent"].GetString(), d["emailType"].GetStringLength());
 
                 EC->emailTime = new char[d["emailTime"].GetStringLength()];
-                strncpy(EC->emailTime, d["emailTime"].GetString(),d["emailType"].GetStringLength());
+                strncpy(EC->emailTime, d["emailTime"].GetString(), d["emailType"].GetStringLength());
 
                 EC->emailTitle = new char[d["emailTitle"].GetStringLength()];
-                strncpy(EC->emailTitle, d["emailTitle"].GetString(),d["emailType"].GetStringLength());
+                strncpy(EC->emailTitle, d["emailTitle"].GetString(), d["emailType"].GetStringLength());
 
                 EC->emailType = new char[d["emailType"].GetStringLength()];
-                strncpy(EC->emailType, d["emailType"].GetString(),d["emailType"].GetStringLength());
+                strncpy(EC->emailType, d["emailType"].GetString(), d["emailType"].GetStringLength());
 
                 EC->targetUsername = new char[d["targetUsername"].GetStringLength()];
-                strncpy(EC->targetUsername, d["targetUsername"].GetString(),d["emailType"].GetStringLength());
+                strncpy(EC->targetUsername, d["targetUsername"].GetString(), d["emailType"].GetStringLength());
             }
         }
         delete[] JSON;
@@ -395,7 +421,6 @@ namespace CLIENT
         return EI;
     }
 
-    //接收文件如何处理待商榷，先做不带附件的吧
     int Client_Core::Send_File(const char *file_path)
     {
         char *file_name = this->Get_File_Name(file_path);
@@ -411,11 +436,15 @@ namespace CLIENT
     }
 
     //最好添加个文件名
-    int Client_Core::Get_File()
+    int Client_Core::Get_File(const char *emaiId)
     {
-        char *Request = DataBag_Rq_File_Simple();
+        char *Request = DataBag_Rq_File_Simple(emaiId);
         this->Send_Data(Request);
+
+        // this->Recive_File("MY_FILE_CLIENT");
         this->Recive_File("MY_FILE_CLIENT");
+        char *error = new char[20];
+        delete[] error;
         delete[] Request;
         return 0;
     }

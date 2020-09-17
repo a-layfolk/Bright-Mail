@@ -46,7 +46,7 @@ int main(int argc, char const *argv[])
         {
 
             std::cout << "输入对应指令完成操作" << endl;
-            cout << "写邮件:w_email   "
+            cout << "写邮件:w_mail   "
                  << "收件箱:rc_mail  "
                  << "已发送:sd_mail  "
                  << "联系人:contact  "
@@ -55,7 +55,7 @@ int main(int argc, char const *argv[])
                  << endl;
             cin >> command_one;
             int size = 0;
-            if (strcmp(command_one, "w_email") == 0)
+            if (strcmp(command_one, "w_mail") == 0)
             {
                 cout << "输入联系人电话号码:" << endl;
                 cin >> command_two;
@@ -64,7 +64,17 @@ int main(int argc, char const *argv[])
                 cout << "输入邮件内容:" << endl;
                 cin >> command_long;
                 cout << "是否要发附件？ yes/no" << endl;
-                CC.Send_Mail(id, command_two, "sended", command_three, command_long);
+                cin >> command_four;
+                if (strcmp(command_four, "yes") == 0)
+                {
+                    cout << "请输入文件路径:" << endl;
+                    cin >> command_four;
+                    CC.Send_Mail_With_File(id, command_two, "sended", command_three, command_long, command_four);
+                }
+                else
+                {
+                    CC.Send_Mail(id, command_two, "sended", command_three, command_long);
+                }
             }
             else if (strcmp(command_one, "rc_mail") == 0)
             {
@@ -86,7 +96,7 @@ int main(int argc, char const *argv[])
                 }
 
                 std::cout << "输入对应指令完成操作" << endl;
-                cout << "输入邮件ID查看信件:id <id的值> 返回上一页:return" << endl;
+                cout << "输入邮件ID查看信件:id <id的值>     返回上一页:return   刷新:refresh" << endl;
                 cin >> command_one;
                 if (strcmp(command_one, "id") == 0)
                 {
@@ -107,6 +117,10 @@ int main(int argc, char const *argv[])
                     std::cout << "输入对应指令完成操作" << endl;
                     cout << "返回上一页:return" << endl;
                     cin >> command_one;
+                    goto Email_List;
+                }
+                else if (strcmp(command_one, "refresh") == 0)
+                {
                     goto Email_List;
                 }
                 else
@@ -155,6 +169,10 @@ int main(int argc, char const *argv[])
                     cout << "返回上一页:return" << endl;
                     cin >> command_one;
                     goto Email_List2;
+                }
+                else if (strcmp(command_one, "refresh") == 0)
+                {
+                    goto Email_List;
                 }
                 else
                 {

@@ -1,19 +1,34 @@
-default:
-	g++ WZC/Dependencies/SqlCon.cpp WZC/Dependencies/My_Json.cpp WZC/Dependencies/Communi_Core.cpp WZC/Server/Server_Core.cpp WZC/Server/Server_Main.cpp -o Server_Main.out -pthread -lmysqlclient;
-	g++ WZC/Dependencies/My_Json.cpp WZC/Dependencies/Communi_Core.cpp WZC/Client/Client_Core.cpp WZC/Client/Client_demo.cpp -o Client_demo.out;
+# 学习日志
 
-client:
-	g++ WZC/Dependencies/My_Json.cpp WZC/Dependencies/Communi_Core.cpp WZC/Client/Client_Core.cpp WZC/Client/Client_demo.cpp -o Client_demo.out;
+## 9.8
++ 成功实现socket多线程、多用户链接
 
-server:
-	g++ WZC/Dependencies/SqlCon.cpp WZC/Dependencies/My_Json.cpp WZC/Dependencies/Communi_Core.cpp WZC/Server/Server_Core.cpp WZC/Server/Server_Main.cpp -o Server_Main.out -pthread -lmysqlclient;
+## 9.9
++ QT入门
++ 多用户连接完善
 
-server_debug:
-	g++ -g WZC/Dependencies/SqlCon.cpp WZC/Dependencies/My_Json.cpp WZC/Dependencies/Communi_Core.cpp WZC/Server/Server_Core.cpp WZC/Server/Server_Main.cpp -o Server_Main.out -pthread -lmysqlclient;
+## 9.10
++ 信号处理解决完毕
++ socket深入学习
 
-client_debug:
-	g++ -g WZC/Dependencies/My_Json.cpp WZC/Dependencies/Communi_Core.cpp WZC/Client/Client_Core.cpp WZC/Client/Client_demo.cpp -o Client_demo.out;
+# 9.11
++ 客户端服务器收发信息基本可用
++ 定制数据包格式
 
-fake:
-	g++ WZC/Dependencies/SqlCon_fake.cpp WZC/Dependencies/My_Json.cpp WZC/Dependencies/Communi_Core.cpp WZC/Server/Server_Core.cpp WZC/Server/Server_Main.cpp -o Server_Main.out -pthread -lmysqlclient;
-	g++ WZC/Dependencies/My_Json.cpp WZC/Dependencies/Communi_Core.cpp WZC/Client/Client_Core.cpp WZC/Client/Client_demo.cpp -o Client_demo.out;
+# 9.12
++ 代码重构设计
+
+# 9.13
++ 代码重构后可成功运行
++ 通信可正常进行
+
+# 9.14
++ 解决代码重构后的BUG
++ 数据库端BUG勘察
++ 客户端、数据库端数据包、接口完成
+
+# 9.15
++ 提升服务器通信稳定性
+
+# 9.16
++ 重构数据库

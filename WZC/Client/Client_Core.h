@@ -78,10 +78,10 @@ namespace CLIENT
         //接收文件如何处理待商榷，先做不带附件的吧
 
         //输入相对地址或者绝对地址//email id我自己查，SQL add todb时会返回
-        int Send_File(const char *file_path); //我需要
+        int Send_File(const char *file_path); //我需要路径
 
         //在执行文件当前目录放文件
-        int Get_File();
+        int Get_File(const char *mail_id);
 
     }; // namespace CLIENT
 } // namespace CLIENT

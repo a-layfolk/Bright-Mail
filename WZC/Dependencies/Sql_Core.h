@@ -35,7 +35,7 @@ private:
             userId = new char[100];
             if (row != NULL)
             {
-                strcpy(userId, row[0]);
+                strncpy(userId, row[0], 100);
             }
             else
             {
@@ -321,7 +321,7 @@ public:
 
         writer.EndObject();
 
-        int J_size = strlen(s.GetString())+1;
+        int J_size = strlen(s.GetString()) + 1;
 
         char *JSON = new char[J_size];
         strncpy(JSON, s.GetString(), J_size);
@@ -381,7 +381,36 @@ public:
         }
         return NULL;
     }
-
+    char *Get_Attached_File(const char *emailId)
+    {
+        char *query = new char[100];
+        char *fileName = NULL;
+        MYSQL_RES *res = NULL;
+        MYSQL_ROW row = NULL;
+        sprintf(query, "select * from User where emailId='%s';", emailId);
+        if (!mysql_query(con, query))
+        {
+            delete[] query;
+            res = mysql_store_result(con);
+            row = mysql_fetch_row(res);
+            fileName = new char[100];
+            if (row != NULL)
+            {
+                strncpy(fileName, row[0], 100);
+            }
+            else
+            {
+                cout << "User not pass" << endl;
+            }
+            return fileName;
+        }
+        else
+        {
+            printf("MySQL query error : %s\n", mysql_error(con));
+            delete[] query;
+            return NULL;
+        }
+    }
     char *Get_Contact_List_JSON(const char *userId)
     {
         string *str = new string;
