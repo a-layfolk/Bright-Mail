@@ -145,10 +145,10 @@ namespace COMMUNI
     //取得服务器数据，数据格式为JSON的字符串
     char *Communi_Core::Recive_Data()
     {
-        int read_len;
+        int read_len = 0;
         char buffer[CONFIG::buffer_size];
-        char *s = new char[2 * CONFIG::buffer_size]; //动态内存分配的算法可以秀一下
-        memset(s, 0, 2 * CONFIG::buffer_size);
+        char *s = new char[3 * CONFIG::buffer_size]; //动态内存分配的算法可以秀一下
+        memset(s, 0, 3 * CONFIG::buffer_size);
         char *cursor = s;
         memset(buffer, 0, CONFIG::buffer_size);
         while ((read_len = read(this->clnt_socket, buffer, CONFIG::buffer_size)) > 0)

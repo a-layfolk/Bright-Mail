@@ -246,7 +246,7 @@ public:
         targetId = this->Get_User_Id(targetTelephone);
         if (targetId != NULL)
         {
-            char *query = new char[100];
+            char *query = new char[1000];
             sprintf(query, "select * from Contact where userId='%s' and targetId='%s';", userId, targetId);
 
             if (!mysql_query(con, query))
@@ -285,7 +285,7 @@ public:
         writer.String(Rq_Type::sd_list);
         writer.Key("info");
         writer.StartArray();
-        char *query = new char[200];
+        char *query = new char[1000];
         sprintf(query, "select emailTitle,targetTelephone,emailTime,emailId from Email where myId=%s and emailType='%s';", userId, emailType);
         MYSQL_RES *res;
         MYSQL_ROW row;
@@ -320,11 +320,15 @@ public:
         // writer.Int(2);
 
         writer.EndObject();
+        int J_size = strlen(s.GetString() + 1);
 
-        char *JSON = new char[s.GetSize()];
-        strcpy(JSON, s.GetString());
-        std::cout << JSON;
+        char *JSON = new char[J_size];
+        strncpy(JSON, s.GetString(), J_size - 1);
         return JSON;
+        // char *JSON = new char[s.GetSize()];
+        // strcpy(JSON, s.GetString());
+        // std::cout << JSON;
+        // return JSON;
     }
 
     char *Get_Email_Detail_JSON(const char *emailId)
@@ -333,9 +337,9 @@ public:
         // str->push_back('{');
 
         // *str += Creat_Key(Key_Type::request_type, Rq_Type::sd_mail, true);
-        char *query = new char[300];
+        char *query = new char[1000];
         MYSQL_ROW row;
-        cout << "1" << endl;
+        // cout << "1" << endl;
         StringBuffer s;
         rapidjson::Writer<rapidjson::StringBuffer> writer(s);
         writer.StartObject();
@@ -343,9 +347,10 @@ public:
         writer.String(Rq_Type::rq_mail);
 
         cout << "1" << endl;
-        sprintf(query, "select  Email.emailTitle, Email.emailContent, Bright_Mail.User.userName,Email.emailType,Email.emailTime,Email.attachedFile from Email,User where emailId=%s AND Email.targetTelephone= Bright_Mail.User.telephone;", emailId);
+        snprintf(query, 1000, "select  Email.emailTitle, Email.emailContent, Bright_Mail.User.userName,Email.emailType,Email.emailTime,Email.attachedFile from Email,User where emailId=%s AND Email.targetTelephone= Bright_Mail.User.telephone;", emailId);
         mysql_query(con, query);
         cout << query << endl;
+        delete[] query;
         cout << "1" << endl;
         if (row != NULL)
         {
@@ -366,26 +371,13 @@ public:
             writer.String(row[3]);
 
             writer.Key("emailTime");
+
             writer.String(row[4]);
-
-            // *str += Creat_Key("emailTitle", row[0], true);
-            // *str += Creat_Key("emailContent", row[1], true);
-            // *str += Creat_Key("targetUsername", row[2], true);
-            // *str += Creat_Key("emailType", row[3], true);
-            // *str += Creat_Key("emailTime", row[4], true);
-            // *str += Creat_Key("attachedFile", row[5], false);
-
-            // delete[] query;
-            // str->push_back('}');
-            // char *JSON = new char[(*str).size()];
-            // strcpy(JSON, (*str).c_str());
-            // delete str;
-            // return JSON;
             writer.EndObject();
+            int J_size = strlen(s.GetString() + 1);
 
-            char *JSON = new char[s.GetSize()];
-            strcpy(JSON, s.GetString());
-            std::cout << JSON;
+            char *JSON = new char[J_size];
+            strncpy(JSON, s.GetString(), J_size - 1);
             return JSON;
         }
         return NULL;
@@ -398,7 +390,7 @@ public:
         *str += Creat_Key(Key_Type::request_type, Rq_Type::sd_list, true);
         *str += "\"info\":[";
 
-        char *query = new char[500];
+        char *query = new char[1000];
         sprintf(query, "select targetId from Contact where userId= %s ;", userId);
         MYSQL_RES *res;
         MYSQL_ROW row;

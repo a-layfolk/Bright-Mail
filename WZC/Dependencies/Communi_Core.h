@@ -13,7 +13,7 @@
 #include <signal.h>
 
 #define APP_PORT 8888
-#define BUFFER_SIZE 1000
+#define BUFFER_SIZE 4000
 
 //通信核心
 namespace COMMUNI

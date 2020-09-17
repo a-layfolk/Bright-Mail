@@ -17,7 +17,7 @@
 
 #include "SQL/SqlCon.h"
 #define APP_PORT 8888
-#define BUFFER_SIZE 1000
+#define BUFFER_SIZE 4000
 //客户端配置
 namespace CLIENT
 {

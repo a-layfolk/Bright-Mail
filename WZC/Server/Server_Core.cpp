@@ -150,10 +150,12 @@ namespace SERVER
             char *JSON = SQL->Get_Email_Detail_JSON(d["emailId"].GetString());
             if (JSON == NULL)
             {
+                this->Send_Error("Get data SQL Wrong");
                 return -1;
             }
 
             this->Send_Data(JSON);
+
             delete[] JSON;
             return 0;
         }
@@ -170,7 +172,14 @@ namespace SERVER
         if (d.HasMember("userId") && d.HasMember("emailType"))
         {
             char *JSON = SQL->Get_Email_List_JSON(d["userId"].GetString(), d["emailType"].GetString());
+            if (JSON == NULL)
+            {
+                this->Send_Error("Get data SQL Wrong");
+                return -1;
+            }
+
             this->Send_Data(JSON);
+
             delete[] JSON;
             return 0;
         }
@@ -187,7 +196,14 @@ namespace SERVER
         if (d.HasMember("userId"))
         {
             char *JSON = SQL->Get_Contact_List_JSON(d["userId"].GetString());
+            if (JSON == NULL)
+            {
+                this->Send_Error("Get data SQL Wrong");
+                return -1;
+            }
+
             this->Send_Data(JSON);
+
             delete[] JSON;
             return 0;
         }
@@ -228,9 +244,9 @@ namespace SERVER
                 {
                     delete[] databag;
                 }
-
                 cout << "This is not a Json-data bag!" << endl;
                 break;
+                return -1;
             }
             else
             {
