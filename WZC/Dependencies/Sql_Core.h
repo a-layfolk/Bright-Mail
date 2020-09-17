@@ -320,10 +320,12 @@ public:
         // writer.Int(2);
 
         writer.EndObject();
-        int J_size = strlen(s.GetString() + 1);
+
+        int J_size = strlen(s.GetString())+1;
 
         char *JSON = new char[J_size];
-        strncpy(JSON, s.GetString(), J_size - 1);
+        strncpy(JSON, s.GetString(), J_size);
+        cout << JSON << endl;
         return JSON;
         // char *JSON = new char[s.GetSize()];
         // strcpy(JSON, s.GetString());
@@ -333,13 +335,8 @@ public:
 
     char *Get_Email_Detail_JSON(const char *emailId)
     {
-        // string *str = new string;
-        // str->push_back('{');
-
-        // *str += Creat_Key(Key_Type::request_type, Rq_Type::sd_mail, true);
         char *query = new char[1000];
         MYSQL_ROW row;
-        // cout << "1" << endl;
         StringBuffer s;
         rapidjson::Writer<rapidjson::StringBuffer> writer(s);
         writer.StartObject();
@@ -374,10 +371,12 @@ public:
 
             writer.String(row[4]);
             writer.EndObject();
-            int J_size = strlen(s.GetString() + 1);
+
+            int J_size = strlen(s.GetString()) + 1;
 
             char *JSON = new char[J_size];
-            strncpy(JSON, s.GetString(), J_size - 1);
+            strncpy(JSON, s.GetString(), J_size);
+            cout << JSON << endl;
             return JSON;
         }
         return NULL;
